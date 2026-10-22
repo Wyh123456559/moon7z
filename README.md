@@ -140,6 +140,14 @@ input, decoder buffers, folder output and returned member copies can coexist.
 LZMA2 chunk sizes are checked before codec allocation. This is a bounded,
 in-memory implementation, not a streaming reader or an exact backup restorer.
 
+Whole-archive `verify()` decodes and checks one folder at a time. It does not
+build the complete extracted tree or copy each member's contents; member CRCs
+are checked directly on folder views. This is useful for ingestion gates that
+need a report without retaining all files. A solid folder still decodes in full,
+and input, packed data and codec buffers can coexist; no peak-RSS bound or
+performance improvement is claimed. `extract_all()` keeps its owned-content
+contract. The existing `test` and `test --json` CLI commands use this verifier.
+
 Delta-filtered WAV/numeric data and BCJ-filtered x86 program archives use the same
 verification, selective read and export APIs. Filters run over the entire solid folder before splitting
 members, so history is retained across file boundaries. Coder bindings are

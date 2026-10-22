@@ -166,15 +166,29 @@ fn decode_streams(
 ) -> Array[Bytes] raise ArchiveError {
   let output : Array[Bytes] = []
   let mut offset = 32 + streams.pack_offset
-  for i, block in streams.blocks {
+  for i in 0..<streams.blocks.length() {
     let length = streams.pack_sizes[i]
-    guard offset <= input.length() && length <= input.length() - offset else {
-      raise Invalid(offset~, reason="packed stream outside archive")
-    }
-    let packed = input[offset:offset + length].to_owned()
-    check_crc(packed, streams.pack_crcs[i], "packed stream \{i}")
-    output.push(decode(block, packed, limits))
+    output.push(decode_packed_stream(input, streams, i, offset, limits))
     offset += length
   }
   output
+}
+
+///|
+fn decode_packed_stream(
+  input : Bytes,
+  streams : Streams,
+  id : Int32,
+  start : Int32,
+  limits : Limits,
+) -> Bytes raise ArchiveError {
+  let length = streams.pack_sizes[id]
+  guard start >= 0 &&
+    start <= input.length() &&
+    length <= input.length() - start else {
+    raise Invalid(offset=start, reason="packed stream outside archive")
+  }
+  let packed = input[start:start + length].to_owned()
+  check_crc(packed, streams.pack_crcs[id], "packed stream \{id}")
+  decode(streams.blocks[id], packed, limits)
 }

@@ -138,6 +138,8 @@ fn validate_pack_ranges(
 /// Requiring member CRCs refuses the first file without one before decoding;
 /// this includes empty files, excludes directories and does not accept only a
 /// shared folder/pack CRC as a substitute. The default behavior is unchanged.
+/// Folders are decoded and checked one at a time; member contents are checked
+/// through views rather than accumulated into owned Member byte copies.
 pub fn Archive::verify(
   self : Archive,
   require_member_crcs~ : Bool = false,
@@ -149,18 +151,29 @@ pub fn Archive::verify(
       }
     }
   }
-  let members = self.extract_all()
   let mut files = 0
   let mut bytes = 0
   let mut checked = 0
-  for item in members {
-    if item.entry.kind == File {
+  let entries : Array[Array[Entry]] = Array::makei(
+    self.streams.blocks.length(),
+    _ => [],
+  )
+  for entry in self.inventory {
+    if entry.block is Some(block) {
+      entries[block].push(entry)
+    }
+    if entry.kind == File {
       files += 1
-      bytes += item.bytes.length()
-      if item.entry.crc32 is Some(_) {
+      bytes += entry.size
+      if entry.crc32 is Some(_) {
         checked += 1
       }
     }
+  }
+  let mut start = 32 + self.streams.pack_offset
+  for id in 0..<self.streams.blocks.length() {
+    verify_folder(self, id, start, entries[id])
+    start += self.streams.pack_sizes[id]
   }
   {
     files,
@@ -168,6 +181,32 @@ pub fn Archive::verify(
     blocks: self.streams.blocks.length(),
     member_crcs_checked: checked,
     members_without_crc: files - checked,
+  }
+}
+
+///|
+/// The decoded buffer is local to this call; it is neither cached nor returned.
+fn verify_folder(
+  archive : Archive,
+  id : Int32,
+  start : Int32,
+  entries : ArrayView[Entry],
+) -> Unit raise ArchiveError {
+  let data = decode_packed_stream(
+    archive.input,
+    archive.streams,
+    id,
+    start,
+    archive.limits,
+  )
+  let mut offset = 0
+  for entry in entries {
+    check_crc(
+      data[offset:offset + entry.size],
+      entry.crc32,
+      "member " + entry.name,
+    )
+    offset += entry.size
   }
 }
 

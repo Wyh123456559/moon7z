@@ -99,9 +99,13 @@ fn Reader::load(self : Reader, id : Int32) -> Bytes raise ArchiveError {
   let archive = self.archive
   let block = archive.streams.blocks[id]
   let start = self.pack_starts[id]
-  let packed = archive.input[start:start + archive.streams.pack_sizes[id]].to_owned()
-  check_crc(packed, archive.streams.pack_crcs[id], "packed stream \{id}")
-  let data = decode(block, packed, archive.limits)
+  let data = decode_packed_stream(
+    archive.input,
+    archive.streams,
+    id,
+    start,
+    archive.limits,
+  )
   let mut offset = 0
   for (size, crc) in block.pieces {
     check_crc(
