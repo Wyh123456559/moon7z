@@ -11,7 +11,9 @@ batch data tools that need to consume archives through an API.
 moon update
 moon run app -- list corpus/lzma2-solid.7z
 moon run app -- test corpus/lzma2-solid.7z
+moon run app -- read corpus/lzma2-solid.7z 6
 moon run examples/import -- corpus/lzma2-solid.7z
+moon run examples/preview -- corpus/lzma2-solid.7z
 moon run app -- extract --contents-only corpus/lzma2-solid.7z . imported-package
 ```
 
@@ -33,6 +35,26 @@ for item in archive.extract_all() {
 This is an API sketch: `bytes` and `consume` belong to the application. The
 module has not been published to Mooncakes. The generated interface in
 [`archive/pkg.generated.mbti`](archive/pkg.generated.mbti) is the API reference.
+
+For previews, create `let reader = archive.reader(cache_bytes=32 * 1024 * 1024)`
+and call `reader.read(id)` or `reader.read_many(ids)`. IDs come from `entries()`;
+duplicate names therefore remain individually addressable. Bulk reads preserve
+request order and duplicate IDs, group requests by folder and check the requested
+output budget before decoding. Each selected folder is decoded at most once per
+bulk call, including when caching is disabled.
+
+The reader retains at most its most recent folder within the cache budget.
+Larger folders remain readable under archive limits but are not cached; zero
+disables retention. `clear_cache()` releases it, and `stats()` exposes attempts,
+hits and resident bytes. These counters do not establish a performance claim.
+The preview example reads JSON members and then repeats a read using the cache.
+
+Selective reads check all available packed/folder/substream CRCs in each selected
+folder, including solid siblings. **Unselected folders are not verified.** A
+healthy selected file can be read while another folder is corrupt; `verify()`
+still rejects the full archive. The `read` command emits exactly one file's bytes
+to stdout, with no added newline. No content is emitted for an invalid ID,
+directory or failed integrity check.
 
 For disk output, `@host.export_contents(archive, parent=".", name="imported-package")`
 returns the new directory and every original entry's metadata. This operation
@@ -88,6 +110,9 @@ and import example use `moonbitlang/async` and support Wasm and native. CI runs
 native tests and examples on Linux, macOS and Windows, and the portable targets
 on Linux. Check the actual [Actions results](https://github.com/Wyh123456559/moon7z/actions)
 for a particular commit rather than assuming a configured job has passed.
+The setup action is fixed at v1.23 because its floating v1 revision failed to
+resolve Nushell 0.115.1 on a runner; the MoonBit compiler/core selection remains
+`latest` stable. This is a provisioning choice, not a reduced target matrix.
 
 ```console
 moon run checks/verify.mbtx -- wasm
@@ -110,8 +135,8 @@ regular-file reads before allocating input; `app/` is the
 host command; `examples/import/` consumes verified members; `corpus/` records
 interoperability inputs; `checks/` runs repeatable verification.
 
-Selective member access with solid-block reuse is planned. Streaming, more filters and encryption require
-separate compatibility work and are not implemented.
+Streaming, more filters, encryption and archive writing require separate
+compatibility work and are not implemented.
 
 Moon7z supplies the 7z container/member layer. Existing MoonBit LZMA/XZ codecs
 and ZIP readers cover different boundaries. The compression algorithms are

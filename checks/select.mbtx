@@ -1,0 +1,53 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/process",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("select workflow requires wasm or native")
+  }
+  let (code, binary, _) = @process.collect_output("moon", [
+    "run", "--target", target, "app", "--", "read", "corpus/binary.7z", "0",
+  ])
+  assert_eq(code, 0)
+  assert_eq(
+    binary.binary(),
+    @fs.read_file("corpus/binary/payload.bin").binary(),
+  )
+  for name in ["copy-plain", "lzma-solid", "lzma2-solid", "lzma2-separate"] {
+    let args = [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "read",
+      "corpus/" + name + ".7z",
+    ]
+    let result = @shell.Cmd("moon", args + ["6"]).output(timeout_ms=120000)
+    assert_eq(result.exit_code(), 0)
+    assert_eq(
+      result.stdout(),
+      @fs.read_file("corpus/source/清单.json").text(),
+    )
+    let missing = @shell.Cmd("moon", args + ["9999"]).output(timeout_ms=120000)
+    assert_true(missing.exit_code() != 0)
+    assert_true(missing.stdout().is_empty())
+    let directory = @shell.Cmd("moon", args + ["0"]).output(timeout_ms=120000)
+    assert_true(directory.exit_code() != 0)
+    assert_true(directory.stdout().is_empty())
+  }
+  @shell.Cmd("moon", [
+    "run", "--target", target, "examples/preview", "--", "corpus/lzma2-solid.7z",
+  ]).run(timeout_ms=120000)
+  println(
+    "Selected stdout matches the original bytes; invalid and directory IDs produce no content",
+  )
+}

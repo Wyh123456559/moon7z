@@ -7,6 +7,7 @@ pub suberror ArchiveError {
   Checksum(scope~ : String)
   Codec(reason~ : String)
   UnsafePath(path~ : String, reason~ : String)
+  NoSuchEntry(id~ : Int32)
 } derive(Debug)
 
 ///|
@@ -48,7 +49,8 @@ pub struct Entry {
 } derive(Debug, Eq)
 
 ///|
-/// A member is returned only after all archive data checks have passed.
+/// A member is returned after the checks for its decoded folder have passed.
+/// `extract_all` verifies the entire archive; a Reader checks selected folders.
 pub struct Member {
   entry : Entry
   bytes : Bytes

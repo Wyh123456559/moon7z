@@ -5,6 +5,10 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    NoSuchEntry(id~) =>
+      logger.write_string(
+        "No 7z entry with ID \{id}. Select an ID from Archive::entries().",
+      )
     UnsafePath(path~, reason~) =>
       logger.write_string(
         "Unsafe extraction path \{Repr(path)}: \{reason}. Rename the member before exporting.",

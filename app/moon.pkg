@@ -2,6 +2,8 @@ import {
   "Wyh123456559/moon7z/host",
   "moonbitlang/async",
   "moonbitlang/core/env",
+  "moonbitlang/core/string",
+  "moonbitlang/async/stdio",
 }
 
 pkgtype(kind: "executable")

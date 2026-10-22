@@ -22,6 +22,12 @@ fn read_names(r : Cursor, count : Int32) -> Array[String] raise ArchiveError {
     let lo = r.byte()
     let hi = r.byte()
     if lo == 0 && hi == 0 {
+      guard names.length() < count else {
+        raise Invalid(
+          offset=r.pos - 2,
+          reason="more filenames than declared entries",
+        )
+      }
       let name = @utf16.decode(
         r.data[start:r.pos - 2],
         ignore_bom=true,

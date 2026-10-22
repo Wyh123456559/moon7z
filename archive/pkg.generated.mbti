@@ -16,6 +16,7 @@ pub suberror ArchiveError {
   Checksum(scope~ : String)
   Codec(reason~ : String)
   UnsafePath(path~ : String, reason~ : String)
+  NoSuchEntry(id~ : Int32)
 } derive(@debug.Debug)
 pub fn ArchiveError::output(Self, &Logger) -> Unit
 #deprecated
@@ -31,6 +32,7 @@ pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
 pub fn Archive::open(Bytes, limits? : Limits) -> Self raise ArchiveError
 pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
+pub fn Archive::reader(Self, cache_bytes? : Int32) -> Reader raise ArchiveError
 pub fn Archive::verify(Self) -> Verification raise ArchiveError
 
 pub struct ContentPlan {
@@ -104,6 +106,26 @@ pub fn Metadata::equal(Self, Self) -> Bool
 pub fn Metadata::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn Metadata::to_repr(Self) -> @debug.Repr
+
+pub struct Reader {
+  // private fields
+}
+pub fn Reader::clear_cache(Self) -> Unit
+pub fn Reader::read(Self, Int32) -> Member raise ArchiveError
+pub fn Reader::read_many(Self, ArrayView[Int32]) -> Array[Member] raise ArchiveError
+pub fn Reader::stats(Self) -> ReaderStats
+
+pub struct ReaderStats {
+  decode_attempts : Int32
+  cache_hits : Int32
+  cached_bytes : Int32
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ReaderStats::equal(Self, Self) -> Bool
+#deprecated
+pub fn ReaderStats::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ReaderStats::to_repr(Self) -> @debug.Repr
 
 pub struct Verification {
   files : Int32

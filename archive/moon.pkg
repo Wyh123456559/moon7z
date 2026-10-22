@@ -7,6 +7,17 @@ import {
 }
 
 rule(
+  name: "binary_archive",
+  command: ":embed --binary -i $input -o $output --name binary_archive",
+)
+
+dev_build(
+  rule: "binary_archive",
+  input: "../corpus/binary.7z",
+  output: "binary_archive_test.mbt",
+)
+
+rule(
   name: "copy_archive",
   command: ":embed --binary -i $input -o $output --name copy_archive",
 )

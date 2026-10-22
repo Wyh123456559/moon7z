@@ -24,3 +24,9 @@ built-in resource tool; users need no 7-Zip installation to run those tests.
 For an independent manual check, run `7zr t ARCHIVE` and `7zr x ARCHIVE -oNEW_DIR`,
 then compare that directory with `source/`. All archives were tested with 7zr;
 Moon7z tests compare each extracted member directly with the originals.
+
+`binary.7z` is a separate boundary fixture containing `binary/payload.bin`
+(archived as `payload.bin`), with bytes 0 through 255. It is project-authored
+test data under Apache-2.0, packed by the same 7zr version using Copy, no solid
+block, plain header and all three timestamp options off. It verifies binary
+member extraction and CLI stdout without decoding bytes as text.
