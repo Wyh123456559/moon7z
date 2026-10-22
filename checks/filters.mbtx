@@ -24,6 +24,15 @@ async fn main {
       ("delta256-copy", [("payload.bin", "binary/payload.bin")]),
       ("bcj-lzma2", [("program.elf", "x86/program.elf")]),
       ("bcj-lzma", [("program.elf", "x86/program.elf")]),
+      ("arm64-lzma2", [("program.elf", "arm64/program.elf")]),
+      (
+        "arm64-offset",
+        [("a-head.bin", "arm64/a-head.bin"), ("b-tail.bin", "arm64/b-tail.bin")],
+      ),
+      (
+        "arm64-wrap",
+        [("a-head.bin", "arm64/a-head.bin"), ("b-tail.bin", "arm64/b-tail.bin")],
+      ),
       (
         "bcj-solid",
         [("part-a.bin", "x86/part-a.bin"), ("part-b.bin", "x86/part-b.bin")],

@@ -1,0 +1,71 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/buffer",
+}
+
+///|
+fn program() -> Bytes {
+  let out = @buffer.Buffer()
+  // ELF64, little endian, Linux AArch64; one read/execute PT_LOAD segment.
+  out.write_bytes(b"\x7fELF\x02\x01\x01\x00" + b"\x00".repeat(8))
+  out.write_bytes(b"\x02\x00\xb7\x00")
+  out.write_uint_le(1U)
+  out.write_uint64_le(0x400078UL)
+  out.write_uint64_le(64UL)
+  out.write_uint64_le(0UL)
+  out.write_uint_le(0U)
+  out.write_bytes(b"\x40\x00\x38\x00\x01\x00\x00\x00\x00\x00\x00\x00")
+  out.write_uint_le(1U)
+  out.write_uint_le(5U)
+  out.write_uint64_le(0UL)
+  out.write_uint64_le(0x400000UL)
+  out.write_uint64_le(0x400000UL)
+  out.write_uint64_le(144UL)
+  out.write_uint64_le(144UL)
+  out.write_uint64_le(4096UL)
+  // BL helper; MOV X0,0; MOV X8,93; SVC 0; ADRP X1,current-page; RET.
+  for
+    word in [
+      0x94000004U, 0xd2800000U, 0xd2800ba8U, 0xd4000001U, 0x90000001U, 0xd65f03c0U,
+    ] {
+    out.write_uint_le(word)
+  }
+  out.to_bytes()
+}
+
+///|
+fn branches() -> Bytes {
+  let out = @buffer.Buffer()
+  for i in 0..<1100 {
+    let word = match i % 5 {
+      0 => 0x94000000U | (i.reinterpret_as_uint() & 0x03ffffffU)
+      1 => 0x97ffffffU
+      2 => {
+        let values = [
+          0U, 1U, 3U, 0x1ffffU, 0x20000U, 0x20001U, 0x1dffffU, 0x1e0000U, 0x1fffffU,
+          0x100000U,
+        ]
+        let page = values[i / 5 % values.length()]
+        0x90000000U |
+        ((page & 3U) << 29) |
+        ((page & 0x1ffffcU) << 3) |
+        (i.reinterpret_as_uint() & 31U)
+      }
+      3 => 0x14000000U // B is not BL and must remain unchanged.
+      _ => 0xd503201fU // NOP
+    }
+    out.write_uint_le(word)
+  }
+  out.write_bytes(b"\xaa\xbb\xcc")
+  out.to_bytes()
+}
+
+///|
+async fn main {
+  @fs.write_file("corpus/arm64/program.elf", program())
+  let data = branches()
+  @fs.write_file("corpus/arm64/a-head.bin", data[:3].to_owned())
+  @fs.write_file("corpus/arm64/b-tail.bin", data[3:].to_owned())
+}

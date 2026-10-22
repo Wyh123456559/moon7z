@@ -24,6 +24,7 @@ async fn main {
       ["fmt", "--check", "checks/subset.mbtx"],
       ["fmt", "--check", "corpus/audio/generate.mbtx"],
       ["fmt", "--check", "corpus/x86/generate.mbtx"],
+      ["fmt", "--check", "corpus/arm64/generate.mbtx"],
       ["info"],
       ["check", "--target", target, "--deny-warn"],
       ["test", "--target", target, "--deny-warn"],

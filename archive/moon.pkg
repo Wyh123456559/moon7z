@@ -16,6 +16,94 @@ import {
 } for "wbtest"
 
 rule(
+  name: "arm64_offset_resource",
+  command: ":embed --binary -i $input -o $output --name arm64_offset_resource",
+)
+
+dev_build(
+  rule: "arm64_offset_resource",
+  input: "../corpus/arm64-offset.7z",
+  output: "arm64_offset_resource_wbtest.mbt",
+)
+
+rule(
+  name: "arm64_wrap_resource",
+  command: ":embed --binary -i $input -o $output --name arm64_wrap_resource",
+)
+
+dev_build(
+  rule: "arm64_wrap_resource",
+  input: "../corpus/arm64-wrap.7z",
+  output: "arm64_wrap_resource_wbtest.mbt",
+)
+
+rule(
+  name: "arm64_archive",
+  command: ":embed --binary -i $input -o $output --name arm64_archive",
+)
+
+dev_build(
+  rule: "arm64_archive",
+  input: "../corpus/arm64-lzma2.7z",
+  output: "arm64_archive_test.mbt",
+)
+
+rule(
+  name: "arm64_offset_archive",
+  command: ":embed --binary -i $input -o $output --name arm64_offset_archive",
+)
+
+dev_build(
+  rule: "arm64_offset_archive",
+  input: "../corpus/arm64-offset.7z",
+  output: "arm64_offset_archive_test.mbt",
+)
+
+rule(
+  name: "arm64_wrap_archive",
+  command: ":embed --binary -i $input -o $output --name arm64_wrap_archive",
+)
+
+dev_build(
+  rule: "arm64_wrap_archive",
+  input: "../corpus/arm64-wrap.7z",
+  output: "arm64_wrap_archive_test.mbt",
+)
+
+rule(
+  name: "arm64_program",
+  command: ":embed --binary -i $input -o $output --name arm64_program",
+)
+
+dev_build(
+  rule: "arm64_program",
+  input: "../corpus/arm64/program.elf",
+  output: "arm64_program_archive_test.mbt",
+)
+
+rule(
+  name: "arm64_head",
+  command: ":embed --binary -i $input -o $output --name arm64_head",
+)
+
+dev_build(
+  rule: "arm64_head",
+  input: "../corpus/arm64/a-head.bin",
+  output: "arm64_head_archive_test.mbt",
+)
+
+rule(
+  name: "arm64_tail",
+  command: ":embed --binary -i $input -o $output --name arm64_tail",
+)
+
+dev_build(
+  rule: "arm64_tail",
+  input: "../corpus/arm64/b-tail.bin",
+  output: "arm64_tail_archive_test.mbt",
+)
+
+rule(
   name: "delta_archive",
   command: ":embed --binary -i $input -o $output --name delta_archive",
 )

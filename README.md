@@ -20,6 +20,7 @@ moon run examples/preview -- corpus/lzma2-solid.7z
 moon run app -- test corpus/delta-solid.7z
 moon run app -- test --require-member-crcs corpus/delta-solid.7z
 moon run app -- test corpus/bcj-lzma2.7z
+moon run app -- test corpus/arm64-lzma2.7z
 moon run app -- extract --contents-only corpus/delta-solid.7z . imported-audio
 moon run app -- extract --contents-only corpus/lzma2-solid.7z . imported-package
 moon run app -- extract-selected --contents-only corpus/lzma2-solid.7z . selected-manifest 6
@@ -113,7 +114,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Capability | Current behavior |
 | --- | --- |
 | Container | Single-volume 7z, version 0.0–0.4, signature at byte zero |
-| Codecs | Copy, LZMA, LZMA2; optionally followed by Delta (distance 1–256) or x86 BCJ |
+| Codecs | Copy, LZMA, LZMA2; optionally followed by Delta (distance 1–256), x86 BCJ or ARM64 |
 | Coder chains | One packed input, linear bindings, at most eight unary coders per folder |
 | Headers | Plain and compressed headers |
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
@@ -122,7 +123,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Resources | Configurable input/header/output/dictionary/member limits |
 
 Encryption, split volumes, SFX, branching/multiple-input coder graphs, BCJ2,
-filters other than Delta/x86 BCJ, additional streams,
+filters other than Delta/x86 BCJ/ARM64, additional streams,
 anti-items, links, special files, unknown semantic properties and writing are
 rejected. Zero padding may repeat. The reader does not silently skip unsupported
 members or metadata. Metadata values are retained for application use; the
@@ -179,6 +180,14 @@ The supported x86 BCJ method is `03 03 01 03`, with empty properties and an init
 instruction pointer of zero, as emitted by 7-Zip's BCJ coder. Nonempty properties
 and the separate `04` method ID are refused. x86 here includes relative CALL/JMP
 instructions in x86-64 binaries; extracting a program does not execute it.
+
+ARM64 filtering uses method `0a`, supporting both the empty default properties
+and a four-byte little-endian initial offset aligned to four bytes. Misaligned
+or incorrectly sized properties are refused. BL and applicable ADRP instructions
+are reconstructed over the complete solid folder, including instruction bytes
+split between members; incomplete trailing bytes are retained unchanged.
+The checked-in AArch64 ELF and offset/wrap archives are compared byte-for-byte
+with their originals. This is archive data decoding, not execution of ARM code.
 
 ## Validation
 

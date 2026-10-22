@@ -2,7 +2,7 @@
 
 | Material | Source | License and use |
 | --- | --- | --- |
-| LZMA/LZMA2 decoder and Delta filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma`, `lzma2` and `filters` public APIs, not vendored |
+| LZMA/LZMA2 decoder and Delta/ARM64 filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma`, `lzma2` and `filters` public APIs, not vendored |
 | Host I/O and asynchronous execution | [moonbitlang/async](https://github.com/moonbitlang/async), 0.22.5 | Apache-2.0; CLI/example/checks only |
 | Standard library | [moonbitlang/core](https://github.com/moonbitlang/core) | Apache-2.0; toolchain dependency |
 | 7z format and SDK description | [7z format](https://www.7-zip.org/7z.html), [LZMA SDK](https://www.7-zip.org/sdk.html) | SDK is Public Domain; format reference; the BCJ adaptation is recorded separately below |
@@ -12,6 +12,7 @@
 | Folder binding and coder output layout | [official 7zFormat.txt](https://github.com/ip7z/7zip/blob/main/DOC/7zFormat.txt) | Format reference consulted for the bounded linear pipeline reader; no source code copied |
 | x86 BCJ decoder | [Igor Pavlov, Bra86.c, 7-Zip 21.07](https://github.com/ip7z/7zip/blob/21.07/C/Bra86.c), file dated 2021-02-09 | Public Domain; decoder translated into `archive/bcj.mbt`, with whole-folder state and explicit UInt32 arithmetic. Original notice retained in source and `licenses/7zip-BCJ-Public-Domain.txt` |
 | BCJ method/properties reference | [BcjRegister.cpp](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BcjRegister.cpp), [BcjCoder.h](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BcjCoder.h) | Consulted to establish the classic 7z method ID, zero initial pointer and absence of property support; no C++ source copied |
+| ARM64 method, properties and alignment | [BranchRegister.cpp](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BranchRegister.cpp), [BranchMisc.cpp](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BranchMisc.cpp), [Bra.c](https://github.com/ip7z/7zip/blob/main/C/Bra.c) | Format/algorithm cross-check only; no ARM64 SDK source copied. The decoder is the Apache-2.0 dependency's public `bcj_arm64` API |
 
 The corpus's empty file, Unicode directory, manifest and project tests were
 written for this repository. No external test cases or archive binaries were
@@ -33,6 +34,15 @@ The dependency's x86 filter is not used: its output differs on the sign-extensio
 vector `E8 00 00 00 FF`; the local decoder is checked against the independent
 7-Zip packer and has a regression test for this case. This is not a claim about
 all upstream filter behavior.
+
+`corpus/arm64/` contains project-authored Apache-2.0 test data and a deterministic
+MoonBit generator. It constructs a minimal ELF64/AArch64 binary with six explicit
+instruction words and a separate BL/ADRP boundary sequence. No compiler runtime,
+third-party program binary or external test suite is included. `readelf` checked
+its ELF header and load segment; the AArch64 program was not executed. Three
+ARM64 archives were independently packed and tested by 7zr 26.04, including
+nonzero and wrapping initial offsets. See `corpus/README.md` for commands and
+the distinction between program fixture bytes and native Moon7z execution.
 
 Development was checked with official stable `moon 0.1.20261021` and
 `moonc v0.10.17+093cb8f9c` (2026-10-21). Compiler executables were checked against

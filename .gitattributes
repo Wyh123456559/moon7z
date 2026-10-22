@@ -1,3 +1,5 @@
 * text=auto eol=lf
 *.7z binary
 *.wav binary
+*.elf binary
+*.bin binary

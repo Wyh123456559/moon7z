@@ -90,3 +90,38 @@ From `corpus/x86/`, using the same 7zr 26.04:
 All three passed `7zr t`. Portable tests and `checks/filters.mbtx` compare every
 extracted byte with the originals. The ELF is not executed during extraction or
 CI; its one-time native fixture run is separate from Moon7z's native tests.
+
+## ARM64 program and filter offset boundaries
+
+`arm64/generate.mbtx` constructs project-authored Apache-2.0 originals. The
+144-byte `program.elf` has one read/execute load segment, ELF64/AArch64 machine
+type, entry `0x400078`, and six instruction words: BL to a helper, MOV X0/0,
+MOV X8/93, SVC 0, ADRP X1/current-page and RET. Its header/load segment were
+inspected with `readelf -h -l`; it was **not executed on an ARM64 CPU**.
+The generator writes the explicit ELF fields and instructions; no runtime or
+third-party executable code is linked.
+
+`a-head.bin` / `b-tail.bin` split a 4,403-byte instruction sequence after three
+bytes, so a BL instruction crosses members. The sequence crosses a 4 KiB page,
+contains positive/negative BL, ADRP immediate range boundaries, unconverted B
+and NOP instructions, and three trailing bytes. Regenerate from the module root:
+
+```console
+moon run corpus/arm64/generate.mbtx
+```
+
+Generate archives to new paths from `corpus/arm64/`, using 7zr 26.04:
+
+```console
+7zr a ../arm64-lzma2.7z program.elf -t7z -m0=ARM64 -m1=LZMA2:d=64k -mhc=on -mtm=off -mtc=off -mta=off
+7zr a ../arm64-offset.7z a-head.bin b-tail.bin -t7z -m0=ARM64:4096 -m1=Copy -ms=on -mhc=off -mtm=off -mtc=off -mta=off
+7zr a ../arm64-wrap.7z a-head.bin b-tail.bin -t7z -m0=ARM64:4294967292 -m1=LZMA:d=64k -ms=on -mhc=off -mtm=off -mtc=off -mta=off
+```
+
+All three passed `7zr t`. The offset fixtures contain four property bytes;
+the final offset wraps during decoding of the first two instructions. The
+portable tests compare every original byte and reject malformed/alignment
+properties, truncation, corruption and resource excess. `checks/filters.mbtx`
+also tests verification, selective binary stdout and contents-only export for
+every archive on Wasm and native. These runs execute Moon7z, not the AArch64
+program fixture.
