@@ -115,6 +115,19 @@ pub fn Metadata::to_json(Self) -> Json
 pub fn Metadata::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Metadata
 
+pub struct RangeRequest {
+  id : Int32
+  offset : Int32
+  length : Int32
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn RangeRequest::equal(Self, Self) -> Bool
+pub fn RangeRequest::new(Int32, offset~ : Int32, length~ : Int32) -> Self
+#deprecated
+pub fn RangeRequest::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn RangeRequest::to_repr(Self) -> @debug.Repr
+
 pub struct Reader {
   // private fields
 }
@@ -122,6 +135,7 @@ pub fn Reader::clear_cache(Self) -> Unit
 pub fn Reader::read(Self, Int32) -> Member raise ArchiveError
 pub fn Reader::read_many(Self, ArrayView[Int32]) -> Array[Member] raise ArchiveError
 pub fn Reader::read_range(Self, Int32, offset~ : Int32, length~ : Int32) -> Bytes raise ArchiveError
+pub fn Reader::read_ranges(Self, ArrayView[RangeRequest]) -> Array[Bytes] raise ArchiveError
 pub fn Reader::stats(Self) -> ReaderStats
 
 pub struct ReaderStats {

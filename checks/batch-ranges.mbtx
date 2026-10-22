@@ -1,0 +1,29 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  for
+    (path, expected) in [
+      ("corpus/lzma2-solid.7z", "清单.json"),
+      ("corpus/arm64-wrap.7z", "b-tail.bin"),
+    ] {
+    let result = @shell.Cmd("moon", [
+      "run", "--target", target, "examples/header-scan", "--", path,
+    ]).output(timeout_ms=120000)
+    assert_eq(result.exit_code(), 0)
+    assert_true(result.stdout().contains(expected))
+    assert_true(result.stdout().contains("Decode attempts: 1"))
+  }
+  println(
+    "Bulk header scans read every file prefix with one decode per selected solid folder",
+  )
+}

@@ -139,29 +139,7 @@ pub fn Reader::read_range(
   offset~ : Int32,
   length~ : Int32,
 ) -> Bytes raise ArchiveError {
-  guard id >= 0 && id < self.archive.inventory.length() else {
-    raise NoSuchEntry(id~)
-  }
-  let entry = self.archive.inventory[id]
-  guard entry.kind == File else {
-    raise Unsupported(
-      feature="byte range on directory entry \{id}; select a file ID",
-    )
-  }
-  guard offset >= 0 &&
-    length >= 0 &&
-    offset <= entry.size &&
-    length <= entry.size - offset else {
-    raise InvalidRange(id~, offset~, length~, size=entry.size)
-  }
-  match entry.block {
-    None => b""
-    Some(block) => {
-      let data = self.load(block)
-      let start = self.member_starts[id] + offset
-      data[start:start + length].to_owned()
-    }
-  }
+  self.read_ranges([RangeRequest::new(id, offset~, length~)])[0]
 }
 
 ///|

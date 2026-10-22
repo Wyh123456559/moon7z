@@ -17,6 +17,7 @@ moon run app -- read corpus/lzma2-solid.7z 6
 moon run app -- read-range corpus/bcj-lzma2.7z 0 0 64
 moon run examples/import -- corpus/lzma2-solid.7z
 moon run examples/preview -- corpus/lzma2-solid.7z
+moon run examples/header-scan -- corpus/lzma2-solid.7z
 moon run app -- test corpus/delta-solid.7z
 moon run app -- test --require-member-crcs corpus/delta-solid.7z
 moon run app -- test corpus/bcj-lzma2.7z
@@ -67,6 +68,15 @@ nonnegative and fit the member; EOF permits an empty range. Out-of-bounds
 requests raise `InvalidRange` before decoding and preserve an existing cache.
 Directories are refused. The matching `read-range` CLI command writes binary
 stdout without a newline; failures produce no content.
+
+For multiple header/trailer fields, build `RangeRequest::new(id, offset=0, length=16)`
+requests and call `reader.read_ranges(requests)`.
+Results retain request order, overlaps and duplicates. All requests and combined
+output bytes are checked before decoding; each selected folder is decoded at
+most once per call even with caching disabled. Count and byte budgets use
+`Limits.entries` and `Limits.output_bytes`. Empty ranges still check data-folder
+integrity. The header-scan example reads up to 16 bytes per file without copying
+full member contents; it prints only after the whole batch succeeds.
 
 Selective reads check all available packed/folder/substream CRCs in each selected
 folder, including solid siblings. **Unselected folders are not verified.** A
