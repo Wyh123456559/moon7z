@@ -5,6 +5,10 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    UnsafePath(path~, reason~) =>
+      logger.write_string(
+        "Unsafe extraction path \{Repr(path)}: \{reason}. Rename the member before exporting.",
+      )
     Invalid(offset~, reason~) =>
       logger.write_string(
         "Invalid 7z data at section byte \{offset}: \{reason}. Supply a complete, unmodified archive.",

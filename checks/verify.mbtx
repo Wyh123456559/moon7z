@@ -14,6 +14,8 @@ async fn main {
   for
     command in [
       ["fmt", "--check"],
+      ["fmt", "--check", "checks/verify.mbtx"],
+      ["fmt", "--check", "checks/export.mbtx"],
       ["info"],
       ["check", "--target", target, "--deny-warn"],
       ["test", "--target", target, "--deny-warn"],
@@ -22,6 +24,9 @@ async fn main {
   }
   @shell.Cmd("git", ["diff", "--exit-code", "--", "*.mbti"]).run()
   if target == "wasm" || target == "native" {
+    @shell.Cmd("moon", ["run", "checks/export.mbtx", "--", target]).run(
+      timeout_ms=120000,
+    )
     for path in ["copy-plain", "lzma-solid", "lzma2-solid", "lzma2-separate"] {
       @shell.Cmd("moon", [
         "run",

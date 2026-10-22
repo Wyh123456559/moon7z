@@ -1,6 +1,12 @@
 import {
   "Wyh123456559/moon7z/archive",
   "moonbitlang/async/fs",
+  "moonbitlang/async/os_error",
+  "moonbitlang/core/random",
 }
+
+import {
+  "moonbitlang/async",
+} for "test"
 
 supported_targets = "+wasm+native"

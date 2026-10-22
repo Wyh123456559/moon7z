@@ -1,0 +1,56 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("export workflow requires wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-cli-export")
+  defer @fs.rmdir(root, recursive=true)
+  for name in ["copy-plain", "lzma-solid", "lzma2-solid", "lzma2-separate"] {
+    @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      "corpus/" + name + ".7z",
+      root,
+      name,
+    ]).run(timeout_ms=120000)
+    for
+      path in [
+        "lzma-mbt/LICENSE", "lzma-mbt/README.md", "lzma-mbt/moon.mod", "清单.json",
+        "empty.txt",
+      ] {
+      assert_eq(
+        @fs.read_file(root + "/" + name + "/" + path).binary(),
+        @fs.read_file("corpus/source/" + path).binary(),
+      )
+    }
+    assert_true(@fs.kind(root + "/" + name + "/空目录") == Directory)
+  }
+  let refused = @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "extract", "--contents-only", "corpus/lzma2-solid.7z",
+    root, "copy-plain",
+  ]).output()
+  assert_true(refused.exit_code() != 0)
+  let refused = @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "extract", "--contents-only", "corpus/lzma2-solid.7z",
+    root, "../outside",
+  ]).output()
+  assert_true(refused.exit_code() != 0)
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 4)
+  println(
+    "Four real archives exported byte-for-byte; overwrite and traversal rejected",
+  )
+}

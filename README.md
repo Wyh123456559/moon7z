@@ -12,6 +12,7 @@ moon update
 moon run app -- list corpus/lzma2-solid.7z
 moon run app -- test corpus/lzma2-solid.7z
 moon run examples/import -- corpus/lzma2-solid.7z
+moon run app -- extract --contents-only corpus/lzma2-solid.7z . imported-package
 ```
 
 The example imports the JSON manifest only after the entire archive has passed
@@ -32,6 +33,23 @@ for item in archive.extract_all() {
 This is an API sketch: `bytes` and `consume` belong to the application. The
 module has not been published to Mooncakes. The generated interface in
 [`archive/pkg.generated.mbti`](archive/pkg.generated.mbti) is the API reference.
+
+For disk output, `@host.export_contents(archive, parent=".", name="imported-package")`
+returns the new directory and every original entry's metadata. This operation
+explicitly exports **contents only**: it does not apply timestamps, permissions
+or other attributes. The CLI requires `--contents-only` to acknowledge this
+contract. Use the in-memory entry metadata if your application needs to store it.
+
+Every path is planned before decoding or writing. Absolute paths, traversal,
+backslashes, reserved device names, trailing dots/spaces, exact duplicates,
+ASCII case aliases and file/directory conflicts are rejected. Unicode names are
+preserved; exclusive creation also rejects aliases recognized by the actual
+filesystem. Files are staged in a new sibling directory and published with a
+no-replace rename after all checks and writes succeed. A destination that already
+exists is refused, including empty directories. The caller must control the
+existing parent during export; concurrent hostile modification of that parent
+is outside this API's guarantees. Failed staging is removed; a cleanup failure
+is returned as an I/O error and may require removing the named staging directory.
 
 ## Supported input
 
@@ -92,8 +110,7 @@ regular-file reads before allocating input; `app/` is the
 host command; `examples/import/` consumes verified members; `corpus/` records
 interoperability inputs; `checks/` runs repeatable verification.
 
-Next capabilities are a destination-safe file exporter and selective member
-access with solid-block reuse. Streaming, more filters and encryption require
+Selective member access with solid-block reuse is planned. Streaming, more filters and encryption require
 separate compatibility work and are not implemented.
 
 Moon7z supplies the 7z container/member layer. Existing MoonBit LZMA/XZ codecs

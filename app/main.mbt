@@ -1,8 +1,18 @@
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() == 6 && args[1] == "extract" && args[2] == "--contents-only" {
+    let archive = @host.open_file(args[3])
+    let exported = @host.export_contents(archive, parent=args[4], name=args[5])
+    println(
+      "Exported \{exported.entries.length()} entries to \{exported.directory}; timestamps and attributes were not applied",
+    )
+    return
+  }
   guard args.length() == 3 && (args[1] == "list" || args[1] == "test") else {
-    fail("usage: moon run app -- <list|test> archive.7z")
+    fail(
+      "usage: moon run app -- <list|test> archive.7z OR extract --contents-only archive.7z existing-parent new-name",
+    )
   }
   let archive = @host.open_file(args[2])
   if args[1] == "list" {

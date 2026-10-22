@@ -6,6 +6,7 @@ pub suberror ArchiveError {
   Limit(resource~ : String, maximum~ : Int32)
   Checksum(scope~ : String)
   Codec(reason~ : String)
+  UnsafePath(path~ : String, reason~ : String)
 } derive(Debug)
 
 ///|

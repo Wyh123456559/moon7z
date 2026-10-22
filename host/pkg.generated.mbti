@@ -6,11 +6,17 @@ import {
 }
 
 // Values
+pub async fn export_contents(@archive.Archive, parent~ : String, name~ : String) -> ExportedContents
+
 pub async fn open_file(String, limits? : @archive.Limits) -> @archive.Archive
 
 // Errors
 
 // Types and methods
+pub struct ExportedContents {
+  directory : String
+  entries : Array[@archive.Entry]
+}
 
 // Type aliases
 

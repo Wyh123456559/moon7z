@@ -6,6 +6,7 @@ import {
 }
 
 // Values
+pub fn validate_path(String) -> Unit raise ArchiveError
 
 // Errors
 pub suberror ArchiveError {
@@ -14,6 +15,7 @@ pub suberror ArchiveError {
   Limit(resource~ : String, maximum~ : Int32)
   Checksum(scope~ : String)
   Codec(reason~ : String)
+  UnsafePath(path~ : String, reason~ : String)
 } derive(@debug.Debug)
 pub fn ArchiveError::output(Self, &Logger) -> Unit
 #deprecated
@@ -28,7 +30,14 @@ pub struct Archive {
 pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
 pub fn Archive::open(Bytes, limits? : Limits) -> Self raise ArchiveError
+pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
 pub fn Archive::verify(Self) -> Verification raise ArchiveError
+
+pub struct ContentPlan {
+  // private fields
+}
+pub fn ContentPlan::directories(Self) -> Array[String]
+pub fn ContentPlan::entries(Self) -> Array[Entry]
 
 pub struct Entry {
   id : Int32
