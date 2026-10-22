@@ -1,0 +1,115 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Wyh123456559/moon7z/archive"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub suberror ArchiveError {
+  Invalid(offset~ : Int32, reason~ : String)
+  Unsupported(feature~ : String)
+  Limit(resource~ : String, maximum~ : Int32)
+  Checksum(scope~ : String)
+  Codec(reason~ : String)
+} derive(@debug.Debug)
+pub fn ArchiveError::output(Self, &Logger) -> Unit
+#deprecated
+pub fn ArchiveError::to_repr(Self) -> @debug.Repr
+pub fn ArchiveError::to_string(Self) -> String
+pub impl Show for ArchiveError
+
+// Types and methods
+pub struct Archive {
+  // private fields
+}
+pub fn Archive::entries(Self) -> Array[Entry]
+pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
+pub fn Archive::open(Bytes, limits? : Limits) -> Self raise ArchiveError
+pub fn Archive::verify(Self) -> Verification raise ArchiveError
+
+pub struct Entry {
+  id : Int32
+  name : String
+  kind : EntryKind
+  size : Int32
+  crc32 : UInt32?
+  block : Int32?
+  metadata : Metadata
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn Entry::equal(Self, Self) -> Bool
+#deprecated
+pub fn Entry::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn Entry::to_repr(Self) -> @debug.Repr
+
+pub(all) enum EntryKind {
+  File
+  Directory
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn EntryKind::equal(Self, Self) -> Bool
+#deprecated
+pub fn EntryKind::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn EntryKind::to_repr(Self) -> @debug.Repr
+
+pub struct Limits {
+  input_bytes : Int32
+  header_bytes : Int32
+  output_bytes : Int32
+  dictionary_bytes : Int32
+  entries : Int32
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn Limits::equal(Self, Self) -> Bool
+pub fn Limits::new(input_bytes? : Int32, header_bytes? : Int32, output_bytes? : Int32, dictionary_bytes? : Int32, entries? : Int32) -> Self
+#deprecated
+pub fn Limits::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn Limits::to_repr(Self) -> @debug.Repr
+
+pub struct Member {
+  entry : Entry
+  bytes : Bytes
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn Member::equal(Self, Self) -> Bool
+#deprecated
+pub fn Member::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn Member::to_repr(Self) -> @debug.Repr
+
+pub struct Metadata {
+  created : UInt64?
+  accessed : UInt64?
+  modified : UInt64?
+  attributes : UInt32?
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn Metadata::equal(Self, Self) -> Bool
+#deprecated
+pub fn Metadata::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn Metadata::to_repr(Self) -> @debug.Repr
+
+pub struct Verification {
+  files : Int32
+  bytes : Int32
+  blocks : Int32
+  member_crcs_checked : Int32
+  members_without_crc : Int32
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn Verification::equal(Self, Self) -> Bool
+#deprecated
+pub fn Verification::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn Verification::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

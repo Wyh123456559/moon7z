@@ -1,0 +1,7 @@
+_build/
+/.mooncakes/
+/moon.lock
+/out/
+/archive/*_archive_test.mbt
+/archive/upstream_*_test.mbt
+/archive/manifest_test.mbt

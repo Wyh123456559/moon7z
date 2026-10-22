@@ -1,0 +1,17 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Wyh123456559/moon7z/host"
+
+import {
+  "Wyh123456559/moon7z/archive",
+}
+
+// Values
+pub async fn open_file(String, limits? : @archive.Limits) -> @archive.Archive
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

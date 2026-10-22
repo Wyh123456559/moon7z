@@ -1,0 +1,6 @@
+import {
+  "Wyh123456559/moon7z/archive",
+  "moonbitlang/async/fs",
+}
+
+supported_targets = "+wasm+native"

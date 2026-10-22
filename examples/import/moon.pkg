@@ -1,0 +1,11 @@
+import {
+  "Wyh123456559/moon7z/host",
+  "moonbitlang/async",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/encoding/utf8",
+}
+
+pkgtype(kind: "executable")
+
+supported_targets = "+wasm+native"

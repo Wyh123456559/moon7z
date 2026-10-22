@@ -1,0 +1,95 @@
+import {
+  "aurora0x27/lzma-mbt/lzma",
+  "aurora0x27/lzma-mbt/lzma2",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/encoding/utf16",
+  "moonbitlang/core/debug",
+}
+
+rule(
+  name: "copy_archive",
+  command: ":embed --binary -i $input -o $output --name copy_archive",
+)
+
+dev_build(
+  rule: "copy_archive",
+  input: "../corpus/copy-plain.7z",
+  output: "copy_archive_test.mbt",
+)
+
+rule(
+  name: "lzma_archive",
+  command: ":embed --binary -i $input -o $output --name lzma_archive",
+)
+
+dev_build(
+  rule: "lzma_archive",
+  input: "../corpus/lzma-solid.7z",
+  output: "lzma_archive_test.mbt",
+)
+
+rule(
+  name: "lzma2_archive",
+  command: ":embed --binary -i $input -o $output --name lzma2_archive",
+)
+
+dev_build(
+  rule: "lzma2_archive",
+  input: "../corpus/lzma2-solid.7z",
+  output: "lzma2_archive_test.mbt",
+)
+
+rule(
+  name: "separate_archive",
+  command: ":embed --binary -i $input -o $output --name separate_archive",
+)
+
+dev_build(
+  rule: "separate_archive",
+  input: "../corpus/lzma2-separate.7z",
+  output: "separate_archive_test.mbt",
+)
+
+rule(
+  name: "upstream_license",
+  command: ":embed --binary -i $input -o $output --name upstream_license",
+)
+
+dev_build(
+  rule: "upstream_license",
+  input: "../corpus/source/lzma-mbt/LICENSE",
+  output: "upstream_license_test.mbt",
+)
+
+rule(
+  name: "upstream_readme",
+  command: ":embed --binary -i $input -o $output --name upstream_readme",
+)
+
+dev_build(
+  rule: "upstream_readme",
+  input: "../corpus/source/lzma-mbt/README.md",
+  output: "upstream_readme_test.mbt",
+)
+
+rule(
+  name: "upstream_module",
+  command: ":embed --binary -i $input -o $output --name upstream_module",
+)
+
+dev_build(
+  rule: "upstream_module",
+  input: "../corpus/source/lzma-mbt/moon.mod",
+  output: "upstream_module_test.mbt",
+)
+
+rule(
+  name: "manifest",
+  command: ":embed --binary -i $input -o $output --name manifest",
+)
+
+dev_build(
+  rule: "manifest",
+  input: "../corpus/source/清单.json",
+  output: "manifest_test.mbt",
+)
