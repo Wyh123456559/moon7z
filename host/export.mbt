@@ -37,8 +37,7 @@ pub async fn export_contents(
     fail("export name must be a single directory component")
   }
   let plan = archive.plan_contents()
-  let items = archive.extract_all()
-  publish_contents(plan, items, parent~, name~)
+  publish_contents(archive, plan, parent~, name~)
 }
 
 ///|
@@ -59,17 +58,18 @@ pub async fn export_selected(
     fail("export name must be a single directory component")
   }
   let plan = archive.plan_selection(ids)
-  let items = archive.reader(cache_bytes=0).read_many(ids)
-  publish_contents(plan, items, parent~, name~)
+  publish_contents(archive, plan, parent~, name~)
 }
 
 ///|
 async fn publish_contents(
+  archive : @archive.Archive,
   plan : @archive.ContentPlan,
-  items : Array[@archive.Member],
   parent~ : String,
   name~ : String,
 ) -> ExportedContents {
+  let (scheduled, cache_bytes) = export_schedule(archive, plan.entries())
+  let reader = archive.reader(cache_bytes~)
   let parent = @fs.realpath(parent)
   guard @fs.kind(parent, follow_symlink=false) == Directory else {
     fail("export parent must be an existing directory")
@@ -81,17 +81,28 @@ async fn publish_contents(
   for directory in plan.directories() {
     @fs.mkdir(staging + "/" + directory, permission=0o700)
   }
-  for item in items {
-    if item.entry.kind == File {
-      @fs.write_file(
-        staging + "/" + item.entry.name,
-        item.bytes,
-        create_mode=CreateNew,
-        permission=0o600,
-      )
-    }
+  for entry in scheduled {
+    write_member(reader, entry, staging)
   }
+  reader.clear_cache()
   @fs.rename(staging, destination, replace=false)
   published = true
   { directory: destination, entries: plan.entries(), }
+}
+
+///|
+/// Keep the owned member buffer local to this call across its write. The next
+/// member is not copied until this call returns. The reader retains one folder.
+async fn write_member(
+  reader : @archive.Reader,
+  entry : @archive.Entry,
+  staging : String,
+) -> Unit {
+  let item = reader.read(entry.id)
+  @fs.write_file(
+    staging + "/" + entry.name,
+    item.bytes,
+    create_mode=CreateNew,
+    permission=0o600,
+  )
 }

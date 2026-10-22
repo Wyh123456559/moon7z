@@ -1,0 +1,63 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("incremental export requires wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-incremental-export")
+  defer @fs.rmdir(root, recursive=true)
+  let parent = root + "/output"
+  @fs.mkdir(parent)
+  let bytes = @fs.read_file("corpus/copy-plain.7z").binary().to_array()
+  // The last byte belongs to the fourth and final data folder (member ID 6).
+  bytes[32 + 14550 - 1] = (bytes[32 + 14550 - 1].to_int() ^ 1).to_byte()
+  let damaged = root + "/damaged.7z"
+  @fs.write_file(damaged, Bytes::from_array(bytes))
+  for operation in ["extract", "extract-selected"] {
+    let args = [
+      "run", "--target", target, "app", "--", operation, "--contents-only", damaged,
+      parent, "rejected",
+    ]
+    if operation == "extract-selected" {
+      // Healthy member 3 is staged before the damaged member 6 is attempted.
+      args.push("3")
+      args.push("6")
+    }
+    let refused = @shell.Cmd("moon", args).output(timeout_ms=120000)
+    assert_true(refused.exit_code() != 0)
+    assert_true(refused.stdout().is_empty())
+    assert_true(
+      refused.stderr().contains("Checksum") ||
+      refused.stderr().contains("CRC-32"),
+    )
+    assert_eq(@fs.readdir(parent, include_hidden=true), [])
+  }
+  @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "extract-selected", "--contents-only",
+    damaged, parent, "healthy", "3",
+  ]).run(timeout_ms=120000)
+  assert_eq(
+    @fs.read_file(parent + "/healthy/lzma-mbt/LICENSE").binary(),
+    @fs.read_file("corpus/source/lzma-mbt/LICENSE").binary(),
+  )
+  @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "extract", "--contents-only", "corpus/copy-plain.7z",
+    parent, "restored",
+  ]).run(timeout_ms=120000)
+  assert_eq(
+    @fs.read_file(parent + "/restored/清单.json").binary(),
+    @fs.read_file("corpus/source/清单.json").binary(),
+  )
+  assert_eq(@fs.readdir(parent, include_hidden=true).length(), 2)
+  println(
+    "Late folder failures remove earlier staged files; selected and whole exports recover",
+  )
+}

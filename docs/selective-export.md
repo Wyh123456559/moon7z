@@ -38,6 +38,9 @@ throughout the operation, as required by the full exporter.
 
 Integrity is scoped to selected folders. A selected solid folder is decoded in
 full and all its available sibling CRCs are checked before any file is written.
+Files are written one at a time in folder groups; a later selected folder failure
+removes earlier staged files and publishes nothing. See
+[incremental export](incremental-export.md) for buffer and rollback behavior.
 Unselected folders are not decoded or verified. To require whole-archive checks,
 call `verify()` first; to require a CRC for every file, use
 `verify(require_member_crcs=true)` first. Missing CRCs are not authenticity proofs.

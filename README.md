@@ -103,6 +103,13 @@ existing parent during export; concurrent hostile modification of that parent
 is outside this API's guarantees. Failed staging is removed; a cleanup failure
 is returned as an I/O error and may require removing the named staging directory.
 
+Disk export reads folders in groups and writes one owned member buffer at a
+time. The reader retains at most one complete decoded folder; it does not build
+an array containing all extracted member bytes. Later folder failures remove
+earlier staged files before returning an error. A solid folder still decodes in
+full, and input and codec buffers coexist; this is not input streaming or a
+measured peak-memory guarantee. See [incremental export](docs/incremental-export.md).
+
 To export specific resources, use
 `@host.export_selected(archive, ids, parent=".", name="selected")` or the
 `extract-selected --contents-only ARCHIVE PARENT NAME ID...` command. IDs come
