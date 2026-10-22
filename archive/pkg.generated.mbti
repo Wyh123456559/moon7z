@@ -22,15 +22,18 @@ pub suberror ArchiveError {
   AmbiguousName(name~ : String, first_id~ : Int32, second_id~ : Int32)
 } derive(@debug.Debug)
 pub fn ArchiveError::output(Self, &Logger) -> Unit
+pub fn ArchiveError::to_json(Self) -> Json
 #deprecated
 pub fn ArchiveError::to_repr(Self) -> @debug.Repr
 pub fn ArchiveError::to_string(Self) -> String
 pub impl Show for ArchiveError
+pub impl ToJson for ArchiveError
 
 // Types and methods
 pub struct Archive {
   // private fields
 }
+pub fn Archive::audit(Self) -> AuditReport
 pub fn Archive::compare(Self, Self) -> Comparison raise ArchiveError
 pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
@@ -40,6 +43,16 @@ pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
 pub fn Archive::plan_selection(Self, ArrayView[Int32]) -> ContentPlan raise ArchiveError
 pub fn Archive::reader(Self, cache_bytes? : Int32) -> Reader raise ArchiveError
 pub fn Archive::verify(Self, require_member_crcs? : Bool) -> Verification raise ArchiveError
+
+pub struct AuditReport {
+  // private fields
+}
+pub fn AuditReport::all_available_checks_passed(Self) -> Bool
+pub fn AuditReport::entries_without_data(Self) -> Array[Entry]
+pub fn AuditReport::files_without_crc(Self) -> Array[Entry]
+pub fn AuditReport::folders(Self) -> Array[FolderAudit]
+pub fn AuditReport::to_json(Self) -> Json
+pub impl ToJson for AuditReport
 
 pub(all) enum ChangeKind {
   Added
@@ -113,6 +126,17 @@ pub fn EntryKind::equal(Self, Self) -> Bool
 pub fn EntryKind::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn EntryKind::to_repr(Self) -> @debug.Repr
+
+pub struct FolderAudit {
+  id : Int32
+  bytes : Int32
+  error : ArchiveError?
+  // private fields
+}
+pub fn FolderAudit::entries(Self) -> Array[Entry]
+pub fn FolderAudit::passed(Self) -> Bool
+pub fn FolderAudit::to_json(Self) -> Json
+pub impl ToJson for FolderAudit
 
 pub struct Limits {
   input_bytes : Int32

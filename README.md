@@ -172,6 +172,14 @@ Duplicate names are refused as ambiguous. Output uses deterministic UTF-16
 lexical name order and retains each side's original entry metadata. See
 [archive comparison](docs/comparison.md) for the schema and verification scope.
 
+For damaged-archive triage, `archive.audit()` and `audit --json ARCHIVE` check
+every data folder independently and retain typed errors while continuing past
+payload failures. Reports include original entries and files lacking member
+CRCs; no payload is released. A completed audit command exits successfully even
+when folders fail, so consumers must inspect `all_available_checks_passed` or use
+`test` for a strict exit status. Headers must still pass normal opening checks.
+See [audit workflow and JSON contract](docs/audit.md).
+
 Defaults: 64 MiB input, 4 MiB header, 128 MiB expanded data, 64 MiB dictionary,
 10,000 entries. Limits bound individual controlled sizes, not peak process RSS:
 input, decoder buffers, folder output and returned member copies can coexist.

@@ -1,0 +1,70 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let args = ["run", "--target", target, "app", "--", "audit", "--json"]
+  let intact = @shell.Cmd("moon", args + ["corpus/copy-plain.7z"]).output(
+    timeout_ms=120000,
+  )
+  assert_eq(intact.exit_code(), 0)
+  assert_true(
+    @json.parse(intact.stdout())
+    is {
+      "schema": String("moon7z.audit.v1"),
+      "all_available_checks_passed": True,
+      ..
+    },
+  )
+  let root = @fs.tmpdir(prefix="moon7z-audit")
+  defer @fs.rmdir(root, recursive=true)
+  let bytes = @fs.read_file("corpus/copy-plain.7z").binary().to_array()
+  bytes[32] = (bytes[32].to_int() ^ 1).to_byte()
+  let path = root + "/damaged.7z"
+  @fs.write_file(path, Bytes::from_array(bytes))
+  let damaged = @shell.Cmd("moon", args + [path]).output(timeout_ms=120000)
+  assert_eq(damaged.exit_code(), 0)
+  assert_true(
+    @json.parse(damaged.stdout())
+    is {
+      "all_available_checks_passed": False,
+      "folders": Array(
+        [
+          {
+            "status": String("failed"),
+            "error": { "code": String("checksum"), .. },
+            ..
+          },
+          { "status": String("passed"), .. },
+          _,
+          _,
+        ]
+      ),
+      ..
+    },
+  )
+  let strict = @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "test", path,
+  ]).output(timeout_ms=120000)
+  assert_true(strict.exit_code() != 0)
+  assert_true(strict.stdout().is_empty())
+  @fs.write_file(root + "/truncated.7z", b"7z")
+  let bad_header = @shell.Cmd("moon", args + [root + "/truncated.7z"]).output(
+    timeout_ms=120000,
+  )
+  assert_true(bad_header.exit_code() != 0)
+  assert_true(bad_header.stdout().is_empty())
+  println(
+    "Audits isolate corrupt folders and retain typed diagnostics while strict verification still fails",
+  )
+}
