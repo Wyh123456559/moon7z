@@ -5,6 +5,10 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    AmbiguousName(name~, first_id~, second_id~) =>
+      logger.write_string(
+        "Ambiguous 7z name \{Repr(name)} at IDs \{first_id} and \{second_id}. Name-based comparison requires unique original names; inspect entries by ID instead.",
+      )
     MissingChecksum(id~, name~) =>
       logger.write_string(
         "7z entry \{id} (\{Repr(name)}) has no member CRC-32. Repack with member checksums or explicitly use the default available-checks policy.",

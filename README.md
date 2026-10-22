@@ -13,6 +13,7 @@ moon run app -- list corpus/lzma2-solid.7z
 moon run app -- list --json corpus/lzma2-solid.7z
 moon run app -- test corpus/lzma2-solid.7z
 moon run app -- test --json corpus/lzma2-solid.7z
+moon run app -- diff --json corpus/copy-plain.7z corpus/lzma2-solid.7z
 moon run app -- read corpus/lzma2-solid.7z 6
 moon run app -- read-range corpus/bcj-lzma2.7z 0 0 64
 moon run examples/import -- corpus/lzma2-solid.7z
@@ -162,6 +163,14 @@ explicit missing-CRC counts. `Entry`, `Metadata` and `Verification` implement
 `ToJson`. Raw 64-bit FILETIME values serialize as decimal strings to preserve
 precision in JavaScript consumers. Inventory never claims content verification,
 and CLI failures leave stdout empty. See [JSON schema and workflow](docs/json-reports.md).
+
+`left.compare(right)` and `diff --json LEFT RIGHT` compare fully verified
+archives by exact original name. Results distinguish additions, removals, type,
+content and metadata changes. Bytes are compared directly; compression, solid
+layout, entry IDs and CRC presence do not create false content changes.
+Duplicate names are refused as ambiguous. Output uses deterministic UTF-16
+lexical name order and retains each side's original entry metadata. See
+[archive comparison](docs/comparison.md) for the schema and verification scope.
 
 Defaults: 64 MiB input, 4 MiB header, 128 MiB expanded data, 64 MiB dictionary,
 10,000 entries. Limits bound individual controlled sizes, not peak process RSS:

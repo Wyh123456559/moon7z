@@ -10,6 +10,7 @@ pub suberror ArchiveError {
   NoSuchEntry(id~ : Int32)
   InvalidRange(id~ : Int32, offset~ : Int32, length~ : Int32, size~ : Int32)
   MissingChecksum(id~ : Int32, name~ : String)
+  AmbiguousName(name~ : String, first_id~ : Int32, second_id~ : Int32)
 } derive(Debug)
 
 ///|

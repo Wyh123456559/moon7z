@@ -1,0 +1,60 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let args = ["run", "--target", target, "app", "--", "diff", "--json"]
+  let equal = @shell.Cmd(
+    "moon",
+    args + ["corpus/copy-plain.7z", "corpus/lzma2-solid.7z"],
+  ).output(timeout_ms=120000)
+  assert_eq(equal.exit_code(), 0)
+  assert_true(
+    @json.parse(equal.stdout())
+    is {
+      "schema": String("moon7z.comparison.v1"),
+      "identical": True,
+      "changes": Array([]),
+      ..
+    },
+  )
+  let changed = @shell.Cmd(
+    "moon",
+    args + ["corpus/binary.7z", "corpus/arm64-lzma2.7z"],
+  ).output(timeout_ms=120000)
+  assert_eq(changed.exit_code(), 0)
+  assert_true(
+    @json.parse(changed.stdout())
+    is {
+      "identical": False,
+      "changes": Array(
+        [{ "kind": String("removed"), .. }, { "kind": String("added"), .. }]
+      ),
+      ..
+    },
+  )
+  let root = @fs.tmpdir(prefix="moon7z-compare")
+  defer @fs.rmdir(root, recursive=true)
+  let bytes = @fs.read_file("corpus/binary.7z").binary().to_array()
+  bytes[32] = b'\xff'
+  let path = root + "/damaged.7z"
+  @fs.write_file(path, Bytes::from_array(bytes))
+  let bad = @shell.Cmd("moon", args + [path, "corpus/arm64-lzma2.7z"]).output(
+    timeout_ms=120000,
+  )
+  assert_true(bad.exit_code() != 0)
+  assert_true(bad.stdout().is_empty())
+  println(
+    "Verified archive comparisons ignore repacking, report real changes and refuse corrupt inputs",
+  )
+}

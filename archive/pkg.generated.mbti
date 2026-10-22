@@ -19,6 +19,7 @@ pub suberror ArchiveError {
   NoSuchEntry(id~ : Int32)
   InvalidRange(id~ : Int32, offset~ : Int32, length~ : Int32, size~ : Int32)
   MissingChecksum(id~ : Int32, name~ : String)
+  AmbiguousName(name~ : String, first_id~ : Int32, second_id~ : Int32)
 } derive(@debug.Debug)
 pub fn ArchiveError::output(Self, &Logger) -> Unit
 #deprecated
@@ -30,6 +31,7 @@ pub impl Show for ArchiveError
 pub struct Archive {
   // private fields
 }
+pub fn Archive::compare(Self, Self) -> Comparison raise ArchiveError
 pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
 pub fn Archive::inventory_json(Self) -> Json
@@ -38,6 +40,29 @@ pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
 pub fn Archive::plan_selection(Self, ArrayView[Int32]) -> ContentPlan raise ArchiveError
 pub fn Archive::reader(Self, cache_bytes? : Int32) -> Reader raise ArchiveError
 pub fn Archive::verify(Self, require_member_crcs? : Bool) -> Verification raise ArchiveError
+
+pub(all) enum ChangeKind {
+  Added
+  Removed
+  TypeChanged
+  ContentChanged
+  MetadataChanged
+  ContentAndMetadataChanged
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn ChangeKind::equal(Self, Self) -> Bool
+#deprecated
+pub fn ChangeKind::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn ChangeKind::to_repr(Self) -> @debug.Repr
+
+pub struct Comparison {
+  // private fields
+}
+pub fn Comparison::changes(Self) -> Array[EntryChange]
+pub fn Comparison::identical(Self) -> Bool
+pub fn Comparison::to_json(Self) -> Json
+pub impl ToJson for Comparison
 
 pub struct ContentPlan {
   // private fields
@@ -62,6 +87,21 @@ pub fn Entry::to_json(Self) -> Json
 #deprecated
 pub fn Entry::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Entry
+
+pub struct EntryChange {
+  name : String
+  kind : ChangeKind
+  left : Entry?
+  right : Entry?
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn EntryChange::equal(Self, Self) -> Bool
+#deprecated
+pub fn EntryChange::not_equal(Self, Self) -> Bool
+pub fn EntryChange::to_json(Self) -> Json
+#deprecated
+pub fn EntryChange::to_repr(Self) -> @debug.Repr
+pub impl ToJson for EntryChange
 
 pub(all) enum EntryKind {
   File

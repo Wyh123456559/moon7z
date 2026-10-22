@@ -1,6 +1,12 @@
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() == 5 && args[1] == "diff" && args[2] == "--json" {
+    let left = @host.open_file(args[3])
+    let right = @host.open_file(args[4])
+    println(left.compare(right).to_json().stringify())
+    return
+  }
   if args.length() >= 7 &&
     args[1] == "extract-selected" &&
     args[2] == "--contents-only" {
@@ -76,7 +82,7 @@ async fn main {
   }
   guard args.length() == 3 && (args[1] == "list" || args[1] == "test") else {
     fail(
-      "usage: moon run app -- <list|test> [--json] archive.7z OR test [--json] --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name OR extract-selected --contents-only archive.7z existing-parent new-name entry-id...",
+      "usage: moon run app -- <list|test> [--json] archive.7z OR diff --json left.7z right.7z OR test [--json] --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name OR extract-selected --contents-only archive.7z existing-parent new-name entry-id...",
     )
   }
   let archive = @host.open_file(args[2])
