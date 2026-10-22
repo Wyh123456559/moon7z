@@ -32,6 +32,7 @@ pub struct Archive {
 }
 pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
+pub fn Archive::inventory_json(Self) -> Json
 pub fn Archive::open(Bytes, limits? : Limits) -> Self raise ArchiveError
 pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
 pub fn Archive::reader(Self, cache_bytes? : Int32) -> Reader raise ArchiveError
@@ -56,8 +57,10 @@ pub struct Entry {
 pub fn Entry::equal(Self, Self) -> Bool
 #deprecated
 pub fn Entry::not_equal(Self, Self) -> Bool
+pub fn Entry::to_json(Self) -> Json
 #deprecated
 pub fn Entry::to_repr(Self) -> @debug.Repr
+pub impl ToJson for Entry
 
 pub(all) enum EntryKind {
   File
@@ -106,8 +109,10 @@ pub struct Metadata {
 pub fn Metadata::equal(Self, Self) -> Bool
 #deprecated
 pub fn Metadata::not_equal(Self, Self) -> Bool
+pub fn Metadata::to_json(Self) -> Json
 #deprecated
 pub fn Metadata::to_repr(Self) -> @debug.Repr
+pub impl ToJson for Metadata
 
 pub struct Reader {
   // private fields
@@ -141,8 +146,10 @@ pub struct Verification {
 pub fn Verification::equal(Self, Self) -> Bool
 #deprecated
 pub fn Verification::not_equal(Self, Self) -> Bool
+pub fn Verification::to_json(Self) -> Json
 #deprecated
 pub fn Verification::to_repr(Self) -> @debug.Repr
+pub impl ToJson for Verification
 
 // Type aliases
 

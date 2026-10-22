@@ -10,7 +10,9 @@ batch data tools that need to consume archives through an API.
 ```console
 moon update
 moon run app -- list corpus/lzma2-solid.7z
+moon run app -- list --json corpus/lzma2-solid.7z
 moon run app -- test corpus/lzma2-solid.7z
+moon run app -- test --json corpus/lzma2-solid.7z
 moon run app -- read corpus/lzma2-solid.7z 6
 moon run app -- read-range corpus/bcj-lzma2.7z 0 0 64
 moon run examples/import -- corpus/lzma2-solid.7z
@@ -123,6 +125,14 @@ replace individual member CRCs. If every file has a CRC, all normal payload
 checks still run. The default remains checking every available CRC and reporting
 missing ones explicitly. This opt-in policy is a data-quality gate, not
 cryptographic authentication.
+
+For CI import gates and archive indexes, `archive.inventory_json()` returns a
+fresh versioned JSON document with original entry IDs, order, names and metadata.
+`archive.verify().to_json()` returns a whole-archive verification report with
+explicit missing-CRC counts. `Entry`, `Metadata` and `Verification` implement
+`ToJson`. Raw 64-bit FILETIME values serialize as decimal strings to preserve
+precision in JavaScript consumers. Inventory never claims content verification,
+and CLI failures leave stdout empty. See [JSON schema and workflow](docs/json-reports.md).
 
 Defaults: 64 MiB input, 4 MiB header, 128 MiB expanded data, 64 MiB dictionary,
 10,000 entries. Limits bound individual controlled sizes, not peak process RSS:

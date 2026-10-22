@@ -1,0 +1,82 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("report workflow requires wasm or native")
+  }
+  let args = ["run", "--target", target, "app", "--"]
+  let command = args + ["list", "--json", "corpus/copy-plain.7z"]
+  let inventory = @shell.Cmd("moon", command).output(timeout_ms=120000)
+  assert_eq(inventory.exit_code(), 0)
+  assert_true(
+    @json.parse(inventory.stdout())
+    is {
+      "schema": String("moon7z.inventory.v1"),
+      "contents_verified": False,
+      "entries": Array(entries),
+      ..
+    } &&
+    entries.length() == 7,
+  )
+  assert_eq(
+    @shell.Cmd("moon", command).output(timeout_ms=120000).stdout(),
+    inventory.stdout(),
+  )
+  let verified = @shell.Cmd(
+    "moon",
+    args + ["test", "--json", "--require-member-crcs", "corpus/binary.7z"],
+  ).output(timeout_ms=120000)
+  assert_eq(verified.exit_code(), 0)
+  assert_true(
+    @json.parse(verified.stdout())
+    is {
+      "contents_verified": True,
+      "bytes": Number(256, ..),
+      "members_without_crc": Number(0, ..),
+      ..
+    },
+  )
+  let refused = @shell.Cmd(
+    "moon",
+    args + ["test", "--json", "--require-member-crcs", "corpus/copy-plain.7z"],
+  ).output(timeout_ms=120000)
+  assert_true(refused.exit_code() != 0)
+  assert_true(refused.stdout().is_empty())
+  let root = @fs.tmpdir(prefix="moon7z-json-report")
+  defer @fs.rmdir(root, recursive=true)
+  let changed = @fs.read_file("corpus/binary.7z").binary().to_array()
+  changed[32] = b'\xff'
+  let path = root + "/damaged.7z"
+  @fs.write_file(path, Bytes::from_array(changed))
+  let listed = @shell.Cmd("moon", args + ["list", "--json", path]).output(
+    timeout_ms=120000,
+  )
+  assert_eq(listed.exit_code(), 0)
+  assert_true(
+    @json.parse(listed.stdout()) is { "contents_verified": False, .. },
+  )
+  let refused = @shell.Cmd("moon", args + ["test", "--json", path]).output(
+    timeout_ms=120000,
+  )
+  assert_true(refused.exit_code() != 0)
+  assert_true(refused.stdout().is_empty())
+  let invalid = @shell.Cmd(
+    "moon",
+    args + ["list", "--json", "--require-member-crcs", "corpus/binary.7z"],
+  ).output(timeout_ms=120000)
+  assert_true(invalid.exit_code() != 0)
+  assert_true(invalid.stdout().is_empty())
+  assert_true(invalid.stderr().contains("usage:"))
+  println(
+    "JSON inventory and verification are deterministic, parseable and honest about unchecked content",
+  )
+}

@@ -1,6 +1,26 @@
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() >= 3 &&
+    (args[1] == "list" || args[1] == "test") &&
+    args[2] == "--json" {
+    let strict = args.length() == 5 &&
+      args[1] == "test" &&
+      args[3] == "--require-member-crcs"
+    guard args.length() == 4 || strict else {
+      fail(
+        "usage: list --json archive.7z OR test --json [--require-member-crcs] archive.7z",
+      )
+    }
+    let archive = @host.open_file(args[if strict { 4 } else { 3 }])
+    let document = if args[1] == "list" {
+      archive.inventory_json()
+    } else {
+      archive.verify(require_member_crcs=strict).to_json()
+    }
+    println(document.stringify())
+    return
+  }
   if args.length() == 4 &&
     args[1] == "test" &&
     args[2] == "--require-member-crcs" {
@@ -40,7 +60,7 @@ async fn main {
   }
   guard args.length() == 3 && (args[1] == "list" || args[1] == "test") else {
     fail(
-      "usage: moon run app -- <list|test> archive.7z OR test --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name",
+      "usage: moon run app -- <list|test> [--json] archive.7z OR test [--json] --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name",
     )
   }
   let archive = @host.open_file(args[2])

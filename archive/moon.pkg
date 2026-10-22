@@ -7,6 +7,14 @@ import {
   "moonbitlang/core/debug",
 }
 
+import {
+  "moonbitlang/core/json",
+} for "test"
+
+import {
+  "moonbitlang/core/json",
+} for "wbtest"
+
 rule(
   name: "delta_archive",
   command: ":embed --binary -i $input -o $output --name delta_archive",
