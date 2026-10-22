@@ -5,11 +5,13 @@
 | LZMA/LZMA2 decoder and Delta filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma`, `lzma2` and `filters` public APIs, not vendored |
 | Host I/O and asynchronous execution | [moonbitlang/async](https://github.com/moonbitlang/async), 0.22.5 | Apache-2.0; CLI/example/checks only |
 | Standard library | [moonbitlang/core](https://github.com/moonbitlang/core) | Apache-2.0; toolchain dependency |
-| 7z format and SDK description | [7z format](https://www.7-zip.org/7z.html), [LZMA SDK](https://www.7-zip.org/sdk.html) | SDK is Public Domain; format reference, no SDK code copied |
+| 7z format and SDK description | [7z format](https://www.7-zip.org/7z.html), [LZMA SDK](https://www.7-zip.org/sdk.html) | SDK is Public Domain; format reference; the BCJ adaptation is recorded separately below |
 | Container parsing reference | [bodgit/sevenzip](https://github.com/bodgit/sevenzip/tree/bc7ebbd2043c386e3bab1bd04a64a62062890fc4), especially `types.go` | BSD-3-Clause; consulted for format structure and cross-checking. License retained in `licenses/sevenzip-BSD-3-Clause.txt` |
 | Corpus source files | [lzma-mbt at e50568f7d8358045c39092210d140f6a5eec6971](https://github.com/aurora0x27/lzma-mbt/tree/e50568f7d8358045c39092210d140f6a5eec6971) | Apache-2.0; exact README.md, LICENSE, moon.mod under `corpus/source/lzma-mbt/` |
 | Corpus packer | [7zr.exe](https://www.7-zip.org/a/7zr.exe), identifying itself as 26.04 (2026-10-05) | Public Domain reduced SDK executable; used to produce fixtures, not redistributed |
 | Folder binding and coder output layout | [official 7zFormat.txt](https://github.com/ip7z/7zip/blob/main/DOC/7zFormat.txt) | Format reference consulted for the bounded linear pipeline reader; no source code copied |
+| x86 BCJ decoder | [Igor Pavlov, Bra86.c, 7-Zip 21.07](https://github.com/ip7z/7zip/blob/21.07/C/Bra86.c), file dated 2021-02-09 | Public Domain; decoder translated into `archive/bcj.mbt`, with whole-folder state and explicit UInt32 arithmetic. Original notice retained in source and `licenses/7zip-BCJ-Public-Domain.txt` |
+| BCJ method/properties reference | [BcjRegister.cpp](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BcjRegister.cpp), [BcjCoder.h](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BcjCoder.h) | Consulted to establish the classic 7z method ID, zero initial pointer and absence of property support; no C++ source copied |
 
 The corpus's empty file, Unicode directory, manifest and project tests were
 written for this repository. No external test cases or archive binaries were
@@ -19,8 +21,18 @@ must not be confused with the SDK's Public Domain terms. No py7zr code is used.
 The two PCM WAV originals in `corpus/audio/` and their generator are
 project-authored Apache-2.0 interoperability data. Their Delta-filtered archives
 were generated with the same Public Domain 7zr, not copied from another project.
-The filter algorithm is reused from `lzma-mbt`; this project implements the 7z
+The Delta filter algorithm is reused from `lzma-mbt`; this project implements the 7z
 binding, size validation and member workflow integration.
+
+`corpus/x86/program.S` is project-authored Apache-2.0 source. Its freestanding
+ELF executable was built by GCC 10.5.0 / GNU binutils on Linux x86-64 with
+`-nostdlib -no-pie -Wl,--build-id=none`; no C runtime or third-party program code
+was linked. The two raw instruction members and their generator are also
+project-authored. Three BCJ archives were packed and tested with 7zr 26.04.
+The dependency's x86 filter is not used: its output differs on the sign-extension
+vector `E8 00 00 00 FF`; the local decoder is checked against the independent
+7-Zip packer and has a regression test for this case. This is not a claim about
+all upstream filter behavior.
 
 Development was checked with official stable `moon 0.1.20261021` and
 `moonc v0.10.17+093cb8f9c` (2026-10-21). Compiler executables were checked against

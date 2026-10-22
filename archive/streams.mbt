@@ -73,9 +73,9 @@ fn read_pipeline(r : Cursor) -> Array[Coder] raise ArchiveError {
           feature="filter without an initial Copy/LZMA/LZMA2 coder",
         )
       }
-    } else if coder.codec_id != b"\x03" {
+    } else if coder.codec_id != b"\x03" && coder.codec_id != b"\x03\x03\x01\x03" {
       raise Unsupported(
-        feature="only Delta filters may follow a compression coder",
+        feature="only Delta or x86 BCJ filters may follow a compression coder",
       )
     }
   }
@@ -126,7 +126,7 @@ fn read_streams(
     let mut total = 0
     for block in blocks {
       block.size = r.count(output_limit - total, "total unpacked bytes")
-      // Delta preserves length. All coder outputs must agree, including
+      // Supported filters preserve length. All coder outputs must agree, including
       // intermediate sizes, before any decoder receives archive input.
       for i, coder in block.coders {
         if i > 0 &&

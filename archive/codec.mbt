@@ -1,6 +1,12 @@
 ///|
 fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
   match coder.codec_id {
+    b"\x03\x03\x01\x03" =>
+      if !coder.properties.is_empty() {
+        raise Unsupported(
+          feature="x86 BCJ properties; only the zero-offset 7z method is supported",
+        )
+      }
     b"\x03" =>
       if coder.properties.length() != 1 {
         raise Invalid(offset=0, reason="Delta needs one distance property byte")
@@ -32,7 +38,7 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
 ///|
 fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
   match coder.codec_id {
-    b"\x00" | b"\x03" => 0UL
+    b"\x00" | b"\x03" | b"\x03\x03\x01\x03" => 0UL
     b"\x03\x01\x01" => {
       let r = Cursor::new(coder.properties[1:].to_owned())
       let size = r.u32().to_uint64()
@@ -139,8 +145,13 @@ fn decode(
     raise Invalid(offset=0, reason="decoded folder length mismatch")
   }
   for filter in block.coders[1:] {
-    output = @filters.delta_decode(output[:], filter.properties[0].to_int() + 1) catch {
-      _ => raise Codec(reason="invalid Delta filter distance")
+    output = match filter.codec_id {
+      b"\x03" =>
+        @filters.delta_decode(output[:], filter.properties[0].to_int() + 1) catch {
+          _ => raise Codec(reason="invalid Delta filter distance")
+        }
+      b"\x03\x03\x01\x03" => bcj_decode(output)
+      _ => raise Unsupported(feature="filter in decode chain")
     }
   }
   check_crc(output, block.crc, "folder")

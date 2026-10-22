@@ -1,0 +1,26 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+}
+
+///|
+async fn main {
+  // Split a five-byte CALL instruction across two solid members.
+  @fs.write_file("corpus/x86/part-a.bin", b"\xe8\x00\x00")
+  let bytes = Array::make(4096, b'\x90')
+  bytes[0] = b'\x00'
+  bytes[1] = b'\x00'
+  let cases = [
+    b"\xe8\xfb\xff\xff\x00", b"\xe9\x00\x00\x00\x00", b"\xe8\xff\xff\xff\xff", b"\xe8\xe9\xe8\x00\xff\x00\x00\x00\x00",
+    b"\xe8\x00\x00\x00\x12",
+  ]
+  for i in 0..<100 {
+    for j, byte in cases[i % cases.length()] {
+      bytes[2 + i * 37 + j] = byte
+    }
+  }
+  bytes[4094] = b'\xe8'
+  bytes[4095] = b'\x00'
+  @fs.write_file("corpus/x86/part-b.bin", Bytes::from_array(bytes))
+}

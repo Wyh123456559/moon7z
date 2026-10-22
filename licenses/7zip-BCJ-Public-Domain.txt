@@ -1,0 +1,11 @@
+Original source notice:
+
+/* Bra86.c -- Converter for x86 code (BCJ)
+2021-02-09 : Igor Pavlov : Public domain */
+
+Source: https://github.com/ip7z/7zip/blob/21.07/C/Bra86.c
+
+archive/bcj.mbt adapts the decoder portion into MoonBit. The algorithm's
+Public Domain status is preserved. The repository's Apache-2.0 license covers
+project-authored integration and tests; it does not restrict the original
+Public Domain source.

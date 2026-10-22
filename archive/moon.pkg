@@ -12,6 +12,72 @@ rule(
   command: ":embed --binary -i $input -o $output --name delta_archive",
 )
 
+rule(
+  name: "bcj_lzma2_archive",
+  command: ":embed --binary -i $input -o $output --name bcj_lzma2_archive",
+)
+
+dev_build(
+  rule: "bcj_lzma2_archive",
+  input: "../corpus/bcj-lzma2.7z",
+  output: "bcj_lzma2_archive_test.mbt",
+)
+
+rule(
+  name: "bcj_lzma_archive",
+  command: ":embed --binary -i $input -o $output --name bcj_lzma_archive",
+)
+
+dev_build(
+  rule: "bcj_lzma_archive",
+  input: "../corpus/bcj-lzma.7z",
+  output: "bcj_lzma_archive_test.mbt",
+)
+
+rule(
+  name: "bcj_solid_archive",
+  command: ":embed --binary -i $input -o $output --name bcj_solid_archive",
+)
+
+dev_build(
+  rule: "bcj_solid_archive",
+  input: "../corpus/bcj-solid.7z",
+  output: "bcj_solid_archive_test.mbt",
+)
+
+rule(
+  name: "x86_program",
+  command: ":embed --binary -i $input -o $output --name x86_program",
+)
+
+dev_build(
+  rule: "x86_program",
+  input: "../corpus/x86/program.elf",
+  output: "x86_program_archive_test.mbt",
+)
+
+rule(
+  name: "x86_first",
+  command: ":embed --binary -i $input -o $output --name x86_first",
+)
+
+dev_build(
+  rule: "x86_first",
+  input: "../corpus/x86/part-a.bin",
+  output: "x86_first_archive_test.mbt",
+)
+
+rule(
+  name: "x86_second",
+  command: ":embed --binary -i $input -o $output --name x86_second",
+)
+
+dev_build(
+  rule: "x86_second",
+  input: "../corpus/x86/part-b.bin",
+  output: "x86_second_archive_test.mbt",
+)
+
 dev_build(
   rule: "delta_archive",
   input: "../corpus/delta-solid.7z",

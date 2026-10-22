@@ -59,3 +59,34 @@ history across the member boundary, CRCs, resource limits and truncated input.
 `moon run checks/filters.mbtx -- wasm` verifies the CLI's test, binary stdout
 and disk export against every original. Replace `wasm` with `native` to execute
 the native application. CI runs both workflows without needing 7-Zip installed.
+
+## x86 BCJ program and instruction boundaries
+
+`x86/program.elf` is a real, freestanding Linux x86-64 executable built from
+`x86/program.S`. It writes `moon7z x86 fixture` and a newline, then exits. No
+runtime is linked. On Linux x86-64, from the module root:
+
+```console
+cc -nostdlib -no-pie -Wl,--build-id=none -o corpus/x86/program.elf corpus/x86/program.S
+./corpus/x86/program.elf
+moon run corpus/x86/generate.mbtx
+```
+
+The checked-in ELF was built with GCC 10.5.0 on Ubuntu. Recompiling with another
+linker can change ELF bytes; repack the archive into a new path if regenerating.
+The raw members exercise forward/backward jumps, overlapping opcodes, bit-24
+sign extension, noncanonical immediates and incomplete tails. A five-byte CALL
+is split across `part-a.bin` / `part-b.bin`; resetting BCJ per member is wrong.
+All fixtures are project-authored Apache-2.0 data, with provenance in SOURCES.md.
+
+From `corpus/x86/`, using the same 7zr 26.04:
+
+```console
+7zr a ../bcj-lzma2.7z program.elf -t7z -m0=BCJ -m1=LZMA2:d=64k -mhc=on -mtm=off -mtc=off -mta=off
+7zr a ../bcj-lzma.7z program.elf -t7z -m0=BCJ -m1=LZMA:d=64k -mhc=off -mtm=off -mtc=off -mta=off
+7zr a ../bcj-solid.7z part-a.bin part-b.bin -t7z -m0=BCJ -m1=Copy -ms=on -mhc=off -mtm=off -mtc=off -mta=off
+```
+
+All three passed `7zr t`. Portable tests and `checks/filters.mbtx` compare every
+extracted byte with the originals. The ELF is not executed during extraction or
+CI; its one-time native fixture run is separate from Moon7z's native tests.

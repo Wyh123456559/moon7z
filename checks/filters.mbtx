@@ -22,6 +22,12 @@ async fn main {
         [("left.wav", "audio/left.wav"), ("right.wav", "audio/right.wav")],
       ),
       ("delta256-copy", [("payload.bin", "binary/payload.bin")]),
+      ("bcj-lzma2", [("program.elf", "x86/program.elf")]),
+      ("bcj-lzma", [("program.elf", "x86/program.elf")]),
+      (
+        "bcj-solid",
+        [("part-a.bin", "x86/part-a.bin"), ("part-b.bin", "x86/part-b.bin")],
+      ),
     ] {
     let args = ["run", "--target", target, "app", "--"]
     let input = "corpus/" + archive + ".7z"
