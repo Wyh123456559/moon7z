@@ -110,9 +110,8 @@ and import example use `moonbitlang/async` and support Wasm and native. CI runs
 native tests and examples on Linux, macOS and Windows, and the portable targets
 on Linux. Check the actual [Actions results](https://github.com/Wyh123456559/moon7z/actions)
 for a particular commit rather than assuming a configured job has passed.
-The setup action is fixed at v1.23 because its floating v1 revision failed to
-resolve Nushell 0.115.1 on a runner; the MoonBit compiler/core selection remains
-`latest` stable. This is a provisioning choice, not a reduced target matrix.
+CI bootstraps the latest stable toolchain with MoonBit's official Unix and
+PowerShell installers. It does not require a separate Nushell installation.
 
 ```console
 moon run checks/verify.mbtx -- wasm

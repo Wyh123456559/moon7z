@@ -11,9 +11,8 @@ jobs:
         target: [wasm, wasm-gc, js]
     steps:
       - uses: actions/checkout@v4
-      - uses: hustcer/setup-moonbit@v1.23
-        with:
-          version: latest
+      - run: curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+      - run: echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -28,9 +27,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: hustcer/setup-moonbit@v1.23
-        with:
-          version: latest
+      - if: runner.os != 'Windows'
+        run: curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+      - if: runner.os != 'Windows'
+        run: echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: Invoke-Expression (Invoke-RestMethod 'https://cli.moonbitlang.com/install/powershell.ps1')
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: Add-Content -LiteralPath $env:GITHUB_PATH -Value "$env:USERPROFILE\.moon\bin"
       - uses: ilammy/msvc-dev-cmd@v1
         if: runner.os == 'Windows'
       - run: moon version --all
