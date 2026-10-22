@@ -1,6 +1,10 @@
 ///|
 fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
   match coder.codec_id {
+    b"\x03" =>
+      if coder.properties.length() != 1 {
+        raise Invalid(offset=0, reason="Delta needs one distance property byte")
+      }
     b"\x00" =>
       if !coder.properties.is_empty() {
         raise Invalid(offset=0, reason="Copy coder has properties")
@@ -28,7 +32,7 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
 ///|
 fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
   match coder.codec_id {
-    b"\x00" => 0UL
+    b"\x00" | b"\x03" => 0UL
     b"\x03\x01\x01" => {
       let r = Cursor::new(coder.properties[1:].to_owned())
       let size = r.u32().to_uint64()
@@ -38,7 +42,7 @@ fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
         size
       }
     }
-    _ => {
+    b"\x21" => {
       let p = coder.properties[0].to_int()
       if p == 40 {
         0xffffffffUL
@@ -46,6 +50,7 @@ fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
         (2 + (p & 1)).to_uint64() << (p / 2 + 11)
       }
     }
+    _ => raise Unsupported(feature="dictionary for unknown coder")
   }
 }
 
@@ -105,31 +110,38 @@ fn decode(
   packed : Bytes,
   limits : Limits,
 ) -> Bytes raise ArchiveError {
-  validate_dictionary(block.coder, limits)
-  let output = match block.coder.codec_id {
+  let coder = block.coders[0]
+  validate_dictionary(coder, limits)
+  let mut output = match coder.codec_id {
     b"\x00" => packed
     b"\x03\x01\x01" => {
       let alone = @buffer.Buffer()
-      alone.write_bytes(block.coder.properties)
+      alone.write_bytes(coder.properties)
       alone.write_uint64_le(block.size.to_uint64())
       alone.write_bytes(packed)
       @lzma.decode_alone(alone.to_bytes(), limits.dictionary_bytes.to_uint64()) catch {
         _ => raise Codec(reason="invalid or truncated compressed data")
       }
     }
-    _ => {
+    b"\x21" => {
       preflight_lzma2(packed, block.size)
       @lzma2.decode_lzma2(
         packed,
         limits.dictionary_bytes.to_uint64(),
-        dict_size=dictionary(block.coder).to_uint(),
+        dict_size=dictionary(coder).to_uint(),
       ) catch {
         _ => raise Codec(reason="invalid or truncated LZMA2 data")
       }
     }
+    _ => raise Unsupported(feature="initial compression coder")
   }
   guard output.length() == block.size else {
     raise Invalid(offset=0, reason="decoded folder length mismatch")
+  }
+  for filter in block.coders[1:] {
+    output = @filters.delta_decode(output[:], filter.properties[0].to_int() + 1) catch {
+      _ => raise Codec(reason="invalid Delta filter distance")
+    }
   }
   check_crc(output, block.crc, "folder")
   output

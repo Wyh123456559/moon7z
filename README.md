@@ -14,6 +14,8 @@ moon run app -- test corpus/lzma2-solid.7z
 moon run app -- read corpus/lzma2-solid.7z 6
 moon run examples/import -- corpus/lzma2-solid.7z
 moon run examples/preview -- corpus/lzma2-solid.7z
+moon run app -- test corpus/delta-solid.7z
+moon run app -- extract --contents-only corpus/delta-solid.7z . imported-audio
 moon run app -- extract --contents-only corpus/lzma2-solid.7z . imported-package
 ```
 
@@ -78,14 +80,16 @@ is returned as an I/O error and may require removing the named staging directory
 | Capability | Current behavior |
 | --- | --- |
 | Container | Single-volume 7z, version 0.0–0.4, signature at byte zero |
-| Codecs | Copy, LZMA, LZMA2; one input/output coder per folder |
+| Codecs | Copy, LZMA, LZMA2; optionally followed by Delta filters (distance 1–256) |
+| Coder chains | One packed input, linear bindings, at most eight unary coders per folder |
 | Headers | Plain and compressed headers |
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
 | Integrity | Start/next header, available packed/folder/member CRC-32 |
 | Metadata | Creation/access/modification FILETIME and Windows/POSIX attribute word retained |
 | Resources | Configurable input/header/output/dictionary/member limits |
 
-Encryption, split volumes, SFX, multiple-coder filters, additional streams,
+Encryption, split volumes, SFX, branching/multiple-input coder graphs, filters
+other than Delta, additional streams,
 anti-items, links, special files, unknown semantic properties and writing are
 rejected. Zero padding may repeat. The reader does not silently skip unsupported
 members or metadata. Metadata values are retained for application use; the
@@ -102,6 +106,15 @@ Defaults: 64 MiB input, 4 MiB header, 128 MiB expanded data, 64 MiB dictionary,
 input, decoder buffers, folder output and returned member copies can coexist.
 LZMA2 chunk sizes are checked before codec allocation. This is a bounded,
 in-memory implementation, not a streaming reader or an exact backup restorer.
+
+Delta-filtered WAV and numeric data archives use the same verification, selective
+read and export APIs. Filters run over the entire solid folder before splitting
+members, so history is retained across file boundaries. Coder bindings are
+resolved independently of their storage order; cycles, duplicate bindings,
+disconnected nodes and differing intermediate output sizes are refused before
+decoding. Each intermediate output must fit the archive's remaining output
+budget. The chain must start with Copy/LZMA/LZMA2 and all remaining coders must
+be supported length-preserving filters.
 
 ## Validation
 
@@ -134,7 +147,7 @@ regular-file reads before allocating input; `app/` is the
 host command; `examples/import/` consumes verified members; `corpus/` records
 interoperability inputs; `checks/` runs repeatable verification.
 
-Streaming, more filters, encryption and archive writing require separate
+Streaming, other filters, encryption and archive writing require separate
 compatibility work and are not implemented.
 
 Moon7z supplies the 7z container/member layer. Existing MoonBit LZMA/XZ codecs

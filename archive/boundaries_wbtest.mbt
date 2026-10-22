@@ -144,7 +144,7 @@ test "unsupported methods and huge dictionaries fail without decoding" {
 test "raw LZMA is bounded by the container length" {
   let props = b"\x5d\x00\x10\x00\x00"
   let block : Block = {
-    coder: { codec_id: b"\x03\x01\x01", properties: props, },
+    coders: [{ codec_id: b"\x03\x01\x01", properties: props, }],
     size: 100,
     crc: None,
     pieces: [],

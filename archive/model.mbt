@@ -85,7 +85,7 @@ priv struct Coder {
 
 ///|
 priv struct Block {
-  coder : Coder
+  coders : Array[Coder]
   mut size : Int32
   mut crc : UInt32?
   pieces : Array[(Int32, UInt32?)]

@@ -1,10 +1,55 @@
 import {
   "aurora0x27/lzma-mbt/lzma",
   "aurora0x27/lzma-mbt/lzma2",
+  "aurora0x27/lzma-mbt/filters",
   "moonbitlang/core/buffer",
   "moonbitlang/core/encoding/utf16",
   "moonbitlang/core/debug",
 }
+
+rule(
+  name: "delta_archive",
+  command: ":embed --binary -i $input -o $output --name delta_archive",
+)
+
+dev_build(
+  rule: "delta_archive",
+  input: "../corpus/delta-solid.7z",
+  output: "delta_archive_test.mbt",
+)
+
+rule(
+  name: "delta256_archive",
+  command: ":embed --binary -i $input -o $output --name delta256_archive",
+)
+
+dev_build(
+  rule: "delta256_archive",
+  input: "../corpus/delta256-copy.7z",
+  output: "delta256_archive_test.mbt",
+)
+
+rule(
+  name: "audio_left",
+  command: ":embed --binary -i $input -o $output --name audio_left",
+)
+
+dev_build(
+  rule: "audio_left",
+  input: "../corpus/audio/left.wav",
+  output: "audio_left_archive_test.mbt",
+)
+
+rule(
+  name: "audio_right",
+  command: ":embed --binary -i $input -o $output --name audio_right",
+)
+
+dev_build(
+  rule: "audio_right",
+  input: "../corpus/audio/right.wav",
+  output: "audio_right_archive_test.mbt",
+)
 
 rule(
   name: "binary_archive",

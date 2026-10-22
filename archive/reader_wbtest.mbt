@@ -13,7 +13,7 @@ test "filename count is enforced before accumulating extra strings" {
 ///|
 test "a bad sibling CRC prevents returning or caching a selected solid folder" {
   let block : Block = {
-    coder: { codec_id: b"\x00", properties: b"", },
+    coders: [{ codec_id: b"\x00", properties: b"", }],
     size: 6,
     crc: None,
     pieces: [(3, Some(crc32(b"abc"))), (3, Some(crc32(b"def") ^ 1U))],

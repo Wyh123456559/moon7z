@@ -1,0 +1,50 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/process",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("filter workflow requires wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-filters")
+  defer @fs.rmdir(root, recursive=true)
+  for
+    (archive, files) in [
+      (
+        "delta-solid",
+        [("left.wav", "audio/left.wav"), ("right.wav", "audio/right.wav")],
+      ),
+      ("delta256-copy", [("payload.bin", "binary/payload.bin")]),
+    ] {
+    let args = ["run", "--target", target, "app", "--"]
+    let input = "corpus/" + archive + ".7z"
+    @shell.Cmd("moon", args + ["test", input]).run(timeout_ms=120000)
+    @shell.Cmd(
+      "moon",
+      args + ["extract", "--contents-only", input, root, archive],
+    ).run(timeout_ms=120000)
+    for id, (name, original) in files {
+      let bytes = @fs.read_file("corpus/" + original).binary()
+      assert_eq(
+        @fs.read_file(root + "/" + archive + "/" + name).binary(),
+        bytes,
+      )
+      let (code, stdout, _) = @process.collect_output(
+        "moon",
+        args + ["read", input, id.to_string()],
+      )
+      assert_eq(code, 0)
+      assert_eq(stdout.binary(), bytes)
+    }
+  }
+  println(
+    "Filtered archives verified, exported and selectively read byte-for-byte",
+  )
+}

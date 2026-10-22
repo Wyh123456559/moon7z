@@ -1,9 +1,5 @@
 ///|
 fn read_coder(r : Cursor) -> Coder raise ArchiveError {
-  let count = r.number()
-  guard count == 1UL else {
-    raise Unsupported(feature="coder graphs with multiple coders")
-  }
   let flags = r.byte()
   let id_size = flags & 15
   guard id_size > 0 && id_size <= 8 && (flags & 0xc0) == 0 else {
@@ -24,6 +20,66 @@ fn read_coder(r : Cursor) -> Coder raise ArchiveError {
   let coder = { codec_id, properties, }
   validate_coder(coder)
   coder
+}
+
+///|
+/// Supported folders have one packed input and a bounded, linear decode path.
+/// Bind indices are global stream indices; with unary coders they equal coder
+/// indices. Resolve the path rather than assuming the stored coder order.
+fn read_pipeline(r : Cursor) -> Array[Coder] raise ArchiveError {
+  let n = r.count(8, "coders per folder")
+  guard n > 0 else {
+    raise Invalid(offset=r.pos, reason="folder has no coders")
+  }
+  let coders = Array::makei(n, _ => read_coder(r))
+  let next = Array::make(n, -1)
+  let incoming = Array::make(n, false)
+  for _ in 0..<(n - 1) {
+    let input = r.count(n - 1, "bind input index")
+    let output = r.count(n - 1, "bind output index")
+    guard input != output && !incoming[input] && next[output] == -1 else {
+      raise Invalid(
+        offset=r.pos,
+        reason="duplicate or self-referential coder binding",
+      )
+    }
+    incoming[input] = true
+    next[output] = input
+  }
+  let roots = Array::makei(n, i => i).filter(i => !incoming[i])
+  guard roots.length() == 1 else {
+    raise Invalid(offset=r.pos, reason="coder graph must have one packed input")
+  }
+  let result : Array[Coder] = []
+  let visited = Array::make(n, false)
+  let mut index = roots[0]
+  while index != -1 {
+    guard !visited[index] else {
+      raise Invalid(offset=r.pos, reason="cycle in coder graph")
+    }
+    visited[index] = true
+    result.push(coders[index])
+    index = next[index]
+  }
+  guard result.length() == n else {
+    raise Invalid(offset=r.pos, reason="disconnected or cyclic coder graph")
+  }
+  for i, coder in result {
+    if i == 0 {
+      guard coder.codec_id == b"\x00" ||
+        coder.codec_id == b"\x03\x01\x01" ||
+        coder.codec_id == b"\x21" else {
+        raise Unsupported(
+          feature="filter without an initial Copy/LZMA/LZMA2 coder",
+        )
+      }
+    } else if coder.codec_id != b"\x03" {
+      raise Unsupported(
+        feature="only Delta filters may follow a compression coder",
+      )
+    }
+  }
+  result
 }
 
 ///|
@@ -64,14 +120,26 @@ fn read_streams(
       raise Unsupported(feature="external folder metadata")
     }
     for _ in 0..<n {
-      blocks.push({ coder: read_coder(r), size: 0, crc: None, pieces: [], })
+      blocks.push({ coders: read_pipeline(r), size: 0, crc: None, pieces: [], })
     }
     r.expect(12)
     let mut total = 0
     for block in blocks {
       block.size = r.count(output_limit - total, "total unpacked bytes")
+      // Delta preserves length. All coder outputs must agree, including
+      // intermediate sizes, before any decoder receives archive input.
+      for i, coder in block.coders {
+        if i > 0 &&
+          r.count(output_limit - total, "intermediate unpacked bytes") !=
+          block.size {
+          raise Invalid(
+            offset=r.pos,
+            reason="length-preserving coder output sizes differ",
+          )
+        }
+        validate_dictionary(coder, limits)
+      }
       total += block.size
-      validate_dictionary(block.coder, limits)
     }
     id = r.byte()
     if id == 10 {

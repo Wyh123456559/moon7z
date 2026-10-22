@@ -1,0 +1,35 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/buffer",
+}
+
+///|
+fn wave(phase : Int32) -> Bytes {
+  let out = @buffer.Buffer()
+  let length = 4096 * 4
+  out.write_bytes(b"RIFF")
+  out.write_uint_le((length + 36).reinterpret_as_uint())
+  out.write_bytes(b"WAVEfmt ")
+  out.write_uint_le(16U)
+  out.write_bytes(b"\x01\x00\x02\x00")
+  out.write_uint_le(16000U)
+  out.write_uint_le(64000U)
+  out.write_bytes(b"\x04\x00\x10\x00data")
+  out.write_uint_le(length.reinterpret_as_uint())
+  for i in 0..<4096 {
+    let sample = ((i + phase) % 256 * 128 - 16384) & 0xffff
+    for channel in [sample, 65535 - sample] {
+      out.write_byte((channel & 255).to_byte())
+      out.write_byte((channel >> 8).to_byte())
+    }
+  }
+  out.to_bytes()
+}
+
+///|
+async fn main {
+  @fs.write_file("corpus/audio/left.wav", wave(0))
+  @fs.write_file("corpus/audio/right.wav", wave(17))
+}
