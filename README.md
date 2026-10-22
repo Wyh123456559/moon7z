@@ -22,6 +22,7 @@ moon run app -- test --require-member-crcs corpus/delta-solid.7z
 moon run app -- test corpus/bcj-lzma2.7z
 moon run app -- extract --contents-only corpus/delta-solid.7z . imported-audio
 moon run app -- extract --contents-only corpus/lzma2-solid.7z . imported-package
+moon run app -- extract-selected --contents-only corpus/lzma2-solid.7z . selected-manifest 6
 ```
 
 The example imports the JSON manifest only after the entire archive has passed
@@ -89,6 +90,23 @@ exists is refused, including empty directories. The caller must control the
 existing parent during export; concurrent hostile modification of that parent
 is outside this API's guarantees. Failed staging is removed; a cleanup failure
 is returned as an I/O error and may require removing the named staging directory.
+
+To export specific resources, use
+`@host.export_selected(archive, ids, parent=".", name="selected")` or the
+`extract-selected --contents-only ARCHIVE PARENT NAME ID...` command. IDs come
+from `entries()` or JSON inventory. Exactly those IDs are selected; a directory
+ID creates that directory without recursively selecting children. Necessary
+parent directories are added, and returned entries contain only selected
+original metadata in request order. `archive.plan_selection(ids)` previews this
+path plan. Repeated IDs and selected path collisions are refused before writing.
+
+Selected exports check all available CRCs in their selected solid folders,
+including unselected siblings. Unselected folders are not verified, so a healthy
+subset can be exported despite unrelated corrupt data. Run `verify()` separately
+if your ingestion policy requires whole-archive verification. The existing
+no-replace staging and trusted-parent requirements apply. An empty library
+selection deliberately exports an empty directory; the CLI requires at least
+one ID. See [selective export workflow](docs/selective-export.md).
 
 ## Supported input
 

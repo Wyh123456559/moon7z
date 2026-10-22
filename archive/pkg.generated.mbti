@@ -35,6 +35,7 @@ pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
 pub fn Archive::inventory_json(Self) -> Json
 pub fn Archive::open(Bytes, limits? : Limits) -> Self raise ArchiveError
 pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
+pub fn Archive::plan_selection(Self, ArrayView[Int32]) -> ContentPlan raise ArchiveError
 pub fn Archive::reader(Self, cache_bytes? : Int32) -> Reader raise ArchiveError
 pub fn Archive::verify(Self, require_member_crcs? : Bool) -> Verification raise ArchiveError
 

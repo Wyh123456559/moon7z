@@ -1,6 +1,22 @@
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() >= 7 &&
+    args[1] == "extract-selected" &&
+    args[2] == "--contents-only" {
+    let archive = @host.open_file(args[3])
+    let ids = args[6:].map(id => @string.parse_int(id))
+    let exported = @host.export_selected(
+      archive,
+      ids,
+      parent=args[4],
+      name=args[5],
+    )
+    println(
+      "Exported \{exported.entries.length()} selected entries to \{exported.directory}; only selected folders were verified and metadata was not applied",
+    )
+    return
+  }
   if args.length() >= 3 &&
     (args[1] == "list" || args[1] == "test") &&
     args[2] == "--json" {
@@ -60,7 +76,7 @@ async fn main {
   }
   guard args.length() == 3 && (args[1] == "list" || args[1] == "test") else {
     fail(
-      "usage: moon run app -- <list|test> [--json] archive.7z OR test [--json] --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name",
+      "usage: moon run app -- <list|test> [--json] archive.7z OR test [--json] --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name OR extract-selected --contents-only archive.7z existing-parent new-name entry-id...",
     )
   }
   let archive = @host.open_file(args[2])

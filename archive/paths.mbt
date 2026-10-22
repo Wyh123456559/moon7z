@@ -75,10 +75,37 @@ pub fn validate_path(name : String) -> Unit raise ArchiveError {
 /// Check every member before the first filesystem write. This plan rejects
 /// exact duplicates, ASCII case aliases and file/directory prefix conflicts.
 pub fn Archive::plan_contents(self : Archive) -> ContentPlan raise ArchiveError {
+  plan_entries(self.inventory)
+}
+
+///|
+/// Plan exactly the requested IDs, preserving request order. Directory IDs
+/// select only that directory, not descendants. Parents are created implicitly.
+/// Missing IDs, repeated entries and selected path collisions are refused;
+/// unselected names do not participate in this explicit subset's path plan.
+pub fn Archive::plan_selection(
+  self : Archive,
+  ids : ArrayView[Int32],
+) -> ContentPlan raise ArchiveError {
+  ignore(
+    bounded(ids.length().to_uint64(), self.limits.entries, "selected entries"),
+  )
+  let entries : Array[Entry] = []
+  for id in ids {
+    guard id >= 0 && id < self.inventory.length() else {
+      raise NoSuchEntry(id~)
+    }
+    entries.push(self.inventory[id])
+  }
+  plan_entries(entries)
+}
+
+///|
+fn plan_entries(entries : Array[Entry]) -> ContentPlan raise ArchiveError {
   let nodes : Map[String, (String, EntryKind)] = Map([])
   let explicit : Set[String] = Set([])
   let folders : Array[String] = []
-  for entry in self.inventory {
+  for entry in entries {
     validate_path(entry.name)
     guard !explicit.contains(entry.name) else {
       raise UnsafePath(path=entry.name, reason="duplicate archive entry")
@@ -109,5 +136,5 @@ pub fn Archive::plan_contents(self : Archive) -> ContentPlan raise ArchiveError 
       }
     }
   }
-  { folders, inventory: self.inventory.copy(), }
+  { folders, inventory: entries.copy(), }
 }

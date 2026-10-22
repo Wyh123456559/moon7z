@@ -38,6 +38,38 @@ pub async fn export_contents(
   }
   let plan = archive.plan_contents()
   let items = archive.extract_all()
+  publish_contents(plan, items, parent~, name~)
+}
+
+///|
+/// Export exactly these stable member IDs, with necessary parents. Selecting
+/// a directory does not select descendants. Only selected folders are decoded;
+/// all CRCs in those folders, including unselected solid siblings, are checked.
+/// Unselected folders are not verified. Publication and metadata contracts are
+/// the same as export_contents. Repeated IDs and selected path aliases fail
+/// before staging. An empty selection deliberately creates an empty directory.
+pub async fn export_selected(
+  archive : @archive.Archive,
+  ids : ArrayView[Int32],
+  parent~ : String,
+  name~ : String,
+) -> ExportedContents {
+  @archive.validate_path(name)
+  guard !name.contains("/") else {
+    fail("export name must be a single directory component")
+  }
+  let plan = archive.plan_selection(ids)
+  let items = archive.reader(cache_bytes=0).read_many(ids)
+  publish_contents(plan, items, parent~, name~)
+}
+
+///|
+async fn publish_contents(
+  plan : @archive.ContentPlan,
+  items : Array[@archive.Member],
+  parent~ : String,
+  name~ : String,
+) -> ExportedContents {
   let parent = @fs.realpath(parent)
   guard @fs.kind(parent, follow_symlink=false) == Directory else {
     fail("export parent must be an existing directory")

@@ -1,0 +1,62 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("subset workflow requires wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-subset")
+  defer @fs.rmdir(root, recursive=true)
+  let args = [
+    "run", "--target", target, "app", "--", "extract-selected", "--contents-only",
+  ]
+  @shell.Cmd("moon", args + ["corpus/lzma2-solid.7z", root, "manifest", "6"]).run(
+    timeout_ms=120000,
+  )
+  assert_eq(
+    @fs.read_file(root + "/manifest/清单.json").binary(),
+    @fs.read_file("corpus/source/清单.json").binary(),
+  )
+  assert_eq(@fs.readdir(root + "/manifest", include_hidden=true).length(), 1)
+  let duplicate = @shell.Cmd(
+    "moon",
+    args + ["corpus/binary.7z", root, "duplicate", "0", "0"],
+  ).output(timeout_ms=120000)
+  assert_true(duplicate.exit_code() != 0)
+  let missing = @shell.Cmd(
+    "moon",
+    args + ["corpus/binary.7z", root, "missing", "99"],
+  ).output(timeout_ms=120000)
+  assert_true(missing.exit_code() != 0)
+  let overwrite = @shell.Cmd(
+    "moon",
+    args + ["corpus/binary.7z", root, "manifest", "0"],
+  ).output(timeout_ms=120000)
+  assert_true(overwrite.exit_code() != 0)
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 1)
+  let corrupted = @fs.read_file("corpus/copy-plain.7z").binary().to_array()
+  corrupted[32] = (corrupted[32].to_int() ^ 1).to_byte()
+  let path = root + "/damaged.7z"
+  @fs.write_file(path, Bytes::from_array(corrupted))
+  // ID 6 is a healthy independent folder; ID 3 is the damaged first data folder.
+  @shell.Cmd("moon", args + [path, root, "healthy", "6"]).run(timeout_ms=120000)
+  assert_eq(
+    @fs.read_file(root + "/healthy/清单.json").binary(),
+    @fs.read_file("corpus/source/清单.json").binary(),
+  )
+  let refused = @shell.Cmd("moon", args + [path, root, "bad", "3"]).output(
+    timeout_ms=120000,
+  )
+  assert_true(refused.exit_code() != 0)
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 3)
+  println(
+    "Explicit subsets export only selected members; collisions and damaged selected folders leave no staging output",
+  )
+}
