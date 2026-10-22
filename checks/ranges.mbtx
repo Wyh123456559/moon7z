@@ -1,0 +1,49 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/process",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("range workflow requires wasm or native")
+  }
+  let args = [
+    "run", "--target", target, "app", "--", "read-range", "corpus/binary.7z", "0",
+  ]
+  for (offset, length) in [(0, 16), (249, 7), (256, 0)] {
+    let (code, stdout, _) = @process.collect_output(
+      "moon",
+      args + [offset.to_string(), length.to_string()],
+    )
+    assert_eq(code, 0)
+    assert_eq(
+      stdout.binary(),
+      Bytes::makei(length, i => (i + offset).to_byte()),
+    )
+  }
+  for (offset, length) in [(-1, 1), (255, 2), (0, 2147483647)] {
+    let (code, stdout, _) = @process.collect_output(
+      "moon",
+      args + [offset.to_string(), length.to_string()],
+    )
+    assert_true(code != 0)
+    assert_true(stdout.binary().is_empty())
+  }
+  let (code, stdout, _) = @process.collect_output("moon", [
+    "run", "--target", target, "app", "--", "read-range", "corpus/bcj-lzma2.7z",
+    "0", "0", "64",
+  ])
+  assert_eq(code, 0)
+  assert_eq(
+    stdout.binary(),
+    @fs.read_file("corpus/x86/program.elf").binary()[:64].to_owned(),
+  )
+  println(
+    "Binary and ELF ranges match original bytes; invalid ranges emit no content",
+  )
+}

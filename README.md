@@ -12,6 +12,7 @@ moon update
 moon run app -- list corpus/lzma2-solid.7z
 moon run app -- test corpus/lzma2-solid.7z
 moon run app -- read corpus/lzma2-solid.7z 6
+moon run app -- read-range corpus/bcj-lzma2.7z 0 0 64
 moon run examples/import -- corpus/lzma2-solid.7z
 moon run examples/preview -- corpus/lzma2-solid.7z
 moon run app -- test corpus/delta-solid.7z
@@ -51,6 +52,16 @@ Larger folders remain readable under archive limits but are not cached; zero
 disables retention. `clear_cache()` releases it, and `stats()` exposes attempts,
 hits and resident bytes. These counters do not establish a performance claim.
 The preview example reads JSON members and then repeats a read using the cache.
+
+For binary header previews or paged consumers, call
+`reader.read_range(id, offset=0, length=64)`. It returns only the requested bytes
+and does not copy the rest of the member. The entire selected folder still
+decodes and passes its available CRC checks, even for a zero-length request.
+This is not random access into compressed data. Offsets and lengths must be
+nonnegative and fit the member; EOF permits an empty range. Out-of-bounds
+requests raise `InvalidRange` before decoding and preserve an existing cache.
+Directories are refused. The matching `read-range` CLI command writes binary
+stdout without a newline; failures produce no content.
 
 Selective reads check all available packed/folder/substream CRCs in each selected
 folder, including solid siblings. **Unselected folders are not verified.** A

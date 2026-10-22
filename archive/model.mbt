@@ -8,6 +8,7 @@ pub suberror ArchiveError {
   Codec(reason~ : String)
   UnsafePath(path~ : String, reason~ : String)
   NoSuchEntry(id~ : Int32)
+  InvalidRange(id~ : Int32, offset~ : Int32, length~ : Int32, size~ : Int32)
 } derive(Debug)
 
 ///|

@@ -125,6 +125,42 @@ pub fn Reader::read(self : Reader, id : Int32) -> Member raise ArchiveError {
 }
 
 ///|
+/// Copy just a file range after verifying its entire folder, including siblings.
+/// This saves returned-copy space, not solid decoding work. Empty ranges in a
+/// data folder still perform integrity checks; directories are not byte files.
+/// Invalid requests do not change cache state. Offset at EOF requires length 0.
+pub fn Reader::read_range(
+  self : Reader,
+  id : Int32,
+  offset~ : Int32,
+  length~ : Int32,
+) -> Bytes raise ArchiveError {
+  guard id >= 0 && id < self.archive.inventory.length() else {
+    raise NoSuchEntry(id~)
+  }
+  let entry = self.archive.inventory[id]
+  guard entry.kind == File else {
+    raise Unsupported(
+      feature="byte range on directory entry \{id}; select a file ID",
+    )
+  }
+  guard offset >= 0 &&
+    length >= 0 &&
+    offset <= entry.size &&
+    length <= entry.size - offset else {
+    raise InvalidRange(id~, offset~, length~, size=entry.size)
+  }
+  match entry.block {
+    None => b""
+    Some(block) => {
+      let data = self.load(block)
+      let start = self.member_starts[id] + offset
+      data[start:start + length].to_owned()
+    }
+  }
+}
+
+///|
 /// Group requests by folder, decode each selected folder at most once per call
 /// and return members in request order, including duplicate IDs. All IDs and
 /// total requested bytes are checked before any decode. No partial result is

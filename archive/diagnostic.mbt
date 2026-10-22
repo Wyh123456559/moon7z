@@ -5,6 +5,10 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    InvalidRange(id~, offset~, length~, size~) =>
+      logger.write_string(
+        "Invalid byte range for 7z entry \{id}: offset \{offset}, length \{length}, file size \{size}. Use nonnegative values within the member; an empty range at EOF is allowed.",
+      )
     NoSuchEntry(id~) =>
       logger.write_string(
         "No 7z entry with ID \{id}. Select an ID from Archive::entries().",

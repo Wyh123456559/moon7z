@@ -17,6 +17,7 @@ pub suberror ArchiveError {
   Codec(reason~ : String)
   UnsafePath(path~ : String, reason~ : String)
   NoSuchEntry(id~ : Int32)
+  InvalidRange(id~ : Int32, offset~ : Int32, length~ : Int32, size~ : Int32)
 } derive(@debug.Debug)
 pub fn ArchiveError::output(Self, &Logger) -> Unit
 #deprecated
@@ -113,6 +114,7 @@ pub struct Reader {
 pub fn Reader::clear_cache(Self) -> Unit
 pub fn Reader::read(Self, Int32) -> Member raise ArchiveError
 pub fn Reader::read_many(Self, ArrayView[Int32]) -> Array[Member] raise ArchiveError
+pub fn Reader::read_range(Self, Int32, offset~ : Int32, length~ : Int32) -> Bytes raise ArchiveError
 pub fn Reader::stats(Self) -> ReaderStats
 
 pub struct ReaderStats {
