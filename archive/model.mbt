@@ -9,6 +9,7 @@ pub suberror ArchiveError {
   UnsafePath(path~ : String, reason~ : String)
   NoSuchEntry(id~ : Int32)
   InvalidRange(id~ : Int32, offset~ : Int32, length~ : Int32, size~ : Int32)
+  MissingChecksum(id~ : Int32, name~ : String)
 } derive(Debug)
 
 ///|

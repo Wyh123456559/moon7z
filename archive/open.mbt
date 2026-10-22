@@ -135,7 +135,20 @@ fn validate_pack_ranges(
 ///|
 /// Verify every packed stream, folder and available member CRC. This checks
 /// accidental corruption, not authenticity or a cryptographic signature.
-pub fn Archive::verify(self : Archive) -> Verification raise ArchiveError {
+/// Requiring member CRCs refuses the first file without one before decoding;
+/// this includes empty files, excludes directories and does not accept only a
+/// shared folder/pack CRC as a substitute. The default behavior is unchanged.
+pub fn Archive::verify(
+  self : Archive,
+  require_member_crcs~ : Bool = false,
+) -> Verification raise ArchiveError {
+  if require_member_crcs {
+    for entry in self.inventory {
+      if entry.kind == File && entry.crc32 is None {
+        raise MissingChecksum(id=entry.id, name=entry.name)
+      }
+    }
+  }
   let members = self.extract_all()
   let mut files = 0
   let mut bytes = 0

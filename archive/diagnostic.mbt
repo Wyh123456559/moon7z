@@ -5,6 +5,10 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    MissingChecksum(id~, name~) =>
+      logger.write_string(
+        "7z entry \{id} (\{Repr(name)}) has no member CRC-32. Repack with member checksums or explicitly use the default available-checks policy.",
+      )
     InvalidRange(id~, offset~, length~, size~) =>
       logger.write_string(
         "Invalid byte range for 7z entry \{id}: offset \{offset}, length \{length}, file size \{size}. Use nonnegative values within the member; an empty range at EOF is allowed.",

@@ -16,6 +16,7 @@ moon run app -- read-range corpus/bcj-lzma2.7z 0 0 64
 moon run examples/import -- corpus/lzma2-solid.7z
 moon run examples/preview -- corpus/lzma2-solid.7z
 moon run app -- test corpus/delta-solid.7z
+moon run app -- test --require-member-crcs corpus/delta-solid.7z
 moon run app -- test corpus/bcj-lzma2.7z
 moon run app -- extract --contents-only corpus/delta-solid.7z . imported-audio
 moon run app -- extract --contents-only corpus/lzma2-solid.7z . imported-package
@@ -112,6 +113,16 @@ Opening checks the headers and complete member mapping. Listing does **not**
 verify file contents. `verify()` and `extract_all()` decode all folders and check
 all available CRCs before returning success. A missing member CRC is counted as
 missing, including empty files. CRC checks detect corruption, not authenticity.
+
+Import pipelines that require a checksum for each file can call
+`archive.verify(require_member_crcs=true)` or run
+`test --require-member-crcs ARCHIVE`. This refuses the first file lacking a
+member CRC with `MissingChecksum(id, name)` before decoding. Empty files are
+included, directories are excluded, and a shared solid-folder CRC does not
+replace individual member CRCs. If every file has a CRC, all normal payload
+checks still run. The default remains checking every available CRC and reporting
+missing ones explicitly. This opt-in policy is a data-quality gate, not
+cryptographic authentication.
 
 Defaults: 64 MiB input, 4 MiB header, 128 MiB expanded data, 64 MiB dictionary,
 10,000 entries. Limits bound individual controlled sizes, not peak process RSS:

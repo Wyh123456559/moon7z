@@ -1,6 +1,16 @@
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() == 4 &&
+    args[1] == "test" &&
+    args[2] == "--require-member-crcs" {
+    let archive = @host.open_file(args[3])
+    let report = archive.verify(require_member_crcs=true) catch {
+      err => fail(err.to_string())
+    }
+    println(Repr(report))
+    return
+  }
   if args.length() == 6 && args[1] == "read-range" {
     let archive = @host.open_file(args[2])
     let id = @string.parse_int(args[3])
@@ -30,7 +40,7 @@ async fn main {
   }
   guard args.length() == 3 && (args[1] == "list" || args[1] == "test") else {
     fail(
-      "usage: moon run app -- <list|test> archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name",
+      "usage: moon run app -- <list|test> archive.7z OR test --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name",
     )
   }
   let archive = @host.open_file(args[2])

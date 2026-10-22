@@ -18,6 +18,7 @@ pub suberror ArchiveError {
   UnsafePath(path~ : String, reason~ : String)
   NoSuchEntry(id~ : Int32)
   InvalidRange(id~ : Int32, offset~ : Int32, length~ : Int32, size~ : Int32)
+  MissingChecksum(id~ : Int32, name~ : String)
 } derive(@debug.Debug)
 pub fn ArchiveError::output(Self, &Logger) -> Unit
 #deprecated
@@ -34,7 +35,7 @@ pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
 pub fn Archive::open(Bytes, limits? : Limits) -> Self raise ArchiveError
 pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
 pub fn Archive::reader(Self, cache_bytes? : Int32) -> Reader raise ArchiveError
-pub fn Archive::verify(Self) -> Verification raise ArchiveError
+pub fn Archive::verify(Self, require_member_crcs? : Bool) -> Verification raise ArchiveError
 
 pub struct ContentPlan {
   // private fields

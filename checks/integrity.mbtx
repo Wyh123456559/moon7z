@@ -1,0 +1,46 @@
+///|
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("integrity workflow requires wasm or native")
+  }
+  let args = ["run", "--target", target, "app", "--", "test"]
+  let accepted = @shell.Cmd(
+    "moon",
+    args + ["--require-member-crcs", "corpus/binary.7z"],
+  ).output(timeout_ms=120000)
+  assert_eq(accepted.exit_code(), 0)
+  assert_true(accepted.stdout().contains("members_without_crc: 0"))
+  let refused = @shell.Cmd(
+    "moon",
+    args + ["--require-member-crcs", "corpus/lzma2-solid.7z"],
+  ).output(timeout_ms=120000)
+  assert_true(refused.exit_code() != 0)
+  assert_true(refused.stdout().is_empty())
+  assert_true(refused.stderr().contains("empty.txt"))
+  assert_true(refused.stderr().contains("Repack"))
+  let root = @fs.tmpdir(prefix="moon7z-crc-policy")
+  defer @fs.rmdir(root, recursive=true)
+  let damaged = @fs.read_file("corpus/binary.7z").binary().to_array()
+  damaged[32] = (damaged[32].to_int() ^ 1).to_byte()
+  let path = root + "/damaged.7z"
+  @fs.write_file(path, Bytes::from_array(damaged))
+  let refused = @shell.Cmd("moon", args + ["--require-member-crcs", path]).output(
+    timeout_ms=120000,
+  )
+  assert_true(refused.exit_code() != 0)
+  assert_true(refused.stdout().is_empty())
+  assert_true(refused.stderr().contains("CRC-32 mismatch"))
+  @shell.Cmd("moon", args + ["corpus/lzma2-solid.7z"]).run(timeout_ms=120000)
+  println(
+    "Strict import policy rejects missing or incorrect CRCs; default verification remains available",
+  )
+}
