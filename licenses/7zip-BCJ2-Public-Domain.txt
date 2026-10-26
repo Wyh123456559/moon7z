@@ -1,0 +1,16 @@
+Original source notices:
+
+/* Bcj2.c -- BCJ2 Decoder (Converter for x86 code)
+2023-03-01 : Igor Pavlov : Public domain */
+
+/* Bcj2.h -- BCJ2 Converter for x86 code (Branch CALL/JUMP variant2)
+2023-03-02 : Igor Pavlov : Public domain */
+
+Sources (7-Zip 26.05):
+https://github.com/ip7z/7zip/blob/26.05/C/Bcj2.c
+https://github.com/ip7z/7zip/blob/26.05/C/Bcj2.h
+
+archive/bcj2.mbt adapts range and branch decoding into a bounded whole-folder
+MoonBit implementation. Public Domain status is preserved. Project-authored
+graph integration and tests are Apache-2.0; that license does not restrict the
+original Public Domain algorithm.

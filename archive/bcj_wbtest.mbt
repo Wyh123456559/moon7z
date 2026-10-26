@@ -27,13 +27,12 @@ test "BCJ preserves short tails non-branch bytes and noncanonical immediates" {
 }
 
 ///|
-test "BCJ2 unknown aliases and BCJ properties are explicitly refused" {
+test "unknown BCJ aliases and BCJ properties are explicitly refused" {
   validate_coder({ codec_id: b"\x03\x03\x01\x03", properties: b"", })
   for
     coder in [
       { codec_id: b"\x03\x03\x01\x03", properties: b"\x00", },
       { codec_id: b"\x03\x03\x01\x03", properties: b"\x00\x00\x00\x00", },
-      { codec_id: b"\x03\x03\x01\x1b", properties: b"", },
       { codec_id: b"\x04", properties: b"", },
     ] {
     let rejected = try {

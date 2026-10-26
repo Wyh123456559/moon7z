@@ -6,7 +6,7 @@ writing temporary files. It is intended for importers, resource managers and
 batch data tools that need to consume archives through an API.
 
 The project is a 7z container and verified-import implementation built on an
-existing LZMA/LZMA2 codec. It includes a small public-domain BCJ adaptation; it
+existing LZMA/LZMA2 codec. It includes public-domain BCJ/BCJ2 adaptations; it
 does not claim that the compression algorithms are original. Basic archive
 reading overlaps the recently published `Sxy11112/moon7z`; the independent work
 is the broader compatibility path plus bounded, verified member processing.
@@ -142,17 +142,17 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Capability | Current behavior |
 | --- | --- |
 | Container | Single-volume; real fixtures cover 0.3 and 0.4; header minors 0–4 accepted; signature at byte zero |
-| Codecs | Copy, LZMA, LZMA2; followed by supported unary filters |
+| Codecs | Copy, LZMA, LZMA2, BCJ2 four-input branch reconstruction |
 | Filters | Delta (distance 1–256), x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
-| Coder chains | One packed input, linear bindings, at most eight unary coders per folder |
+| Coder graph | Bounded acyclic graphs of supported unary coders and four-input BCJ2; explicit physical input mappings |
 | Headers | Plain and compressed headers |
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
 | Integrity | Start/next header, available packed/folder/member CRC-32 |
 | Metadata | Creation/access/modification FILETIME and Windows/POSIX attribute word retained |
 | Archive properties | Original ordered UInt64 IDs and opaque bytes, including duplicate IDs and empty values |
-| Resources | Configurable input/header/output/dictionary/member limits |
+| Resources | Configurable input/header/output/dictionary/member/coder/intermediate-output limits |
 
-Encryption, split volumes, SFX, branching/multiple-input coder graphs, BCJ2,
+Encryption, split volumes, SFX,
 unlisted filters (including RISC-V), additional streams,
 anti-items, links, special files, unknown semantic properties and writing are
 rejected. Zero padding may repeat. The reader does not silently skip unsupported
@@ -206,7 +206,8 @@ when folders fail, so consumers must inspect `all_available_checks_passed` or us
 See [audit workflow and JSON contract](docs/audit.md).
 
 Defaults: 64 MiB input, 4 MiB header, 128 MiB expanded data, 64 MiB dictionary,
-10,000 entries. Limits bound individual controlled sizes, not peak process RSS:
+10,000 entries, 64 coders per folder and 256 MiB summed declared coder outputs
+per folder (`working_bytes`). Limits bound controlled sizes, not peak process RSS:
 input, decoder buffers, folder output and returned member copies can coexist.
 LZMA2 chunk sizes are checked before codec allocation. This is a bounded,
 in-memory implementation, not a streaming reader or an exact backup restorer.
@@ -223,10 +224,12 @@ Delta-filtered WAV/numeric data and BCJ-filtered x86 program archives use the sa
 verification, selective read and export APIs. Filters run over the entire solid folder before splitting
 members, so history is retained across file boundaries. Coder bindings are
 resolved independently of their storage order; cycles, duplicate bindings,
-disconnected nodes and differing intermediate output sizes are refused before
-decoding. Each intermediate output must fit the archive's remaining output
-budget. The chain must start with Copy/LZMA/LZMA2 and all remaining coders must
-be supported length-preserving filters.
+disconnected nodes and inconsistent length-preserving output sizes are refused
+before decoding. Intermediate outputs share the folder's `working_bytes` budget;
+final folder outputs share `output_bytes`. BCJ2 consumes independently mapped
+main, call, jump and range-control inputs, including LZMA/LZMA2-compressed
+branches. Each physical input CRC is checked before releasing folder contents.
+See [BCJ2 workflow, evidence and resource policy](docs/bcj2.md).
 
 The supported x86 BCJ method is `03 03 01 03`, with empty properties and an initial
 instruction pointer of zero, as emitted by 7-Zip's BCJ coder. Nonempty properties

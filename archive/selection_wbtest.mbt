@@ -4,7 +4,13 @@ fn named_empty_archive(names : Array[String]) -> Archive {
     input: b"",
     limits: Limits::new(),
     archive_properties: [],
-    streams: { pack_offset: 0, pack_sizes: [], pack_crcs: [], blocks: [], },
+    streams: {
+      pack_offset: 0,
+      pack_sizes: [],
+      pack_crcs: [],
+      blocks: [],
+      layouts: [],
+    },
     inventory: names.mapi((id, name) => {
       id,
       name,

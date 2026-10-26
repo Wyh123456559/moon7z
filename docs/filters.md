@@ -1,7 +1,7 @@
 # Classic 7z branch and byte-swap filters
 
-The reader accepts these registered 7z methods after Copy, LZMA or LZMA2 in a
-bounded linear pipeline:
+The reader accepts these registered 7z methods as length-preserving nodes in a
+bounded coder graph, including the Copy/LZMA/LZMA2 pipelines demonstrated here:
 
 | Name | Method ID | Properties / initial position |
 | --- | --- | --- |

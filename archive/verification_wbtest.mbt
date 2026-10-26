@@ -13,6 +13,7 @@ test "folderwise verification checks member CRCs when no folder CRC exists" {
     limits: Limits::new(),
     archive_properties: [],
     streams: {
+      layouts: [],
       pack_offset: 0,
       pack_sizes: [6],
       pack_crcs: [None],

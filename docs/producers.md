@@ -73,6 +73,6 @@ is correct inventory and every original file byte, with retained metadata.
 This baseline covers the listed codec/header/layout combinations for those
 producers. It does not cover their entire feature set, all platforms on which
 they run, AES, BCJ2, PPMd, BZip2, additional streams, split volumes or large
-seekable inputs. Those remain explicit rows in the
+seekable inputs. BCJ2 has [separate five-case evidence](bcj2.md); the other gaps remain explicit rows in the
 [1.0 completion target](compatibility.md). Passing these 21 cases is not a
 claim that the complete reader target or contest acceptance is achieved.

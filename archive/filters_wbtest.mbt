@@ -3,15 +3,15 @@ test "linear bindings resolve decode order independently of stored order" {
   let pipeline = read_pipeline(
     Cursor::new(b"\x02\x21\x03\x01\x03\x01\x00\x00\x01"),
   )
-  assert_eq(pipeline.length(), 2)
-  assert_eq(pipeline[0].codec_id, b"\x00")
-  assert_eq(pipeline[1].codec_id, b"\x03")
+  assert_eq(pipeline.ordered_coders().length(), 2)
+  assert_eq(pipeline.ordered_coders()[0].codec_id, b"\x00")
+  assert_eq(pipeline.ordered_coders()[1].codec_id, b"\x03")
   let chain : Block = {
     coders: read_pipeline(
       Cursor::new(
         b"\x03\x21\x03\x01\x03\x21\x03\x01\x00\x01\x00\x00\x01\x01\x02",
       ),
-    ),
+    ).ordered_coders(),
     size: 8,
     crc: Some(crc32(b"abcdefgh")),
     pieces: [],
@@ -29,7 +29,10 @@ test "linear bindings resolve decode order independently of stored order" {
     maximum.write_byte(i.to_byte())
     maximum.write_byte((i - 1).to_byte())
   }
-  assert_eq(read_pipeline(Cursor::new(maximum.to_bytes())).length(), 8)
+  assert_eq(
+    read_pipeline(Cursor::new(maximum.to_bytes())).ordered_coders().length(),
+    8,
+  )
 }
 
 ///|
@@ -38,8 +41,7 @@ test "coder graphs reject duplicate edges cycles disconnected nodes and unsafe s
     bytes in [
       b"\x00", b"\x09", b"\x02\x01\x00\x01\x00\x00\x00", b"\x02\x01\x00\x01\x00\x02\x00",
       b"\x03\x01\x00\x01\x00\x01\x00\x01\x00\x01\x02", b"\x03\x01\x00\x01\x00\x01\x00\x01\x00\x02\x00",
-      b"\x03\x01\x00\x01\x00\x01\x00\x01\x02\x02\x01", b"\x02\x01\x00\x01\x00\x01\x00",
-      b"\x01\x11\x00\x02\x01", b"\x01\x21\x03\x01\x00",
+      b"\x03\x01\x00\x01\x00\x01\x00\x01\x02\x02\x01", b"\x01\x11\x00\x02\x01",
     ] {
     let rejected = try {
       ignore(read_pipeline(Cursor::new(bytes)))

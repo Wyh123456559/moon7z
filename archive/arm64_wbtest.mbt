@@ -89,8 +89,8 @@ test "ARM64 property shape and alignment are checked before decode" {
   let pipeline = read_pipeline(
     Cursor::new(b"\x02\x21\x0a\x04\x00\x10\x00\x00\x01\x00\x00\x01"),
   )
-  assert_eq(pipeline[0].codec_id, b"\x00")
-  assert_eq(pipeline[1].properties, b"\x00\x10\x00\x00")
+  assert_eq(pipeline.ordered_coders()[0].codec_id, b"\x00")
+  assert_eq(pipeline.ordered_coders()[1].properties, b"\x00\x10\x00\x00")
 }
 
 ///|
@@ -103,7 +103,7 @@ test "ARM64 composes with Delta in the resolved decode order" {
   let block : Block = {
     coders: read_pipeline(
       Cursor::new(b"\x03\x01\x00\x21\x03\x01\x00\x01\x0a\x01\x00\x02\x01"),
-    ),
+    ).ordered_coders(),
     size: 8,
     crc: Some(crc32(b"\x1f\x20\x03\xd5\x04\x00\x00\x94")),
     pieces: [],

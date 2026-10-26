@@ -1,0 +1,89 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else {
+    fail(
+      "usage: moon run corpus/bcj2/generate.mbtx -- 7ZA19 7ZA26 NEW-DIRECTORY",
+    )
+  }
+  for (packer, version) in [(args[1], "19.00"), (args[2], "26.05")] {
+    let banner = @shell.Cmd(packer, []).output().stdout()
+    guard banner.contains(version) else {
+      fail("expected official 7-Zip " + version)
+    }
+  }
+  @fs.mkdir(args[3])
+  let root = @fs.realpath(args[3])
+  let source = root + "/source"
+  @fs.mkdir(source)
+  for file in ["part-a.bin", "part-b.bin", "program.elf"] {
+    @fs.write_file(
+      source + "/" + file,
+      @fs.read_file("corpus/x86/" + file).binary(),
+    )
+  }
+  for
+    (id, old, codec, solid, program) in [
+      ("direct", false, "Copy", true, false),
+      ("lzma2", false, "LZMA2", true, false),
+      ("lzma19", true, "LZMA", true, false),
+      ("separate", false, "LZMA2", false, false),
+      ("program", false, "LZMA2", true, true),
+    ] {
+    let packer = if old { args[1] } else { args[2] }
+    let archive = root + "/" + id + ".7z"
+    let files = if program {
+      ["program.elf"]
+    } else {
+      ["part-a.bin", "part-b.bin"]
+    }
+    let command = ["a", archive] +
+      files +
+      [
+        "-t7z",
+        "-m0=BCJ2",
+        if solid {
+          "-ms=on"
+        } else {
+          "-ms=off"
+        },
+        if codec == "Copy" {
+          "-mhc=off"
+        } else {
+          "-mhc=on"
+        },
+        "-mtm=off",
+        "-mtc=off",
+        "-mta=off",
+      ]
+    if codec != "Copy" {
+      for index in ["1", "2", "3"] {
+        command.push("-m" + index + "=" + codec + ":d=64k")
+      }
+      for binding in ["-mb0:1", "-mb0s1:2", "-mb0s2:3"] {
+        command.push(binding)
+      }
+    }
+    let made = @shell.Cmd(packer, command, cwd=source).output()
+    guard made.exit_code() == 0 else { fail(made.stderr() + made.stdout()) }
+    @shell.Cmd(args[2], ["t", archive]).run()
+    let extracted = root + "/unpacked-" + id
+    @shell.Cmd(args[2], ["x", archive, "-o" + extracted]).run()
+    for file in files {
+      assert_eq(
+        @fs.read_file(extracted + "/" + file).binary(),
+        @fs.read_file(source + "/" + file).binary(),
+      )
+    }
+    println("Independently verified BCJ2 graph: " + id)
+  }
+}

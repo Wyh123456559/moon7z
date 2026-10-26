@@ -44,9 +44,9 @@ pub fn Archive::reader(
   }
   let pack_starts : Array[Int32] = []
   let mut next = 32 + self.streams.pack_offset
-  for size in self.streams.pack_sizes {
+  for id in 0..<self.streams.blocks.length() {
     pack_starts.push(next)
-    next += size
+    next += packed_folder_bytes(self.streams, id)
   }
   let member_starts : Array[Int32] = []
   let offsets = Array::make(self.streams.blocks.length(), 0)

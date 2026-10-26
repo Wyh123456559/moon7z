@@ -30,6 +30,7 @@ fn comparison_archive(
     archive_properties: [],
     inventory,
     streams: {
+      layouts: [],
       pack_offset: 0,
       pack_sizes: sizes,
       pack_crcs: sizes.map(_ => None),

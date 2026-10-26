@@ -17,6 +17,61 @@ import {
 } for "wbtest"
 
 rule(
+  name: "bcj2_direct",
+  command: ":embed --binary -i $input -o $output --name bcj2_direct",
+)
+
+dev_build(
+  rule: "bcj2_direct",
+  input: "../corpus/bcj2/direct.7z",
+  output: "bcj2_direct_archive_test.mbt",
+)
+
+rule(
+  name: "bcj2_lzma2",
+  command: ":embed --binary -i $input -o $output --name bcj2_lzma2",
+)
+
+dev_build(
+  rule: "bcj2_lzma2",
+  input: "../corpus/bcj2/lzma2.7z",
+  output: "bcj2_lzma2_archive_test.mbt",
+)
+
+rule(
+  name: "bcj2_lzma19",
+  command: ":embed --binary -i $input -o $output --name bcj2_lzma19",
+)
+
+dev_build(
+  rule: "bcj2_lzma19",
+  input: "../corpus/bcj2/lzma19.7z",
+  output: "bcj2_lzma19_archive_test.mbt",
+)
+
+rule(
+  name: "bcj2_separate",
+  command: ":embed --binary -i $input -o $output --name bcj2_separate",
+)
+
+dev_build(
+  rule: "bcj2_separate",
+  input: "../corpus/bcj2/separate.7z",
+  output: "bcj2_separate_archive_test.mbt",
+)
+
+rule(
+  name: "bcj2_program",
+  command: ":embed --binary -i $input -o $output --name bcj2_program",
+)
+
+dev_build(
+  rule: "bcj2_program",
+  input: "../corpus/bcj2/program.7z",
+  output: "bcj2_program_archive_test.mbt",
+)
+
+rule(
   name: "property_archive",
   command: ":embed --binary -i $input -o $output --name property_archive",
 )

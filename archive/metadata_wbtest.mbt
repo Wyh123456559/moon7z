@@ -7,7 +7,7 @@ fn metadata_entries(properties : Bytes) -> Array[Entry] raise ArchiveError {
   )
   read_files(
     r,
-    { pack_offset: 0, pack_sizes: [], pack_crcs: [], blocks: [], },
+    { pack_offset: 0, pack_sizes: [], pack_crcs: [], blocks: [], layouts: [], },
     Limits::new(),
   )
 }

@@ -13,6 +13,8 @@ pub fn Archive::open(
       limits.output_bytes,
       limits.dictionary_bytes,
       limits.entries,
+      limits.working_bytes,
+      limits.coders,
     ] {
     guard value >= 0 && value <= 0x3fffffff else {
       raise Invalid(
@@ -51,7 +53,13 @@ pub fn Archive::open(
     return {
       input,
       limits,
-      streams: { pack_offset: 0, pack_sizes: [], pack_crcs: [], blocks: [], },
+      streams: {
+        pack_offset: 0,
+        pack_sizes: [],
+        pack_crcs: [],
+        blocks: [],
+        layouts: [],
+      },
       inventory: [],
       archive_properties: [],
     }
@@ -80,6 +88,7 @@ pub fn Archive::open(
     )
   }
   let mut streams : Streams = {
+    layouts: [],
     pack_offset: 0,
     pack_sizes: [],
     pack_crcs: [],
@@ -182,7 +191,7 @@ pub fn Archive::verify(
   let mut start = 32 + self.streams.pack_offset
   for id in 0..<self.streams.blocks.length() {
     verify_folder(self, id, start, entries[id])
-    start += self.streams.pack_sizes[id]
+    start += packed_folder_bytes(self.streams, id)
   }
   {
     files,

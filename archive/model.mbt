@@ -21,6 +21,8 @@ pub struct Limits {
   output_bytes : Int32
   dictionary_bytes : Int32
   entries : Int32
+  working_bytes : Int32
+  coders : Int32
 } derive(Debug, Eq)
 
 ///|
@@ -76,8 +78,18 @@ pub fn Limits::new(
   output_bytes~ : Int32 = 128 * 1024 * 1024,
   dictionary_bytes~ : Int32 = 64 * 1024 * 1024,
   entries~ : Int32 = 10000,
+  working_bytes~ : Int32 = 256 * 1024 * 1024,
+  coders~ : Int32 = 64,
 ) -> Limits {
-  { input_bytes, header_bytes, output_bytes, dictionary_bytes, entries, }
+  {
+    input_bytes,
+    header_bytes,
+    output_bytes,
+    dictionary_bytes,
+    entries,
+    working_bytes,
+    coders,
+  }
 }
 
 ///|
@@ -100,6 +112,7 @@ priv struct Streams {
   pack_sizes : Array[Int32]
   pack_crcs : Array[UInt32?]
   blocks : Array[Block]
+  layouts : Array[Layout]
 }
 
 ///|

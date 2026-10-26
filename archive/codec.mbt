@@ -5,6 +5,10 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
     return
   }
   match coder.codec_id {
+    b"\x03\x03\x01\x1b" =>
+      if !coder.properties.is_empty() {
+        raise Invalid(offset=0, reason="BCJ2 has no coder properties")
+      }
     b"\x02\x03\x02" | b"\x02\x03\x04" =>
       if !coder.properties.is_empty() {
         raise Invalid(offset=0, reason="Swap2/Swap4 have no coder properties")
@@ -64,7 +68,7 @@ fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
     return 0UL
   }
   match coder.codec_id {
-    b"\x00" | b"\x03" | b"\x03\x03\x01\x03" | b"\x0a" => 0UL
+    b"\x00" | b"\x03\x03\x01\x1b" => 0UL
     b"\x03\x01\x01" => {
       let r = Cursor::new(coder.properties[1:].to_owned())
       let size = r.u32().to_uint64()
@@ -208,9 +212,8 @@ fn decode_streams(
   let output : Array[Bytes] = []
   let mut offset = 32 + streams.pack_offset
   for i in 0..<streams.blocks.length() {
-    let length = streams.pack_sizes[i]
     output.push(decode_packed_stream(input, streams, i, offset, limits))
-    offset += length
+    offset += packed_folder_bytes(streams, i)
   }
   output
 }
@@ -223,13 +226,26 @@ fn decode_packed_stream(
   start : Int32,
   limits : Limits,
 ) -> Bytes raise ArchiveError {
-  let length = streams.pack_sizes[id]
-  guard start >= 0 &&
-    start <= input.length() &&
-    length <= input.length() - start else {
-    raise Invalid(offset=start, reason="packed stream outside archive")
+  let (first, count) = pack_range(streams, id)
+  let packed : Array[Bytes] = []
+  let mut offset = start
+  for stream in first..<(first + count) {
+    let length = streams.pack_sizes[stream]
+    guard offset >= 0 &&
+      offset <= input.length() &&
+      length <= input.length() - offset else {
+      raise Invalid(offset~, reason="packed stream outside archive")
+    }
+    let bytes = input[offset:offset + length].to_owned()
+    check_crc(bytes, streams.pack_crcs[stream], "packed stream \{stream}")
+    packed.push(bytes)
+    offset += length
   }
-  let packed = input[start:start + length].to_owned()
-  check_crc(packed, streams.pack_crcs[id], "packed stream \{id}")
-  decode(streams.blocks[id], packed, limits)
+  if streams.layouts.is_empty() {
+    decode(streams.blocks[id], packed[0], limits)
+  } else {
+    let result = decode_graph(streams.layouts[id], packed, limits)
+    check_crc(result, streams.blocks[id].crc, "folder")
+    result
+  }
 }

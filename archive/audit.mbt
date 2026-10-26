@@ -76,7 +76,7 @@ pub fn Archive::audit(self : Archive) -> AuditReport {
       err => Some(err)
     }
     results.push({ id, bytes: block.size, error, original: groups[id], })
-    start += self.streams.pack_sizes[id]
+    start += packed_folder_bytes(self.streams, id)
   }
   { results, without_data, without_crc, }
 }

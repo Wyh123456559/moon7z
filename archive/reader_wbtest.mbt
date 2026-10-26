@@ -23,6 +23,7 @@ test "a bad sibling CRC prevents returning or caching a selected solid folder" {
     limits: Limits::new(),
     archive_properties: [],
     streams: {
+      layouts: [],
       pack_offset: 0,
       pack_sizes: [6],
       pack_crcs: [None],

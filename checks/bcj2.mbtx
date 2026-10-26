@@ -1,0 +1,47 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/bcj2")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-bcj2")
+  defer @fs.rmdir(root, recursive=true)
+  for id in ["direct", "lzma2", "lzma19", "separate", "program"] {
+    let result = @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).output(timeout_ms=120000)
+    guard result.exit_code() == 0 else { fail(id + ": " + result.stderr()) }
+    let files = if id == "program" {
+      ["program.elf"]
+    } else {
+      ["part-a.bin", "part-b.bin"]
+    }
+    for file in files {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + file).binary(),
+        @fs.read_file("corpus/x86/" + file).binary(),
+      )
+    }
+    println("BCJ2 graph exported byte-for-byte: " + id)
+  }
+}
