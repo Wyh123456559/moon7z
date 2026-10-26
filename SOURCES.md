@@ -1,5 +1,10 @@
 # Sources and licenses
 
+The API-level reuse boundary and current ecosystem comparison are documented in
+[docs/ecosystem.md](docs/ecosystem.md). The project does not claim that the LZMA,
+LZMA2 or adapted BCJ algorithms are original. `Sxy11112/moon7z` is an independently
+reviewed direct peer, not a dependency or a source of code/fixtures here.
+
 | Material | Source | License and use |
 | --- | --- | --- |
 | LZMA/LZMA2 decoder and Delta/ARM64 filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma`, `lzma2` and `filters` public APIs, not vendored |

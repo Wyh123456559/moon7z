@@ -5,6 +5,16 @@ returns complete file members and their metadata without launching 7-Zip or
 writing temporary files. It is intended for importers, resource managers and
 batch data tools that need to consume archives through an API.
 
+The project is a 7z container and verified-import implementation built on an
+existing LZMA/LZMA2 codec. It includes a small public-domain BCJ adaptation; it
+does not claim that the compression algorithms are original. Basic archive
+reading overlaps the recently published `Sxy11112/moon7z`; the independent work
+is the broader compatibility path plus bounded, verified member processing.
+See [ecosystem and reuse comparison](docs/ecosystem.md), the
+[versioned compatibility target](docs/compatibility.md), and
+[Chinese project submission](docs/submission.md). The compatibility target is
+not yet complete; passing the current tests does not imply full 7z coverage.
+
 ## Use it
 
 ```console
