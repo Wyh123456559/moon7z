@@ -1,0 +1,86 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else {
+    fail("usage: generate.mbtx 7ZA19 7ZA26 NEW_DIRECTORY")
+  }
+  for (packer, version) in [(args[1], "19.00"), (args[2], "26.05")] {
+    guard @shell.Cmd(packer, []).output().stdout().contains(version) else {
+      fail("wrong producer version: " + version)
+    }
+  }
+  @fs.mkdir(args[3])
+  let root = @fs.realpath(args[3])
+  let source = root + "/source"
+  @fs.mkdir(source)
+  for
+    (original, file) in [
+      ("corpus/audio/left.wav", "left.wav"),
+      ("corpus/audio/right.wav", "right.wav"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    @fs.write_file(source + "/" + file, @fs.read_file(original).binary())
+  }
+  for
+    (id, old, separate, level) in [
+      ("v1900-solid", true, false, "9"),
+      ("v2605-solid", false, false, "9"),
+      ("v2605-separate", false, true, "1"),
+      ("v2605-level0", false, false, "0"),
+    ] {
+    let archive = root + "/" + id + ".7z"
+    let command = [
+      "a",
+      archive,
+      "left.wav",
+      "right.wav",
+      "清单.json",
+      "-t7z",
+      "-m0=Deflate:x=" + level,
+      if separate {
+        "-ms=off"
+      } else {
+        "-ms=on"
+      },
+      if level == "0" {
+        "-mhc=off"
+      } else {
+        "-mhc=on"
+      },
+      "-mtm=off",
+      "-mtc=off",
+      "-mta=off",
+    ]
+    let result = @shell.Cmd(
+      if old {
+        args[1]
+      } else {
+        args[2]
+      },
+      command,
+      cwd=source,
+    ).output()
+    guard result.exit_code() == 0 else {
+      fail(result.stdout() + result.stderr())
+    }
+    @shell.Cmd(args[2], ["t", archive]).run()
+    let output = root + "/unpacked-" + id
+    @shell.Cmd(args[2], ["x", archive, "-o" + output]).run()
+    for file in ["left.wav", "right.wav", "清单.json"] {
+      assert_eq(
+        @fs.read_file(output + "/" + file).binary(),
+        @fs.read_file(source + "/" + file).binary(),
+      )
+    }
+    println("Independent DEFLATE extraction passed: " + id)
+  }
+}

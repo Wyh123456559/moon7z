@@ -142,7 +142,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Capability | Current behavior |
 | --- | --- |
 | Container | Single-volume; real fixtures cover 0.3 and 0.4; header minors 0–4 accepted; signature at byte zero |
-| Codecs | Copy, LZMA, LZMA2, BCJ2 four-input branch reconstruction |
+| Codecs | Copy, LZMA, LZMA2, raw DEFLATE, BCJ2 four-input branch reconstruction |
 | Filters | Delta (distance 1–256), x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder graph | Bounded acyclic graphs of supported unary coders and four-input BCJ2; explicit physical input mappings |
 | Headers | Plain and compressed headers |
@@ -230,6 +230,12 @@ final folder outputs share `output_bytes`. BCJ2 consumes independently mapped
 main, call, jump and range-control inputs, including LZMA/LZMA2-compressed
 branches. Each physical input CRC is checked before releasing folder contents.
 See [BCJ2 workflow, evidence and resource policy](docs/bcj2.md).
+
+The 7z DEFLATE method (`04 01 08`, empty properties) accepts stored, fixed and
+dynamic Huffman blocks, a 32 KiB history window and overlapping matches. The
+decoder checks declared output before every literal/copy and refuses trailing
+compressed bytes. Existing APIs also handle Delta/DEFLATE audio archives.
+See [DEFLATE import workflow and independent evidence](docs/deflate.md).
 
 The supported x86 BCJ method is `03 03 01 03`, with empty properties and an initial
 instruction pointer of zero, as emitted by 7-Zip's BCJ coder. Nonempty properties

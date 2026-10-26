@@ -10,7 +10,7 @@ projects. `Wyh123456559/moon7z` and `Sxy11112/moon7z` are different modules.
 | [Sxy11112/moon7z](https://github.com/Sxy11112/moon7z/tree/6804168772a3419436f6512b1c8f260c037c4ca9), registry 0.1.0 | `SevenZ::open`, `entries`, `streams`, `extract_all`, `extract(name)`; own Copy/LZMA1/LZMA2 decoding; plain/compressed headers and solid members | **Direct overlap in basic container reading and extraction.** Its checked README explicitly excludes filters, AES, volumes, BCJ2 and PPMd/BZip2/Deflate. Those statements describe that revision, not all future versions. |
 | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), registry 0.1.0 | LZMA/LZMA2/XZ stream coding; `lzma.decode_alone`, `lzma2.decode_lzma2`, filter functions | Dependency, not a competing 7z member/container workflow. Moon7z does not implement or claim ownership of its range coder, dictionary engine or reused filters. |
 | [lin2077-zeming/MoonXZ](https://github.com/lin2077-zeming/MoonXZ), registry 0.4.6 | `lib.compress`, `decompress`, `.lzma` helpers and XZ reader/writer APIs | Adjacent stream format. Its README snapshot still names 0.4.4; registry version and README claims must not be treated as identical. Not used as a dependency. |
-| [bikallem/compress](https://github.com/bikallem/compress), registry 0.3.4 | Compression streams including DEFLATE and BZip2 | Potential codec infrastructure, not a 7z container. No code or tests copied into Moon7z. |
+| [bikallem/compress](https://github.com/bikallem/compress), registry 0.3.4 | Compression streams including DEFLATE and BZip2 | Adjacent codec APIs, not a 7z member workflow. Source was inspected for reuse; this published version's legacy `moon.mod.json` is rejected by the current stable toolchain. No code or tests copied into Moon7z; it is not a dependency. |
 | [bodgit/sevenzip](https://github.com/bodgit/sevenzip/tree/bc7ebbd2043c386e3bab1bd04a64a62062890fc4) (Go) | General 7z reader using existing codecs and typed members | Container structure reference; not the implementation being wholly ported. BSD-3-Clause notice retained. |
 
 All four checked MoonBit modules declare Apache-2.0 in the registry. The direct
@@ -58,6 +58,8 @@ of ecosystem uniqueness or approval.
 | `aurora0x27/lzma-mbt@0.1.0/lzma2` | `decode_lzma2`: raw LZMA2 data and dictionary size; Moon7z checks chunk/output budgets before the call | Upstream Apache-2.0 decoder |
 | `aurora0x27/lzma-mbt@0.1.0/filters` | `delta_decode`, `bcj_arm64`, `bcj_arm`, `bcj_armthumb`, `bcj_powerpc`, `bcj_ia64`, `bcj_sparc`; independent 7-Zip cases exercise each used filter | Upstream Apache-2.0 algorithms |
 | `archive/bcj.mbt` | Classic x86 BCJ decoding translated from Igor Pavlov's `Bra86.c` (7-Zip 21.07) | Public Domain adaptation, not an original algorithm |
+| `archive/bcj2.mbt` | Four-input reconstruction adapted from 7-Zip 26.05 BCJ2 | Public Domain adaptation |
+| `archive/deflate.mbt` | Bounded whole-node raw DEFLATE decoding integrated with 7z graph/integrity policies | Project code from RFC 1951 format rules; the established algorithm is not claimed as novel |
 | `archive/binary.mbt`, `streams.mbt`, `files.mbt`, `open.mbt` | 7z framing, bounded fields, coder topology, inventory and decode integration | Project code; format references and consulted BSD reference recorded in SOURCES.md |
 | `reader.mbt`, `ranges.mbt`, `paths.mbt`, `compare.mbt`, `audit.mbt`, `report.mbt`, `host/` | Public workflow logic and diagnostics | Project code, Apache-2.0 |
 

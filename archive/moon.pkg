@@ -17,6 +17,50 @@ import {
 } for "wbtest"
 
 rule(
+  name: "deflate_1900",
+  command: ":embed --binary -i $input -o $output --name deflate_1900",
+)
+
+dev_build(
+  rule: "deflate_1900",
+  input: "../corpus/deflate/v1900-solid.7z",
+  output: "deflate_1900_archive_test.mbt",
+)
+
+rule(
+  name: "deflate_2605",
+  command: ":embed --binary -i $input -o $output --name deflate_2605",
+)
+
+dev_build(
+  rule: "deflate_2605",
+  input: "../corpus/deflate/v2605-solid.7z",
+  output: "deflate_2605_archive_test.mbt",
+)
+
+rule(
+  name: "deflate_separate",
+  command: ":embed --binary -i $input -o $output --name deflate_separate",
+)
+
+dev_build(
+  rule: "deflate_separate",
+  input: "../corpus/deflate/v2605-separate.7z",
+  output: "deflate_separate_archive_test.mbt",
+)
+
+rule(
+  name: "deflate_level0",
+  command: ":embed --binary -i $input -o $output --name deflate_level0",
+)
+
+dev_build(
+  rule: "deflate_level0",
+  input: "../corpus/deflate/v2605-level0.7z",
+  output: "deflate_level0_archive_test.mbt",
+)
+
+rule(
   name: "bcj2_direct",
   command: ":embed --binary -i $input -o $output --name bcj2_direct",
 )

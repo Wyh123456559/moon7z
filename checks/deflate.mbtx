@@ -1,0 +1,46 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/deflate")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-deflate")
+  defer @fs.rmdir(root, recursive=true)
+  for id in ["v1900-solid", "v2605-solid", "v2605-separate", "v2605-level0"] {
+    @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).run(timeout_ms=120000)
+    for
+      (original, file) in [
+        ("corpus/audio/left.wav", "left.wav"),
+        ("corpus/audio/right.wav", "right.wav"),
+        ("corpus/source/清单.json", "清单.json"),
+      ] {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + file).binary(),
+        @fs.read_file(original).binary(),
+      )
+    }
+  }
+  println("Four real DEFLATE archives exported byte-for-byte")
+}
