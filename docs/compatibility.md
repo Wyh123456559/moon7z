@@ -31,7 +31,7 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Coder graph | At most eight unary coders in one linear decode path, one pack stream per folder | General bounded graph validation, multiple packed inputs, BCJ2 and every mapped output/substream |
 | Compression | Copy, LZMA1 and LZMA2 | Also PPMd7, BZip2 and DEFLATE; method/property compatibility tested against independent encoders |
 | LZMA properties | Codec-backed supported lc/lp range; exact decoded size and dictionary policy enforced | All property combinations emitted by the declared producer matrix, or a documented remaining blocker |
-| Filters | Delta, classic x86 BCJ, ARM64 | Also ARM, ARM-Thumb, PowerPC, IA64, SPARC, RISC-V, Swap2/Swap4 and valid initial-offset forms |
+| Filters | Delta, classic x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4; see [evidence](filters.md) | Also RISC-V and all valid properties; classic methods use empty properties, unlike ARM64/RISC-V |
 | Encryption | Explicitly unsupported | Password API, AES-256/SHA-256 7z derivation with work limits, encrypted headers and data, missing/wrong-password cases |
 | Split/SFX input | Explicitly unsupported; signature must be at byte zero | Ordered volume source, missing/reordered volume diagnostics and bounded signature discovery for SFX; no executable is run |
 | Input scale | In-memory bytes, controlled sizes at most 0x3fffffff | Seekable bounded input with UInt64 offsets; retain a deliberate in-memory convenience API |

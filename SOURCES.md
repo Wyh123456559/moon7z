@@ -7,7 +7,7 @@ reviewed direct peer, not a dependency or a source of code/fixtures here.
 
 | Material | Source | License and use |
 | --- | --- | --- |
-| LZMA/LZMA2 decoder and Delta/ARM64 filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma`, `lzma2` and `filters` public APIs, not vendored |
+| LZMA/LZMA2 decoder and Delta/branch filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma`, `lzma2` and `filters` public APIs, not vendored; exact calls are in docs/ecosystem.md |
 | Host I/O and asynchronous execution | [moonbitlang/async](https://github.com/moonbitlang/async), 0.22.5 | Apache-2.0; CLI/example/checks only |
 | Standard library | [moonbitlang/core](https://github.com/moonbitlang/core) | Apache-2.0; toolchain dependency |
 | 7z format and SDK description | [7z format](https://www.7-zip.org/7z.html), [LZMA SDK](https://www.7-zip.org/sdk.html) | SDK is Public Domain; format reference; the BCJ adaptation is recorded separately below |
@@ -49,7 +49,19 @@ ARM64 archives were independently packed and tested by 7zr 26.04, including
 nonzero and wrapping initial offsets. See `corpus/README.md` for commands and
 the distinction between program fixture bytes and native Moon7z execution.
 
-Development was checked with official stable `moon 0.1.20261021` and
-`moonc v0.10.17+093cb8f9c` (2026-10-21). Compiler executables were checked against
-the official stable SHA-256 manifest. No performance or full 7-Zip compatibility
-claim is made.
+`corpus/branches/` contains project-authored Apache-2.0 deterministic instruction
+and byte data. Twelve archives were generated, tested and independently unpacked
+with 7zr 26.04; no peer fixtures or external test vectors were copied. ARM,
+ARM-Thumb, PowerPC, IA64 and SPARC transforms are dependency calls, not new
+algorithms. Swap2/Swap4 group reversal is project code. Official
+[BranchRegister.cpp](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BranchRegister.cpp),
+[BranchMisc.h](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Compress/BranchMisc.h)
+and [Methods.txt](https://github.com/ip7z/7zip/blob/main/DOC/Methods.txt) were
+consulted for method IDs and the difference between classic empty properties
+and ARM64/RISC-V offset properties; no additional C/C++ code was copied.
+
+Development was rechecked on 2026-10-26 with official stable
+`moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).
+Windows compiler/runtime/formatter/interface executables were checked against
+the current official stable SHA-256 manifest. No performance or full 7-Zip
+compatibility claim is made.

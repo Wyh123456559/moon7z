@@ -1,9 +1,10 @@
-///|
+----
 import {
   "moonbitlang/async",
   "moonbitlang/async/shell",
   "moonbitlang/core/env",
 }
+----
 
 ///|
 async fn main {
@@ -26,17 +27,23 @@ async fn main {
       ["fmt", "--check", "checks/compare.mbtx"],
       ["fmt", "--check", "checks/audit.mbtx"],
       ["fmt", "--check", "checks/incremental-export.mbtx"],
+      ["fmt", "--check", "checks/branches.mbtx"],
+      ["fmt", "--check", "corpus/branches/generate.mbtx"],
       ["fmt", "--check", "corpus/audio/generate.mbtx"],
       ["fmt", "--check", "corpus/x86/generate.mbtx"],
       ["fmt", "--check", "corpus/arm64/generate.mbtx"],
       ["info"],
       ["check", "--target", target, "--deny-warn"],
+      ["build", "--target", target, "--deny-warn"],
       ["test", "--target", target, "--deny-warn"],
     ] {
     @shell.Cmd("moon", command).run(timeout_ms=120000)
   }
   @shell.Cmd("git", ["diff", "--exit-code", "--", "*.mbti"]).run()
   if target == "wasm" || target == "native" {
+    @shell.Cmd("moon", ["run", "checks/branches.mbtx", "--", target]).run(
+      timeout_ms=360000,
+    )
     @shell.Cmd("moon", ["run", "checks/incremental-export.mbtx", "--", target]).run(
       timeout_ms=120000,
     )

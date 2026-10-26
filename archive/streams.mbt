@@ -73,11 +73,9 @@ fn read_pipeline(r : Cursor) -> Array[Coder] raise ArchiveError {
           feature="filter without an initial Copy/LZMA/LZMA2 coder",
         )
       }
-    } else if coder.codec_id != b"\x03" &&
-      coder.codec_id != b"\x03\x03\x01\x03" &&
-      coder.codec_id != b"\x0a" {
+    } else if !is_filter(coder.codec_id) {
       raise Unsupported(
-        feature="only Delta, x86 BCJ or ARM64 filters may follow a compression coder",
+        feature="only supported unary filters may follow a compression coder",
       )
     }
   }

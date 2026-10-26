@@ -1,0 +1,105 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+/// Deterministic binary test data, not executable third-party program code.
+fn original() -> Bytes {
+  let data = Array::makei(65539, i => {
+    ((i * 37 + i / 7 + (i >> 8)) & 255).to_byte()
+  })
+  for base in 0..<1024 {
+    let start = base * 64
+    for
+      i, byte in b"\x48\x00\x00\x01\xff\xff\xff\xeb\x00\xf0\x00\xf8\x7f\xff\xff\xff" {
+      data[start + i] = byte
+    }
+    // IA64 template 22 with a convertible branch in slot 2.
+    data[start + 32] = b'\x16'
+    data[start + 44] = (data[start + 44].to_int() & 0xf8).to_byte()
+    data[start + 47] = ((data[start + 47].to_int() & 15) | 0x50).to_byte()
+  }
+  data[65536] = b'\xaa'
+  data[65537] = b'\xbb'
+  data[65538] = b'\xcc'
+  Bytes::from_array(data)
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else {
+    fail(
+      "usage: moon run corpus/branches/generate.mbtx -- PACKER NEW-OUTPUT-DIRECTORY",
+    )
+  }
+  let packer = args[1]
+  let output = args[2]
+  @fs.mkdir(output)
+  let output = @fs.realpath(output)
+  let source = output + "/source"
+  @fs.mkdir(source)
+  let bytes = original()
+  @fs.write_file(source + "/a-head.bin", bytes[:3].to_owned())
+  @fs.write_file(source + "/b-tail.bin", bytes[3:].to_owned())
+  for
+    (name, codec) in [
+      ("arm", "ARM"),
+      ("thumb", "ARMT"),
+      ("ppc", "PPC"),
+      ("ia64", "IA64"),
+      ("sparc", "SPARC"),
+      ("swap2", "Swap2"),
+      ("swap4", "Swap4"),
+    ] {
+    let variants = if name.has_prefix("swap") {
+      ["copy"]
+    } else {
+      ["copy", "lzma2"]
+    }
+    for variant in variants {
+      let archive = output + "/" + name + "-" + variant + ".7z"
+      @shell.Cmd(
+        packer,
+        [
+          "a",
+          archive,
+          "a-head.bin",
+          "b-tail.bin",
+          "-t7z",
+          "-m0=" + codec,
+          if variant == "lzma2" {
+            "-m1=LZMA2:d=64k"
+          } else {
+            "-m1=Copy"
+          },
+          "-ms=on",
+          if variant == "lzma2" {
+            "-mhc=on"
+          } else {
+            "-mhc=off"
+          },
+          "-mtm=off",
+          "-mtc=off",
+          "-mta=off",
+        ],
+        cwd=source,
+      ).run()
+      @shell.Cmd(packer, ["t", archive]).run()
+      let unpacked = output + "/unpacked-" + name + "-" + variant
+      @shell.Cmd(packer, ["x", archive, "-o" + unpacked]).run()
+      for file in ["a-head.bin", "b-tail.bin"] {
+        assert_eq(
+          @fs.read_file(unpacked + "/" + file).binary(),
+          @fs.read_file(source + "/" + file).binary(),
+        )
+      }
+    }
+  }
+  println("Generated and independently unpacked 12 branch/swap archives")
+}

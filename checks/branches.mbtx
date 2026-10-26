@@ -1,0 +1,52 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let corpus = args.get(2).unwrap_or("corpus/branches")
+  let root = @fs.tmpdir(prefix="moon7z-branch-check")
+  defer @fs.rmdir(root, recursive=true)
+  for name in ["arm", "thumb", "ppc", "ia64", "sparc", "swap2", "swap4"] {
+    let modes = if name.has_prefix("swap") {
+      ["copy"]
+    } else {
+      ["copy", "lzma2"]
+    }
+    for mode in modes {
+      let case_name = name + "-" + mode
+      @shell.Cmd("moon", [
+        "run",
+        "--target",
+        target,
+        "app",
+        "--",
+        "extract",
+        "--contents-only",
+        corpus + "/" + case_name + ".7z",
+        root,
+        case_name,
+      ]).run(timeout_ms=120000)
+      for file in ["a-head.bin", "b-tail.bin"] {
+        assert_eq(
+          @fs.read_file(root + "/" + case_name + "/" + file).binary(),
+          @fs.read_file(corpus + "/source/" + file).binary(),
+        )
+      }
+    }
+  }
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 12)
+  println(
+    "Twelve independently packed branch/swap archives export every original byte",
+  )
+}

@@ -1,6 +1,14 @@
 ///|
 fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
+  if is_legacy_branch(coder.codec_id) {
+    validate_branch(coder)
+    return
+  }
   match coder.codec_id {
+    b"\x02\x03\x02" | b"\x02\x03\x04" =>
+      if !coder.properties.is_empty() {
+        raise Invalid(offset=0, reason="Swap2/Swap4 have no coder properties")
+      }
     b"\x0a" => {
       guard coder.properties.is_empty() || coder.properties.length() == 4 else {
         raise Invalid(
@@ -52,6 +60,9 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
 
 ///|
 fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
+  if is_filter(coder.codec_id) {
+    return 0UL
+  }
   match coder.codec_id {
     b"\x00" | b"\x03" | b"\x03\x03\x01\x03" | b"\x0a" => 0UL
     b"\x03\x01\x01" => {
@@ -161,6 +172,13 @@ fn decode(
   }
   for filter in block.coders[1:] {
     output = match filter.codec_id {
+      b"\x03\x03\x05\x01" => @filters.bcj_arm(output[:], 0U, false)
+      b"\x03\x03\x07\x01" => @filters.bcj_armthumb(output[:], 0U, false)
+      b"\x03\x03\x02\x05" => @filters.bcj_powerpc(output[:], 0U, false)
+      b"\x03\x03\x04\x01" => @filters.bcj_ia64(output[:], 0U, false)
+      b"\x03\x03\x08\x05" => @filters.bcj_sparc(output[:], 0U, false)
+      b"\x02\x03\x02" => swap_bytes(output, 2)
+      b"\x02\x03\x04" => swap_bytes(output, 4)
       b"\x03" =>
         @filters.delta_decode(output[:], filter.properties[0].to_int() + 1) catch {
           _ => raise Codec(reason="invalid Delta filter distance")

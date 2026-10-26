@@ -1,4 +1,4 @@
-///|
+----
 import {
   "moonbitlang/async",
   "moonbitlang/async/fs",
@@ -6,6 +6,7 @@ import {
   "moonbitlang/async/process",
   "moonbitlang/core/env",
 }
+----
 
 ///|
 async fn main {

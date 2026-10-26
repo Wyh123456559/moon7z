@@ -56,7 +56,7 @@ of ecosystem uniqueness or approval.
 | --- | --- | --- |
 | `aurora0x27/lzma-mbt@0.1.0/lzma` | `decode_alone`: a temporary LZMA_Alone framing supplies 7z properties and the declared output size | Upstream Apache-2.0 decoder |
 | `aurora0x27/lzma-mbt@0.1.0/lzma2` | `decode_lzma2`: raw LZMA2 data and dictionary size; Moon7z checks chunk/output budgets before the call | Upstream Apache-2.0 decoder |
-| `aurora0x27/lzma-mbt@0.1.0/filters` | `delta_decode`, `bcj_arm64`; further filters are listed only when implemented and independently tested | Upstream Apache-2.0 algorithms |
+| `aurora0x27/lzma-mbt@0.1.0/filters` | `delta_decode`, `bcj_arm64`, `bcj_arm`, `bcj_armthumb`, `bcj_powerpc`, `bcj_ia64`, `bcj_sparc`; independent 7-Zip cases exercise each used filter | Upstream Apache-2.0 algorithms |
 | `archive/bcj.mbt` | Classic x86 BCJ decoding translated from Igor Pavlov's `Bra86.c` (7-Zip 21.07) | Public Domain adaptation, not an original algorithm |
 | `archive/binary.mbt`, `streams.mbt`, `files.mbt`, `open.mbt` | 7z framing, bounded fields, coder topology, inventory and decode integration | Project code; format references and consulted BSD reference recorded in SOURCES.md |
 | `reader.mbt`, `ranges.mbt`, `paths.mbt`, `compare.mbt`, `audit.mbt`, `report.mbt`, `host/` | Public workflow logic and diagnostics | Project code, Apache-2.0 |

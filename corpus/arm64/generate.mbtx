@@ -1,9 +1,10 @@
-///|
+----
 import {
   "moonbitlang/async",
   "moonbitlang/async/fs",
   "moonbitlang/core/buffer",
 }
+----
 
 ///|
 fn program() -> Bytes {

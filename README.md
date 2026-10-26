@@ -142,7 +142,8 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Capability | Current behavior |
 | --- | --- |
 | Container | Single-volume 7z, version 0.0–0.4, signature at byte zero |
-| Codecs | Copy, LZMA, LZMA2; optionally followed by Delta (distance 1–256), x86 BCJ or ARM64 |
+| Codecs | Copy, LZMA, LZMA2; followed by supported unary filters |
+| Filters | Delta (distance 1–256), x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder chains | One packed input, linear bindings, at most eight unary coders per folder |
 | Headers | Plain and compressed headers |
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
@@ -151,7 +152,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Resources | Configurable input/header/output/dictionary/member limits |
 
 Encryption, split volumes, SFX, branching/multiple-input coder graphs, BCJ2,
-filters other than Delta/x86 BCJ/ARM64, additional streams,
+unlisted filters (including RISC-V), additional streams,
 anti-items, links, special files, unknown semantic properties and writing are
 rejected. Zero padding may repeat. The reader does not silently skip unsupported
 members or metadata. Metadata values are retained for application use; the
@@ -232,6 +233,14 @@ are reconstructed over the complete solid folder, including instruction bytes
 split between members; incomplete trailing bytes are retained unchanged.
 The checked-in AArch64 ELF and offset/wrap archives are compared byte-for-byte
 with their originals. This is archive data decoding, not execution of ARM code.
+
+Classic ARM, ARM-Thumb, PowerPC, IA64 and SPARC methods use their registered
+7z IDs with empty properties and a zero initial position. Nonempty properties
+are explicitly refused, rather than interpreted as ARM64-style offsets. Swap2
+and Swap4 reverse complete byte groups and preserve an incomplete final group.
+Twelve independently packed archives cover these filters with Copy/LZMA2,
+compressed/plain headers, a solid member boundary inside an instruction and an
+odd final length. See [filter compatibility evidence](docs/filters.md).
 
 ## Validation
 

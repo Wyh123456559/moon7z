@@ -33,6 +33,11 @@ member extraction and CLI stdout without decoding bytes as text.
 
 ## Delta-filtered audio and byte data
 
+The additional `branches/` corpus covers ARM, ARM-Thumb, PowerPC, IA64, SPARC,
+Swap2 and Swap4 with 12 independently packed archives, two solid members and an
+odd 65,539-byte original. Its standalone generator performs 7zr pack/test/extract
+and compares the extracted originals. See [filter evidence and regeneration](../docs/filters.md).
+
 `audio/left.wav` and `audio/right.wav` are valid RIFF PCM files: stereo signed
 16-bit samples at 16 kHz, 4,096 frames each. They contain deterministic sawtooth
 signals with different phases; they are interoperability data, not recorded

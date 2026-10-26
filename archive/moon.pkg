@@ -16,6 +16,160 @@ import {
 } for "wbtest"
 
 rule(
+  name: "branch_head",
+  command: ":embed --binary -i $input -o $output --name branch_head",
+)
+
+dev_build(
+  rule: "branch_head",
+  input: "../corpus/branches/source/a-head.bin",
+  output: "branch_head_test.mbt",
+)
+
+rule(
+  name: "branch_tail",
+  command: ":embed --binary -i $input -o $output --name branch_tail",
+)
+
+dev_build(
+  rule: "branch_tail",
+  input: "../corpus/branches/source/b-tail.bin",
+  output: "branch_tail_test.mbt",
+)
+
+rule(
+  name: "branch_arm_copy",
+  command: ":embed --binary -i $input -o $output --name branch_arm_copy",
+)
+
+dev_build(
+  rule: "branch_arm_copy",
+  input: "../corpus/branches/arm-copy.7z",
+  output: "branch_arm_copy_test.mbt",
+)
+
+rule(
+  name: "branch_arm_lzma2",
+  command: ":embed --binary -i $input -o $output --name branch_arm_lzma2",
+)
+
+dev_build(
+  rule: "branch_arm_lzma2",
+  input: "../corpus/branches/arm-lzma2.7z",
+  output: "branch_arm_lzma2_test.mbt",
+)
+
+rule(
+  name: "branch_thumb_copy",
+  command: ":embed --binary -i $input -o $output --name branch_thumb_copy",
+)
+
+dev_build(
+  rule: "branch_thumb_copy",
+  input: "../corpus/branches/thumb-copy.7z",
+  output: "branch_thumb_copy_test.mbt",
+)
+
+rule(
+  name: "branch_thumb_lzma2",
+  command: ":embed --binary -i $input -o $output --name branch_thumb_lzma2",
+)
+
+dev_build(
+  rule: "branch_thumb_lzma2",
+  input: "../corpus/branches/thumb-lzma2.7z",
+  output: "branch_thumb_lzma2_test.mbt",
+)
+
+rule(
+  name: "branch_ppc_copy",
+  command: ":embed --binary -i $input -o $output --name branch_ppc_copy",
+)
+
+dev_build(
+  rule: "branch_ppc_copy",
+  input: "../corpus/branches/ppc-copy.7z",
+  output: "branch_ppc_copy_test.mbt",
+)
+
+rule(
+  name: "branch_ppc_lzma2",
+  command: ":embed --binary -i $input -o $output --name branch_ppc_lzma2",
+)
+
+dev_build(
+  rule: "branch_ppc_lzma2",
+  input: "../corpus/branches/ppc-lzma2.7z",
+  output: "branch_ppc_lzma2_test.mbt",
+)
+
+rule(
+  name: "branch_ia64_copy",
+  command: ":embed --binary -i $input -o $output --name branch_ia64_copy",
+)
+
+dev_build(
+  rule: "branch_ia64_copy",
+  input: "../corpus/branches/ia64-copy.7z",
+  output: "branch_ia64_copy_test.mbt",
+)
+
+rule(
+  name: "branch_ia64_lzma2",
+  command: ":embed --binary -i $input -o $output --name branch_ia64_lzma2",
+)
+
+dev_build(
+  rule: "branch_ia64_lzma2",
+  input: "../corpus/branches/ia64-lzma2.7z",
+  output: "branch_ia64_lzma2_test.mbt",
+)
+
+rule(
+  name: "branch_sparc_copy",
+  command: ":embed --binary -i $input -o $output --name branch_sparc_copy",
+)
+
+dev_build(
+  rule: "branch_sparc_copy",
+  input: "../corpus/branches/sparc-copy.7z",
+  output: "branch_sparc_copy_test.mbt",
+)
+
+rule(
+  name: "branch_sparc_lzma2",
+  command: ":embed --binary -i $input -o $output --name branch_sparc_lzma2",
+)
+
+dev_build(
+  rule: "branch_sparc_lzma2",
+  input: "../corpus/branches/sparc-lzma2.7z",
+  output: "branch_sparc_lzma2_test.mbt",
+)
+
+rule(
+  name: "branch_swap2_copy",
+  command: ":embed --binary -i $input -o $output --name branch_swap2_copy",
+)
+
+dev_build(
+  rule: "branch_swap2_copy",
+  input: "../corpus/branches/swap2-copy.7z",
+  output: "branch_swap2_copy_test.mbt",
+)
+
+rule(
+  name: "branch_swap4_copy",
+  command: ":embed --binary -i $input -o $output --name branch_swap4_copy",
+)
+
+dev_build(
+  rule: "branch_swap4_copy",
+  input: "../corpus/branches/swap4-copy.7z",
+  output: "branch_swap4_copy_test.mbt",
+)
+
+rule(
   name: "arm64_offset_resource",
   command: ":embed --binary -i $input -o $output --name arm64_offset_resource",
 )

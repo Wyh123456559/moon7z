@@ -6,3 +6,17 @@ _build/
 /archive/upstream_*_test.mbt
 /archive/manifest_test.mbt
 /archive/*_resource_wbtest.mbt
+/archive/branch_arm_copy_test.mbt
+/archive/branch_arm_lzma2_test.mbt
+/archive/branch_thumb_copy_test.mbt
+/archive/branch_thumb_lzma2_test.mbt
+/archive/branch_ppc_copy_test.mbt
+/archive/branch_ppc_lzma2_test.mbt
+/archive/branch_ia64_copy_test.mbt
+/archive/branch_ia64_lzma2_test.mbt
+/archive/branch_sparc_copy_test.mbt
+/archive/branch_sparc_lzma2_test.mbt
+/archive/branch_swap2_copy_test.mbt
+/archive/branch_swap4_copy_test.mbt
+/archive/branch_head_test.mbt
+/archive/branch_tail_test.mbt
