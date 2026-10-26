@@ -25,7 +25,7 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 
 | Area | Current 0.1.x evidence | Required for the 1.0 profile |
 | --- | --- | --- |
-| File versions | Header major 0 / minor 0–4 accepted; current fixtures are mainly 7zr 26.04, 0.4 | Independently generated 0.3 and 0.4 archives; acceptance of a version byte alone is insufficient |
+| File versions | Header major 0 / minor 0–4 accepted; independently generated 0.3/0.4 archives from five official versions and libarchive, [21 required cases](producers.md) | Maintain a complete per-feature matrix; acceptance of a version byte alone is insufficient |
 | Headers | Plain and single-stream compressed headers, start/next/header CRC checks, ordered opaque archive properties | Additional/external metadata streams, all declared header placements and encoded-header mappings |
 | Inventory | Files, directories, zero-length files, solid and separate folders, original UTF-16 names/IDs, three FILETIMEs and attributes | Anti-items, links/special-file metadata and extension properties retained without destructive export |
 | Coder graph | At most eight unary coders in one linear decode path, one pack stream per folder | General bounded graph validation, multiple packed inputs, BCJ2 and every mapped output/substream |
@@ -45,10 +45,13 @@ profile. A small demo or a larger test count cannot substitute for these rows.
 ## Producer and feature matrix
 
 The release matrix must identify **producer software version separately from
-container version**. Planned reproducible producer set: official 7-Zip 19.00,
-23.01, 24.09, 25.01 and 26.05, plus libarchive/bsdtar with its exact observed
-version. These version strings are targets, not a claim they were all run.
-Current checked-in corpus and commands are in [corpus/README.md](../corpus/README.md).
+container version**. The baseline producer set has now been run: official
+7-Zip 19.00, 23.01, 24.09, 25.01 and 26.05, plus libarchive/bsdtar 3.8.9.
+The 21 baseline cases and their SHA-256 evidence are in
+[producer matrix](producers.md). They exercise Copy/LZMA/LZMA2 and the declared
+header/layout modes; pending codecs, encryption and other structures remain
+pending even though their producer version appears in this baseline.
+Current corpus and commands are in [corpus/README.md](../corpus/README.md).
 
 For each supported method/structure, record producer/version, arguments, original
 input provenance/license, header/solid mode, declared feature, expected inventory,

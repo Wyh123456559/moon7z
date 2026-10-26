@@ -141,7 +141,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 
 | Capability | Current behavior |
 | --- | --- |
-| Container | Single-volume 7z, version 0.0–0.4, signature at byte zero |
+| Container | Single-volume; real fixtures cover 0.3 and 0.4; header minors 0–4 accepted; signature at byte zero |
 | Codecs | Copy, LZMA, LZMA2; followed by supported unary filters |
 | Filters | Delta (distance 1–256), x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder chains | One packed input, linear bindings, at most eight unary coders per folder |
@@ -250,6 +250,14 @@ compressed/plain headers, a solid member boundary inside an instruction and an
 odd final length. See [filter compatibility evidence](docs/filters.md).
 
 ## Validation
+
+The checked producer matrix includes official 7-Zip 19.00, 23.01, 24.09, 25.01,
+26.05 and libarchive 3.8.9: 21 required cases for Copy/LZMA/LZMA2, solid/separate
+folders, plain/compressed headers and a real Unicode/empty-file source tree.
+Each was independently unpacked and checked against the original bytes; fixture
+SHA-256 values and software/container versions are recorded. Required cases fail
+on `Unsupported` rather than being skipped. This certifies those cases, not all
+features of those versions. See [producer matrix](docs/producers.md).
 
 The core library is tested on Wasm, Wasm-GC, JavaScript and native. The host CLI
 and import example use `moonbitlang/async` and support Wasm and native. CI runs

@@ -1,0 +1,182 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/x@0.5.5/crypto",
+}
+----
+
+///|
+async fn run(program : String, args : Array[String], cwd : String) -> String {
+  let result = @shell.Cmd(program, args, cwd~).output(timeout_ms=120000)
+  guard result.exit_code() == 0 else {
+    fail(program + " failed: " + result.stderr() + result.stdout())
+  }
+  result.stdout()
+}
+
+///|
+async fn verify(
+  oracle : String,
+  tar : String,
+  archive : String,
+  output : String,
+  source : String,
+  files : Array[String],
+) -> Unit {
+  ignore(run(tar, ["-tf", archive], source))
+  ignore(run(oracle, ["t", archive], source))
+  ignore(run(oracle, ["x", archive, "-o" + output], source))
+  for file in files {
+    assert_eq(
+      @fs.read_file(output + "/" + file).binary(),
+      @fs.read_file(source + "/" + file).binary(),
+    )
+  }
+  for directory in ["lzma-mbt", "空目录"] {
+    assert_true(@fs.kind(output + "/" + directory) == Directory)
+  }
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 8 else {
+    fail(
+      "usage: moon run corpus/producers/generate.mbtx -- PACKER19 PACKER23 PACKER24 PACKER25 PACKER26 BSDTAR NEW-OUTPUT-DIRECTORY",
+    )
+  }
+  @fs.mkdir(args[7])
+  let output = @fs.realpath(args[7])
+  let source = output + "/source"
+  @fs.mkdir(source)
+  for directory in ["lzma-mbt", "空目录"] {
+    @fs.mkdir(source + "/" + directory)
+  }
+  let files = [
+    "lzma-mbt/LICENSE", "lzma-mbt/README.md", "lzma-mbt/moon.mod", "清单.json",
+    "empty.txt",
+  ]
+  let originals : Array[Json] = []
+  for file in files {
+    let bytes = @fs.read_file("corpus/source/" + file).binary()
+    @fs.write_file(source + "/" + file, bytes)
+    originals.push({
+      "path": Json(file),
+      "bytes": Json(bytes.length()),
+      "sha256": Json(@crypto.bytes_to_hex_string(@crypto.sha256(bytes))),
+    })
+  }
+  let tar = args[6]
+  let tar_version = run(tar, ["--version"], source).trim().to_owned()
+  let cases : Array[Json] = []
+  for
+    index, (version, prefix) in [
+      ("19.00", "v1900"),
+      ("23.01", "v2301"),
+      ("24.09", "v2409"),
+      ("25.01", "v2501"),
+      ("26.05", "v2605"),
+    ] {
+    let packer = args[index + 1]
+    let banner = run(packer, [], source)
+    assert_true(banner.contains(version))
+    for
+      (suffix, codec, solid, compressed) in [
+        ("copy", "Copy", false, false),
+        ("lzma-solid", "LZMA", true, true),
+        ("lzma2-solid", "LZMA2", true, true),
+        ("lzma2-separate", "LZMA2", false, false),
+      ] {
+      let id = prefix + "-" + suffix
+      let path = output + "/" + id + ".7z"
+      let command = [
+        "a",
+        path,
+        "lzma-mbt",
+        "清单.json",
+        "empty.txt",
+        "空目录",
+        "-t7z",
+        "-m0=" + codec,
+        if solid {
+          "-ms=on"
+        } else {
+          "-ms=off"
+        },
+        if compressed {
+          "-mhc=on"
+        } else {
+          "-mhc=off"
+        },
+        "-mtm=on",
+        "-mtc=on",
+        "-mta=on",
+      ]
+      if codec != "Copy" {
+        command.push("-md=64k")
+      }
+      ignore(run(packer, command, source))
+      verify(args[5], tar, path, output + "/unpacked-" + id, source, files)
+      let bytes = @fs.read_file(path).binary()
+      assert_eq(bytes[6], b'\x00')
+      assert_eq(bytes[7], b'\x04')
+      cases.push({
+        "id": Json(id),
+        "producer": "7-Zip",
+        "producer_version": Json(version),
+        "archive_major": Json(bytes[6].to_int()),
+        "archive_minor": Json(bytes[7].to_int()),
+        "codec": Json(codec),
+        "solid": Json(solid),
+        "compressed_header": Json(compressed),
+        "archive_sha256": Json(
+          @crypto.bytes_to_hex_string(@crypto.sha256(bytes)),
+        ),
+      })
+      println("Independent producer case verified: " + id)
+    }
+  }
+  let id = "libarchive"
+  let archive = output + "/libarchive.7z"
+  ignore(
+    run(
+      tar,
+      [
+        "-cf", archive, "--format=7zip", "-C", source, "lzma-mbt", "清单.json",
+        "empty.txt", "空目录",
+      ],
+      source,
+    ),
+  )
+  verify(args[5], tar, archive, output + "/unpacked-libarchive", source, files)
+  let bytes = @fs.read_file(archive).binary()
+  assert_eq(bytes[6], b'\x00')
+  assert_eq(bytes[7], b'\x03')
+  cases.push({
+    "id": Json(id),
+    "producer": "libarchive",
+    "producer_version": Json(tar_version),
+    "archive_major": Json(bytes[6].to_int()),
+    "archive_minor": Json(bytes[7].to_int()),
+    "codec": "LZMA",
+    "solid": true,
+    "compressed_header": true,
+    "archive_sha256": Json(@crypto.bytes_to_hex_string(@crypto.sha256(bytes))),
+  })
+  let manifest : Json = {
+    "schema": "moon7z.producer-corpus.v1",
+    "originals": Json::array(originals),
+    "cases": Json::array(cases),
+    "content_oracle": "7-Zip 26.05",
+    "listing_oracle": Json(tar_version),
+    "independent_bytes_verified": true,
+    "moon7z_verification": "run portable tests and checks/producers.mbtx",
+  }
+  @fs.write_file(output + "/manifest.json", manifest.stringify(indent=2))
+  assert_eq(cases.length(), 21)
+  println("Twenty-one producer cases verified; none skipped as unsupported")
+}

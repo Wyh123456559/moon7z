@@ -69,6 +69,17 @@ was consulted to confirm variable UInt64 property IDs (`ReadID`) and bounded
 value skipping; no C++ code was copied. Metadata is retained here rather than
 skipped. JSON Base64 coding uses `moonbitlang/core/encoding/base64` (Apache-2.0).
 
+`corpus/producers/` contains 21 newly generated archives of the same attributed
+source tree: official 7-Zip Extra 19.00, 23.01, 24.09, 25.01 and 26.05, plus
+Windows bsdtar/libarchive 3.8.9. Actual producer banners were checked during
+generation. Binaries came from the official [download page](https://www.7-zip.org/download.html)
+and linked ip7z/7zip release assets, and are not redistributed. Unlike 7zr,
+7za Extra has LGPL and BSD components; no code was copied from these binaries
+or linked into Moon7z. bsdtar/libarchive (BSD-2-Clause) is a test oracle only.
+Input SHA-256 and archive SHA-256 values are recorded in `manifest.json`;
+hashing in standalone development/check scripts uses
+`moonbitlang/x@0.5.5/crypto` (Apache-2.0), not a runtime library dependency.
+
 Development was rechecked on 2026-10-26 with official stable
 `moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).
 Windows compiler/runtime/formatter/interface executables were checked against

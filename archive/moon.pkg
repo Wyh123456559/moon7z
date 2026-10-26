@@ -477,3 +477,234 @@ dev_build(
   input: "../corpus/source/清单.json",
   output: "manifest_test.mbt",
 )
+
+rule(
+  name: "producer_v1900_copy",
+  command: ":embed --binary -i $input -o $output --name producer_v1900_copy",
+)
+
+dev_build(
+  rule: "producer_v1900_copy",
+  input: "../corpus/producers/v1900-copy.7z",
+  output: "producer_v1900_copy_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v1900_lzma_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v1900_lzma_solid",
+)
+
+dev_build(
+  rule: "producer_v1900_lzma_solid",
+  input: "../corpus/producers/v1900-lzma-solid.7z",
+  output: "producer_v1900_lzma_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v1900_lzma2_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v1900_lzma2_solid",
+)
+
+dev_build(
+  rule: "producer_v1900_lzma2_solid",
+  input: "../corpus/producers/v1900-lzma2-solid.7z",
+  output: "producer_v1900_lzma2_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v1900_lzma2_separate",
+  command: ":embed --binary -i $input -o $output --name producer_v1900_lzma2_separate",
+)
+
+dev_build(
+  rule: "producer_v1900_lzma2_separate",
+  input: "../corpus/producers/v1900-lzma2-separate.7z",
+  output: "producer_v1900_lzma2_separate_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2301_copy",
+  command: ":embed --binary -i $input -o $output --name producer_v2301_copy",
+)
+
+dev_build(
+  rule: "producer_v2301_copy",
+  input: "../corpus/producers/v2301-copy.7z",
+  output: "producer_v2301_copy_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2301_lzma_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2301_lzma_solid",
+)
+
+dev_build(
+  rule: "producer_v2301_lzma_solid",
+  input: "../corpus/producers/v2301-lzma-solid.7z",
+  output: "producer_v2301_lzma_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2301_lzma2_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2301_lzma2_solid",
+)
+
+dev_build(
+  rule: "producer_v2301_lzma2_solid",
+  input: "../corpus/producers/v2301-lzma2-solid.7z",
+  output: "producer_v2301_lzma2_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2301_lzma2_separate",
+  command: ":embed --binary -i $input -o $output --name producer_v2301_lzma2_separate",
+)
+
+dev_build(
+  rule: "producer_v2301_lzma2_separate",
+  input: "../corpus/producers/v2301-lzma2-separate.7z",
+  output: "producer_v2301_lzma2_separate_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2409_copy",
+  command: ":embed --binary -i $input -o $output --name producer_v2409_copy",
+)
+
+dev_build(
+  rule: "producer_v2409_copy",
+  input: "../corpus/producers/v2409-copy.7z",
+  output: "producer_v2409_copy_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2409_lzma_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2409_lzma_solid",
+)
+
+dev_build(
+  rule: "producer_v2409_lzma_solid",
+  input: "../corpus/producers/v2409-lzma-solid.7z",
+  output: "producer_v2409_lzma_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2409_lzma2_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2409_lzma2_solid",
+)
+
+dev_build(
+  rule: "producer_v2409_lzma2_solid",
+  input: "../corpus/producers/v2409-lzma2-solid.7z",
+  output: "producer_v2409_lzma2_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2409_lzma2_separate",
+  command: ":embed --binary -i $input -o $output --name producer_v2409_lzma2_separate",
+)
+
+dev_build(
+  rule: "producer_v2409_lzma2_separate",
+  input: "../corpus/producers/v2409-lzma2-separate.7z",
+  output: "producer_v2409_lzma2_separate_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2501_copy",
+  command: ":embed --binary -i $input -o $output --name producer_v2501_copy",
+)
+
+dev_build(
+  rule: "producer_v2501_copy",
+  input: "../corpus/producers/v2501-copy.7z",
+  output: "producer_v2501_copy_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2501_lzma_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2501_lzma_solid",
+)
+
+dev_build(
+  rule: "producer_v2501_lzma_solid",
+  input: "../corpus/producers/v2501-lzma-solid.7z",
+  output: "producer_v2501_lzma_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2501_lzma2_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2501_lzma2_solid",
+)
+
+dev_build(
+  rule: "producer_v2501_lzma2_solid",
+  input: "../corpus/producers/v2501-lzma2-solid.7z",
+  output: "producer_v2501_lzma2_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2501_lzma2_separate",
+  command: ":embed --binary -i $input -o $output --name producer_v2501_lzma2_separate",
+)
+
+dev_build(
+  rule: "producer_v2501_lzma2_separate",
+  input: "../corpus/producers/v2501-lzma2-separate.7z",
+  output: "producer_v2501_lzma2_separate_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2605_copy",
+  command: ":embed --binary -i $input -o $output --name producer_v2605_copy",
+)
+
+dev_build(
+  rule: "producer_v2605_copy",
+  input: "../corpus/producers/v2605-copy.7z",
+  output: "producer_v2605_copy_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2605_lzma_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2605_lzma_solid",
+)
+
+dev_build(
+  rule: "producer_v2605_lzma_solid",
+  input: "../corpus/producers/v2605-lzma-solid.7z",
+  output: "producer_v2605_lzma_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2605_lzma2_solid",
+  command: ":embed --binary -i $input -o $output --name producer_v2605_lzma2_solid",
+)
+
+dev_build(
+  rule: "producer_v2605_lzma2_solid",
+  input: "../corpus/producers/v2605-lzma2-solid.7z",
+  output: "producer_v2605_lzma2_solid_archive_test.mbt",
+)
+
+rule(
+  name: "producer_v2605_lzma2_separate",
+  command: ":embed --binary -i $input -o $output --name producer_v2605_lzma2_separate",
+)
+
+dev_build(
+  rule: "producer_v2605_lzma2_separate",
+  input: "../corpus/producers/v2605-lzma2-separate.7z",
+  output: "producer_v2605_lzma2_separate_archive_test.mbt",
+)
+
+rule(
+  name: "producer_libarchive",
+  command: ":embed --binary -i $input -o $output --name producer_libarchive",
+)
+
+dev_build(
+  rule: "producer_libarchive",
+  input: "../corpus/producers/libarchive.7z",
+  output: "producer_libarchive_archive_test.mbt",
+)

@@ -19,3 +19,5 @@
 **7、来源与许可证：** [lzma-mbt](https://github.com/aurora0x27/lzma-mbt)（Apache-2.0）提供 LZMA/LZMA2 和部分过滤器；[bodgit/sevenzip](https://github.com/bodgit/sevenzip)（BSD-3-Clause）为容器参考；[7-Zip Bra86.c](https://github.com/ip7z/7zip/blob/21.07/C/Bra86.c)（Public Domain）为 x86 BCJ 局部移植来源。项目代码采用 Apache-2.0，完整清单见 [SOURCES.md](../SOURCES.md)。
 
 **8、仓库与记录：** [Wyh123456559/moon7z](https://github.com/Wyh123456559/moon7z)，已有超过 10 项实质提交，覆盖实现、边界测试、互操作语料和 CI。以[公开提交记录](https://github.com/Wyh123456559/moon7z/commits/main/)及各版本 CI 为准；不以提交数量替代兼容性完成度。
+
+**兼容证据：** 已用官方 7-Zip 19.00/23.01/24.09/25.01/26.05 与 libarchive 3.8.9 生成并逐字节验证 21 个基础用例，覆盖实际 0.3/0.4 归档；[结果与再现方法](producers.md)不代表待补齐功能已完成。

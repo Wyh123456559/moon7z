@@ -1,0 +1,88 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/x@0.5.5/crypto",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let corpus = args.get(2).unwrap_or("corpus/producers")
+  let document = @json.parse(@fs.read_file(corpus + "/manifest.json").text())
+  guard document
+    is {
+      "schema": String("moon7z.producer-corpus.v1"),
+      "cases": Array(cases),
+      ..
+    } else {
+    fail("Invalid producer manifest")
+  }
+  assert_eq(cases.length(), 21)
+  let root = @fs.tmpdir(prefix="moon7z-producers")
+  defer @fs.rmdir(root, recursive=true)
+  let ids : Set[String] = Set([])
+  let required : Set[String] = Set(["libarchive"])
+  for prefix in ["v1900", "v2301", "v2409", "v2501", "v2605"] {
+    for suffix in ["copy", "lzma-solid", "lzma2-solid", "lzma2-separate"] {
+      required.add(prefix + "-" + suffix)
+    }
+  }
+  for data in cases {
+    guard data
+      is {
+        "id": String(id),
+        "archive_sha256": String(hash),
+        "archive_major": Number(major, ..),
+        "archive_minor": Number(minor, ..),
+        ..
+      } else {
+      fail("Missing producer identity or digest")
+    }
+    assert_true(required.contains(id))
+    assert_true(!ids.contains(id))
+    ids.add(id)
+    let bytes = @fs.read_file(corpus + "/" + id + ".7z").binary()
+    assert_eq(@crypto.bytes_to_hex_string(@crypto.sha256(bytes)), hash)
+    assert_eq(major, 0.0)
+    assert_eq(minor, if id == "libarchive" { 3.0 } else { 4.0 })
+    assert_eq(bytes[6].to_int().to_double(), major)
+    assert_eq(bytes[7].to_int().to_double(), minor)
+    let result = @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).output(timeout_ms=120000)
+    guard result.exit_code() == 0 else {
+      fail("Required producer case failed: " + id + "\n" + result.stderr())
+    }
+    for
+      path in [
+        "lzma-mbt/LICENSE", "lzma-mbt/README.md", "lzma-mbt/moon.mod", "清单.json",
+        "empty.txt",
+      ] {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + path).binary(),
+        @fs.read_file("corpus/source/" + path).binary(),
+      )
+    }
+    assert_true(@fs.kind(root + "/" + id + "/空目录") == Directory)
+    println("Required producer case passed: " + id)
+  }
+  assert_eq(ids.length(), 21)
+}

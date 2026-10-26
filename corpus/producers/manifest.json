@@ -1,0 +1,267 @@
+{
+  "schema": "moon7z.producer-corpus.v1",
+  "originals": [
+    {
+      "path": "lzma-mbt/LICENSE",
+      "bytes": 11350,
+      "sha256": "7857cfb86ce1619a93030a3712df6f0f514c7f3dd961d82a544057c2560e4747"
+    },
+    {
+      "path": "lzma-mbt/README.md",
+      "bytes": 2827,
+      "sha256": "ccba12dd2e71f3aa8209bd89e091a5fe6ef96d5f18593673c78c5ae9264ed33b"
+    },
+    {
+      "path": "lzma-mbt/moon.mod",
+      "bytes": 321,
+      "sha256": "36291bb3d04a6121d6f2280ae3d568a9f7b9595626b5636eed77ecd90dc823bb"
+    },
+    {
+      "path": "清单.json",
+      "bytes": 52,
+      "sha256": "df63a4fe6672f552ea1f4ce9baf05de12454ed10717b6b2f2ac86182e1775ccf"
+    },
+    {
+      "path": "empty.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "cases": [
+    {
+      "id": "v1900-copy",
+      "producer": "7-Zip",
+      "producer_version": "19.00",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "Copy",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "0afd04255e7cc5c0286e2299432b2c7535670915f07cd783e0932efc1aa10020"
+    },
+    {
+      "id": "v1900-lzma-solid",
+      "producer": "7-Zip",
+      "producer_version": "19.00",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "82fcd802d9d2d77979bca4cbf5c224aa514ea111e64a1cbca847525fac2cd824"
+    },
+    {
+      "id": "v1900-lzma2-solid",
+      "producer": "7-Zip",
+      "producer_version": "19.00",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "cb96bbde258919c56f5d393e0f53b79754051c22badf7e6081ca462e695b0257"
+    },
+    {
+      "id": "v1900-lzma2-separate",
+      "producer": "7-Zip",
+      "producer_version": "19.00",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "b10673ee54472ce631e7170a5e0119b59037648097e5092bca96ba154980eabd"
+    },
+    {
+      "id": "v2301-copy",
+      "producer": "7-Zip",
+      "producer_version": "23.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "Copy",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "8fd888eecd075056288732e3eaefeb4b9818f572c06bd7a658ec0477e969c607"
+    },
+    {
+      "id": "v2301-lzma-solid",
+      "producer": "7-Zip",
+      "producer_version": "23.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "cc874d96a6ba7e27e77e366734f605e4708417fcd56b899c8d1735d5b304d102"
+    },
+    {
+      "id": "v2301-lzma2-solid",
+      "producer": "7-Zip",
+      "producer_version": "23.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "fe359aba7175e73ece28abd50db80e98e6300187436aa7664bf4af4d015afec5"
+    },
+    {
+      "id": "v2301-lzma2-separate",
+      "producer": "7-Zip",
+      "producer_version": "23.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "3267df6b380943f83c44487ec79b0c030767d6fb44285e061c9e212af2af8a72"
+    },
+    {
+      "id": "v2409-copy",
+      "producer": "7-Zip",
+      "producer_version": "24.09",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "Copy",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "769cf57b0e750f38d7fbdfea19c47b51fb00b1102aaa5eacb3b7ae03bd02dcfe"
+    },
+    {
+      "id": "v2409-lzma-solid",
+      "producer": "7-Zip",
+      "producer_version": "24.09",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "109a3e380391b3699858a2c4e2a8f4bba5e8f99c3895a22bfa6a01f33662efdd"
+    },
+    {
+      "id": "v2409-lzma2-solid",
+      "producer": "7-Zip",
+      "producer_version": "24.09",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "5663f9f4536ae8cb39461479149b9b6b46ffae581db2a9a2a2e2805fa095071e"
+    },
+    {
+      "id": "v2409-lzma2-separate",
+      "producer": "7-Zip",
+      "producer_version": "24.09",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "10ca41503d0a26285ae4638b01215dff8936e8b6831e20889ad86b5d5485462b"
+    },
+    {
+      "id": "v2501-copy",
+      "producer": "7-Zip",
+      "producer_version": "25.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "Copy",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "0e89ffc62f4e0a1c713419b6a86977271306d97bfb1d48793e594acbd4c792c6"
+    },
+    {
+      "id": "v2501-lzma-solid",
+      "producer": "7-Zip",
+      "producer_version": "25.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "308a4160c091cc4d366d0904adb7b6f55eb0da0b2fe1c0567b6cdfac98717a1e"
+    },
+    {
+      "id": "v2501-lzma2-solid",
+      "producer": "7-Zip",
+      "producer_version": "25.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "4d90c2e10c6080846851c3e3b042a73c679c743b1ec048dc7215177ecec8eb2d"
+    },
+    {
+      "id": "v2501-lzma2-separate",
+      "producer": "7-Zip",
+      "producer_version": "25.01",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "0a04fd9ee2efe3e0cd2ff9f7908311d011f3939eaa53133d1efc7ceee6a1edd2"
+    },
+    {
+      "id": "v2605-copy",
+      "producer": "7-Zip",
+      "producer_version": "26.05",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "Copy",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "8c0a2428d2af310cd9e59312635cf8221fc710117fdc88aa5ec2a1bacb6c9856"
+    },
+    {
+      "id": "v2605-lzma-solid",
+      "producer": "7-Zip",
+      "producer_version": "26.05",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "2b3aaa0ef8a339ac390bb609ed193f6316f8e1fa5e9ffb6996babcc9373c4937"
+    },
+    {
+      "id": "v2605-lzma2-solid",
+      "producer": "7-Zip",
+      "producer_version": "26.05",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "140dc82a22fa74eb76f6f7fba064105eaec6c5db32482c4a03429954d47aab15"
+    },
+    {
+      "id": "v2605-lzma2-separate",
+      "producer": "7-Zip",
+      "producer_version": "26.05",
+      "archive_major": 0,
+      "archive_minor": 4,
+      "codec": "LZMA2",
+      "solid": false,
+      "compressed_header": false,
+      "archive_sha256": "bbf1b8c0bcdedffe452791e9515acbe997609332e5f3e00dea3e8454cb782f1e"
+    },
+    {
+      "id": "libarchive",
+      "producer": "libarchive",
+      "producer_version": "bsdtar 3.8.9 - libarchive 3.8.9 zlib/1.2.13.1-motley liblzma/5.8.3 bz2lib/1.0.8 libzstd/1.5.7 cng/2.0 libb2/bundled",
+      "archive_major": 0,
+      "archive_minor": 3,
+      "codec": "LZMA",
+      "solid": true,
+      "compressed_header": true,
+      "archive_sha256": "0c62a3eb50a17dbd305e43c71a1c0c3651b86aa9072c56b5cc3c96112574d216"
+    }
+  ],
+  "content_oracle": "7-Zip 26.05",
+  "listing_oracle": "bsdtar 3.8.9 - libarchive 3.8.9 zlib/1.2.13.1-motley liblzma/5.8.3 bz2lib/1.0.8 libzstd/1.5.7 cng/2.0 libb2/bundled",
+  "independent_bytes_verified": true,
+  "moon7z_verification": "run portable tests and checks/producers.mbtx"
+}

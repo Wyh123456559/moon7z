@@ -1,5 +1,11 @@
 # Interoperability corpus
 
+The [producer matrix](../docs/producers.md) adds 21 required archives generated
+with official 7-Zip 19.00/23.01/24.09/25.01/26.05 and libarchive 3.8.9, recording
+both producer and container versions plus SHA-256 values. Unlike the original
+four archives below, those new official cases retain all three timestamps.
+Source files are shared; actual archived metadata may differ by producer/host.
+
 `source/` contains real Apache-2.0 package metadata/documentation, a JSON import
 manifest, an empty file and a Unicode empty directory. Source provenance and
 licenses are in `../SOURCES.md`. All four archives contain the same five files
