@@ -200,7 +200,17 @@ fn validate_graph_sizes(
 ) -> Unit raise ArchiveError {
   for node, coder in layout.nodes {
     let input = layout.input_offsets[node]
-    if is_filter(coder.codec_id) || coder.codec_id == b"\x00" {
+    if coder.codec_id == b"\x06\xf1\x07\x01" {
+      let packed = graph_input_size(layout, input, packed_sizes)
+      guard packed % 16 == 0 &&
+        layout.sizes[node] <= packed &&
+        packed - layout.sizes[node] < 16 else {
+        raise Invalid(
+          offset=0,
+          reason="AES padded input size differs from declared output",
+        )
+      }
+    } else if is_filter(coder.codec_id) || coder.codec_id == b"\x00" {
       guard layout.sizes[node] == graph_input_size(layout, input, packed_sizes) else {
         raise Invalid(
           offset=0,
@@ -231,6 +241,7 @@ fn decode_graph(
   layout : Layout,
   packed : Array[Bytes],
   limits : Limits,
+  crypto~ : CryptState? = None,
 ) -> Bytes raise ArchiveError {
   let inputs : Array[Bytes?] = Array::make(layout.bindings.length(), None)
   for i, input in layout.packed {
@@ -260,7 +271,12 @@ fn decode_graph(
       } else {
         [coder]
       }
-      decode({ coders, size, crc: None, pieces: [], }, incoming[0], limits)
+      decode(
+        { coders, size, crc: None, pieces: [], },
+        incoming[0],
+        limits,
+        crypto~,
+      )
     }
     for input in first..<(first + layout.input_counts[node]) {
       let source = layout.bindings[input]

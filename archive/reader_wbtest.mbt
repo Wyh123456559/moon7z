@@ -22,6 +22,7 @@ test "a bad sibling CRC prevents returning or caching a selected solid folder" {
     input: b"x".repeat(32) + b"abcdef",
     limits: Limits::new(),
     archive_properties: [],
+    crypto: CryptState::new(None, Limits::new()),
     streams: {
       layouts: [],
       pack_offset: 0,

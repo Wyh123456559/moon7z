@@ -32,13 +32,13 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Compression | Copy, LZMA1, LZMA2, raw DEFLATE and BZip2; [DEFLATE](deflate.md) and [BZip2](bzip2.md) include independent producer/boundary evidence | Also PPMd7; preserve method/property compatibility against independent encoders |
 | LZMA properties | Codec-backed supported lc/lp range; exact decoded size and dictionary policy enforced | All property combinations emitted by the declared producer matrix, or a documented remaining blocker |
 | Filters | Delta, classic x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4; see [evidence](filters.md) | Also RISC-V and all valid properties; classic methods use empty properties, unlike ARM64/RISC-V |
-| Encryption | Explicitly unsupported | Password API, AES-256/SHA-256 7z derivation with work limits, encrypted headers and data, missing/wrong-password cases |
+| Encryption | Password API, AES-256-CBC/SHA-256 derivation with cumulative work limits, encrypted headers/data and [four real cases](encrypted.md), missing/wrong password recovery | Preserve these contracts across remaining input/header paths; CRC is not authenticated encryption |
 | Split/SFX input | Explicitly unsupported; signature must be at byte zero | Ordered volume source, missing/reordered volume diagnostics and bounded signature discovery for SFX; no executable is run |
 | Input scale | In-memory bytes, controlled sizes at most 0x3fffffff | Seekable bounded input with UInt64 offsets; retain a deliberate in-memory convenience API |
 | Integrity | All available pack/folder/member CRCs in verified scope; missing member CRCs explicit | Same behavior for all new graph/method/volume paths; CRC is not authenticity |
 | Publishing | No-replace staging, exact selected IDs, metadata returned rather than applied | Preserve these contracts while expanding readable inputs; unsafe export must fail clearly |
 
-Every pending row is a real gap. In particular, AES and PPMd must
+Every pending row is a real gap. In particular, PPMd must
 not remain excluded while the project is described as having completed this
 profile. A small demo or a larger test count cannot substitute for these rows.
 

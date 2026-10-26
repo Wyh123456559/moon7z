@@ -1,0 +1,95 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else {
+    fail("usage: generate.mbtx 7ZA19 7ZA26 NEW_DIRECTORY")
+  }
+  for (packer, version) in [(args[1], "19.00"), (args[2], "26.05")] {
+    guard @shell.Cmd(packer, []).output().stdout().contains(version) else {
+      fail("wrong producer version: " + version)
+    }
+  }
+  @fs.mkdir(args[3])
+  let root = @fs.realpath(args[3])
+  let source = root + "/source"
+  @fs.mkdir(source)
+  for file in ["part-a.bin", "part-b.bin"] {
+    @fs.write_file(
+      source + "/" + file,
+      @fs.read_file("corpus/x86/" + file).binary(),
+    )
+  }
+  let password = "moon7z-密码-🔑"
+  for
+    (id, old, codec, encrypted_header, separate) in [
+      ("v1900-data", true, "LZMA", false, false),
+      ("v2605-header", false, "LZMA2", true, false),
+      ("v2605-copy", false, "Copy", false, false),
+      ("v2605-separate", false, "BZip2", true, true),
+    ] {
+    let archive = root + "/" + id + ".7z"
+    let command = [
+      "a",
+      archive,
+      "part-a.bin",
+      "part-b.bin",
+      "-t7z",
+      "-m0=" + codec,
+      if separate {
+        "-ms=off"
+      } else {
+        "-ms=on"
+      },
+      if encrypted_header {
+        "-mhe=on"
+      } else {
+        "-mhe=off"
+      },
+      "-p" + password,
+      "-mtm=off",
+      "-mtc=off",
+      "-mta=off",
+    ]
+    if codec != "Copy" {
+      command.push(if codec == "BZip2" { "-md=100k" } else { "-md=64k" })
+    }
+    let result = @shell.Cmd(
+      if old {
+        args[1]
+      } else {
+        args[2]
+      },
+      command,
+      cwd=source,
+    ).output()
+    guard result.exit_code() == 0 else {
+      fail("independent encrypted packing failed")
+    }
+    let tested = @shell.Cmd(args[2], ["t", archive, "-p" + password]).output()
+    assert_eq(tested.exit_code(), 0)
+    let output = root + "/unpacked-" + id
+    let exported = @shell.Cmd(args[2], [
+      "x",
+      archive,
+      "-p" + password,
+      "-o" + output,
+    ]).output()
+    assert_eq(exported.exit_code(), 0)
+    for file in ["part-a.bin", "part-b.bin"] {
+      assert_eq(
+        @fs.read_file(output + "/" + file).binary(),
+        @fs.read_file(source + "/" + file).binary(),
+      )
+    }
+    println("Independent encrypted extraction passed: " + id)
+  }
+}

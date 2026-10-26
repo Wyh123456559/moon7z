@@ -17,4 +17,5 @@ preferred_target = "wasm"
 import {
   "aurora0x27/lzma-mbt@0.1.0",
   "moonbitlang/async@0.22.5",
+  "moonbitlang/x@0.5.5",
 }

@@ -105,6 +105,7 @@ fn Reader::load(self : Reader, id : Int32) -> Bytes raise ArchiveError {
     id,
     start,
     archive.limits,
+    crypto=Some(archive.crypto),
   )
   let mut offset = 0
   for (size, crc) in block.pieces {
@@ -112,7 +113,9 @@ fn Reader::load(self : Reader, id : Int32) -> Bytes raise ArchiveError {
       data[offset:offset + size],
       crc,
       "folder \{id} substream at \{offset}",
-    )
+    ) catch {
+      error => raise encrypted_error(block, error)
+    }
     offset += size
   }
   if data.length() <= self.cache_limit {

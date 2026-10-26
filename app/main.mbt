@@ -1,21 +1,32 @@
 ///|
 async fn main {
-  let args = @env.args()
+  let mut args = @env.args()
+  let password = if args.length() >= 3 && args[1] == "--password-env" {
+    let name = args[2]
+    let secret = @env.get_env_var(name)
+    guard secret is Some(_) else {
+      fail("password environment variable is not set: " + name)
+    }
+    args = [args[0]] + args[3:].to_owned()
+    secret
+  } else {
+    None
+  }
   if args.length() == 4 && args[1] == "audit" && args[2] == "--json" {
-    let archive = @host.open_file(args[3])
+    let archive = @host.open_file(args[3], password?)
     println(archive.audit().to_json().stringify())
     return
   }
   if args.length() == 5 && args[1] == "diff" && args[2] == "--json" {
-    let left = @host.open_file(args[3])
-    let right = @host.open_file(args[4])
+    let left = @host.open_file(args[3], password?)
+    let right = @host.open_file(args[4], password?)
     println(left.compare(right).to_json().stringify())
     return
   }
   if args.length() >= 7 &&
     args[1] == "extract-selected" &&
     args[2] == "--contents-only" {
-    let archive = @host.open_file(args[3])
+    let archive = @host.open_file(args[3], password?)
     let ids = args[6:].map(id => @string.parse_int(id))
     let exported = @host.export_selected(
       archive,
@@ -39,7 +50,7 @@ async fn main {
         "usage: list --json archive.7z OR test --json [--require-member-crcs] archive.7z",
       )
     }
-    let archive = @host.open_file(args[if strict { 4 } else { 3 }])
+    let archive = @host.open_file(args[if strict { 4 } else { 3 }], password?)
     let document = if args[1] == "list" {
       archive.inventory_json()
     } else {
@@ -51,7 +62,7 @@ async fn main {
   if args.length() == 4 &&
     args[1] == "test" &&
     args[2] == "--require-member-crcs" {
-    let archive = @host.open_file(args[3])
+    let archive = @host.open_file(args[3], password?)
     let report = archive.verify(require_member_crcs=true) catch {
       err => fail(err.to_string())
     }
@@ -59,7 +70,7 @@ async fn main {
     return
   }
   if args.length() == 6 && args[1] == "read-range" {
-    let archive = @host.open_file(args[2])
+    let archive = @host.open_file(args[2], password?)
     let id = @string.parse_int(args[3])
     let offset = @string.parse_int(args[4])
     let length = @string.parse_int(args[5])
@@ -68,7 +79,7 @@ async fn main {
     return
   }
   if args.length() == 4 && args[1] == "read" {
-    let archive = @host.open_file(args[2])
+    let archive = @host.open_file(args[2], password?)
     let id = @string.parse_int(args[3])
     let item = archive.reader().read(id)
     guard item.entry.kind == File else {
@@ -78,7 +89,7 @@ async fn main {
     return
   }
   if args.length() == 6 && args[1] == "extract" && args[2] == "--contents-only" {
-    let archive = @host.open_file(args[3])
+    let archive = @host.open_file(args[3], password?)
     let exported = @host.export_contents(archive, parent=args[4], name=args[5])
     println(
       "Exported \{exported.entries.length()} entries to \{exported.directory}; timestamps and attributes were not applied",
@@ -90,7 +101,7 @@ async fn main {
       "usage: moon run app -- <list|test> [--json] archive.7z OR audit --json archive.7z OR diff --json left.7z right.7z OR test [--json] --require-member-crcs archive.7z OR read archive.7z entry-id OR read-range archive.7z entry-id offset length OR extract --contents-only archive.7z existing-parent new-name OR extract-selected --contents-only archive.7z existing-parent new-name entry-id...",
     )
   }
-  let archive = @host.open_file(args[2])
+  let archive = @host.open_file(args[2], password?)
   if args[1] == "list" {
     for entry in archive.entries() {
       println(

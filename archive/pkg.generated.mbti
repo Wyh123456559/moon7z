@@ -10,6 +10,8 @@ pub fn validate_path(String) -> Unit raise ArchiveError
 
 // Errors
 pub suberror ArchiveError {
+  PasswordRequired
+  DecryptionFailed
   Invalid(offset~ : Int32, reason~ : String)
   Unsupported(feature~ : String)
   Limit(resource~ : String, maximum~ : Int32)
@@ -38,7 +40,8 @@ pub fn Archive::compare(Self, Self) -> Comparison raise ArchiveError
 pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
 pub fn Archive::inventory_json(Self) -> Json
-pub fn Archive::open(Bytes, limits? : Limits) -> Self raise ArchiveError
+pub fn Archive::is_encrypted(Self) -> Bool
+pub fn Archive::open(Bytes, limits? : Limits, password? : String) -> Self raise ArchiveError
 pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
 pub fn Archive::plan_selection(Self, ArrayView[Int32]) -> ContentPlan raise ArchiveError
 pub fn Archive::properties(Self) -> Array[ArchiveProperty]
@@ -161,10 +164,13 @@ pub struct Limits {
   entries : Int32
   working_bytes : Int32
   coders : Int32
+  kdf_rounds : Int32
+  kdf_bytes : Int32
+  password_bytes : Int32
 } derive(Eq, @debug.Debug)
 #deprecated
 pub fn Limits::equal(Self, Self) -> Bool
-pub fn Limits::new(input_bytes? : Int32, header_bytes? : Int32, output_bytes? : Int32, dictionary_bytes? : Int32, entries? : Int32, working_bytes? : Int32, coders? : Int32) -> Self
+pub fn Limits::new(input_bytes? : Int32, header_bytes? : Int32, output_bytes? : Int32, dictionary_bytes? : Int32, entries? : Int32, working_bytes? : Int32, coders? : Int32, kdf_rounds? : Int32, kdf_bytes? : Int32, password_bytes? : Int32) -> Self
 #deprecated
 pub fn Limits::not_equal(Self, Self) -> Bool
 #deprecated

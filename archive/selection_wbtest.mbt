@@ -4,6 +4,7 @@ fn named_empty_archive(names : Array[String]) -> Archive {
     input: b"",
     limits: Limits::new(),
     archive_properties: [],
+    crypto: CryptState::new(None, Limits::new()),
     streams: {
       pack_offset: 0,
       pack_sizes: [],

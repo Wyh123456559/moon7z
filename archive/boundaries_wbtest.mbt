@@ -117,7 +117,7 @@ test "LZMA2 expanded size is bounded before codec allocation" {
 ///|
 test "unsupported methods and huge dictionaries fail without decoding" {
   let unsupported = try {
-    validate_coder({ codec_id: b"\x06\xf1\x07\x01", properties: b"", })
+    validate_coder({ codec_id: b"\x06\xf1\x07\x02", properties: b"", })
     false
   } catch {
     Unsupported(..) => true

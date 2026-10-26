@@ -146,13 +146,14 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Filters | Delta (distance 1–256), x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder graph | Bounded acyclic graphs of supported unary coders and four-input BCJ2; explicit physical input mappings |
 | Headers | Plain and compressed headers |
+| Encryption | 7z AES-256/SHA-256 password reading for headers/data; bounded cumulative derivation work |
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
 | Integrity | Start/next header, available packed/folder/member CRC-32 |
 | Metadata | Creation/access/modification FILETIME and Windows/POSIX attribute word retained |
 | Archive properties | Original ordered UInt64 IDs and opaque bytes, including duplicate IDs and empty values |
 | Resources | Configurable input/header/output/dictionary/member/coder/intermediate-output limits |
 
-Encryption, split volumes, SFX,
+Split volumes, SFX,
 unlisted filters (including RISC-V), additional streams,
 anti-items, links, special files, unknown semantic properties and writing are
 rejected. Zero padding may repeat. The reader does not silently skip unsupported
@@ -242,6 +243,13 @@ concatenated streams and legacy randomized blocks. Its block/stream CRCs are
 checked alongside 7z CRCs. The data header's block size is checked against the
 dictionary policy before building the inverse-transform data, and RLE expansion
 is bounded by the declared coder output. See [BZip2 evidence](docs/bzip2.md).
+
+`Archive::open(bytes, password="...")` and `host.open_file(path, password="...")`
+read encrypted headers/data. `is_encrypted()` reports encryption presence.
+The CLI accepts a leading `--password-env NAME`, keeping the password out of its
+arguments. `PasswordRequired` and `DecryptionFailed` distinguish missing input
+from failed encrypted decoding/integrity; a wrong password and damaged ciphertext
+cannot be reliably distinguished. See [password workflow and limits](docs/encrypted.md).
 
 The supported x86 BCJ method is `03 03 01 03`, with empty properties and an initial
 instruction pointer of zero, as emitted by 7-Zip's BCJ coder. Nonempty properties

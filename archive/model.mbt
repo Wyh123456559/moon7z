@@ -1,6 +1,8 @@
 ///|
 /// Errors identify an input defect, unsupported feature or resource policy.
 pub suberror ArchiveError {
+  PasswordRequired
+  DecryptionFailed
   Invalid(offset~ : Int32, reason~ : String)
   Unsupported(feature~ : String)
   Limit(resource~ : String, maximum~ : Int32)
@@ -23,6 +25,9 @@ pub struct Limits {
   entries : Int32
   working_bytes : Int32
   coders : Int32
+  kdf_rounds : Int32
+  kdf_bytes : Int32
+  password_bytes : Int32
 } derive(Debug, Eq)
 
 ///|
@@ -80,6 +85,9 @@ pub fn Limits::new(
   entries~ : Int32 = 10000,
   working_bytes~ : Int32 = 256 * 1024 * 1024,
   coders~ : Int32 = 64,
+  kdf_rounds~ : Int32 = 4 * 1024 * 1024,
+  kdf_bytes~ : Int32 = 128 * 1024 * 1024,
+  password_bytes~ : Int32 = 8192,
 ) -> Limits {
   {
     input_bytes,
@@ -89,6 +97,9 @@ pub fn Limits::new(
     entries,
     working_bytes,
     coders,
+    kdf_rounds,
+    kdf_bytes,
+    password_bytes,
   }
 }
 
@@ -119,6 +130,7 @@ priv struct Streams {
 /// Opening validates headers and the complete member-to-block mapping.
 /// Data CRCs are checked by `verify` and `extract_all`, not by listing.
 pub struct Archive {
+  priv crypto : CryptState
   priv input : Bytes
   priv limits : Limits
   priv streams : Streams

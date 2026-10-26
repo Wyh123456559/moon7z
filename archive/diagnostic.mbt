@@ -5,6 +5,14 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    PasswordRequired =>
+      logger.write_string(
+        "This 7z stream requires a password. Supply Archive::open(password=...) or the CLI --password-env option.",
+      )
+    DecryptionFailed =>
+      logger.write_string(
+        "Encrypted 7z data failed decoding or integrity checks. Check the password and obtain an intact archive; these causes cannot be distinguished reliably.",
+      )
     AmbiguousName(name~, first_id~, second_id~) =>
       logger.write_string(
         "Ambiguous 7z name \{Repr(name)} at IDs \{first_id} and \{second_id}. Name-based comparison requires unique original names; inspect entries by ID instead.",

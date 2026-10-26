@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/x/crypto",
   "aurora0x27/lzma-mbt/lzma",
   "aurora0x27/lzma-mbt/lzma2",
   "aurora0x27/lzma-mbt/filters",
@@ -15,6 +16,50 @@ import {
 import {
   "moonbitlang/core/json",
 } for "wbtest"
+
+rule(
+  name: "encrypted_data",
+  command: ":embed --binary -i $input -o $output --name encrypted_data",
+)
+
+dev_build(
+  rule: "encrypted_data",
+  input: "../corpus/encrypted/v1900-data.7z",
+  output: "encrypted_data_archive_test.mbt",
+)
+
+rule(
+  name: "encrypted_header",
+  command: ":embed --binary -i $input -o $output --name encrypted_header",
+)
+
+dev_build(
+  rule: "encrypted_header",
+  input: "../corpus/encrypted/v2605-header.7z",
+  output: "encrypted_header_archive_test.mbt",
+)
+
+rule(
+  name: "encrypted_copy",
+  command: ":embed --binary -i $input -o $output --name encrypted_copy",
+)
+
+dev_build(
+  rule: "encrypted_copy",
+  input: "../corpus/encrypted/v2605-copy.7z",
+  output: "encrypted_copy_archive_test.mbt",
+)
+
+rule(
+  name: "encrypted_separate",
+  command: ":embed --binary -i $input -o $output --name encrypted_separate",
+)
+
+dev_build(
+  rule: "encrypted_separate",
+  input: "../corpus/encrypted/v2605-separate.7z",
+  output: "encrypted_separate_archive_test.mbt",
+)
 
 rule(
   name: "bzip_1900",

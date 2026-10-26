@@ -1,10 +1,13 @@
 ///|
-/// Read an unencrypted single-volume 7z archive. Archive properties are retained
+/// Read a single-volume 7z archive, optionally with a UTF-16 encoded password.
+/// A plain-header encrypted archive can be listed without a password; encrypted
+/// headers require it at opening. Archive properties are retained
 /// as opaque bytes; unsupported file/coder semantics are refused explicitly.
 /// Input bytes are immutable and remain owned by the archive.
 pub fn Archive::open(
   bytes : Bytes,
   limits~ : Limits = Limits::new(),
+  password? : String,
 ) -> Archive raise ArchiveError {
   for
     value in [
@@ -15,6 +18,9 @@ pub fn Archive::open(
       limits.entries,
       limits.working_bytes,
       limits.coders,
+      limits.kdf_rounds,
+      limits.kdf_bytes,
+      limits.password_bytes,
     ] {
     guard value >= 0 && value <= 0x3fffffff else {
       raise Invalid(
@@ -23,6 +29,19 @@ pub fn Archive::open(
       )
     }
   }
+  let secret = match password {
+    None => None
+    Some(text) => {
+      guard text.length() <= limits.password_bytes / 2 else {
+        raise Limit(
+          resource="UTF-16 password bytes",
+          maximum=limits.password_bytes,
+        )
+      }
+      Some(@utf16.encode(text[:], endianness=Little, bom=false))
+    }
+  }
+  let crypto = CryptState::new(secret, limits)
   ignore(bounded(bytes.length().to_uint64(), limits.input_bytes, "input bytes"))
   let input = bytes
   let start = Cursor::new(input)
@@ -51,6 +70,7 @@ pub fn Archive::open(
       raise Invalid(offset=32, reason="empty archive contains unclaimed data")
     }
     return {
+      crypto,
       input,
       limits,
       streams: {
@@ -75,9 +95,11 @@ pub fn Archive::open(
     guard streams.blocks.length() == 1 && streams.blocks[0].pieces.length() == 1 else {
       raise Unsupported(feature="encoded header with multiple streams")
     }
-    let decoded = decode_streams(input, streams, limits)
+    let decoded = decode_streams(input, streams, limits, crypto=Some(crypto))
     let (_, crc) = streams.blocks[0].pieces[0]
-    check_crc(decoded[0], crc, "encoded header substream")
+    check_crc(decoded[0], crc, "encoded header substream") catch {
+      error => raise encrypted_error(streams.blocks[0], error)
+    }
     header = Cursor::new(decoded[0])
     id = header.byte()
   }
@@ -133,7 +155,11 @@ pub fn Archive::open(
       reason="archive data has no file inventory",
     )
   }
-  { input, limits, streams, inventory, archive_properties, }
+  crypto.encrypted = crypto.encrypted ||
+    streams.blocks.any(block => {
+      block.coders.any(coder => coder.codec_id == b"\x06\xf1\x07\x01")
+    })
+  { crypto, input, limits, streams, inventory, archive_properties, }
 }
 
 ///|
@@ -216,6 +242,7 @@ fn verify_folder(
     id,
     start,
     archive.limits,
+    crypto=Some(archive.crypto),
   )
   let mut offset = 0
   for entry in entries {
@@ -223,7 +250,9 @@ fn verify_folder(
       data[offset:offset + entry.size],
       entry.crc32,
       "member " + entry.name,
-    )
+    ) catch {
+      error => raise encrypted_error(archive.streams.blocks[id], error)
+    }
     offset += entry.size
   }
 }
@@ -232,7 +261,12 @@ fn verify_folder(
 /// Return every member in archive order after verifying all available CRCs.
 /// Names and metadata remain unchanged; this API never writes filesystem paths.
 pub fn Archive::extract_all(self : Archive) -> Array[Member] raise ArchiveError {
-  let blocks = decode_streams(self.input, self.streams, self.limits)
+  let blocks = decode_streams(
+    self.input,
+    self.streams,
+    self.limits,
+    crypto=Some(self.crypto),
+  )
   let offsets = Array::make(blocks.length(), 0)
   let members : Array[Member] = []
   for entry in self.inventory {
@@ -240,7 +274,9 @@ pub fn Archive::extract_all(self : Archive) -> Array[Member] raise ArchiveError 
       let start = offsets[block]
       let output = blocks[block][start:start + entry.size].to_owned()
       offsets[block] += entry.size
-      check_crc(output, entry.crc32, "member " + entry.name)
+      check_crc(output, entry.crc32, "member " + entry.name) catch {
+        error => raise encrypted_error(self.streams.blocks[block], error)
+      }
       output
     } else {
       b""

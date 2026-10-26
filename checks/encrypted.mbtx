@@ -1,0 +1,89 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/encrypted")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-encrypted")
+  defer @fs.rmdir(root, recursive=true)
+  let password = "moon7z-密码-🔑"
+  let environment = { "MOON7Z_TEST_PASSWORD": password }
+  for id in ["v1900-data", "v2605-header", "v2605-copy", "v2605-separate"] {
+    let result = @shell.Cmd(
+      "moon",
+      [
+        "run",
+        "--target",
+        target,
+        "app",
+        "--",
+        "--password-env",
+        "MOON7Z_TEST_PASSWORD",
+        "extract",
+        "--contents-only",
+        corpus + "/" + id + ".7z",
+        root,
+        id,
+      ],
+      env=environment,
+    ).output(timeout_ms=120000)
+    assert_eq(result.exit_code(), 0)
+    assert_true(!result.stdout().contains(password))
+    assert_true(!result.stderr().contains(password))
+    for file in ["part-a.bin", "part-b.bin"] {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + file).binary(),
+        @fs.read_file("corpus/x86/" + file).binary(),
+      )
+    }
+  }
+  let absent = @shell.Cmd("moon", [
+    "run",
+    "--target",
+    target,
+    "app",
+    "--",
+    "list",
+    "--json",
+    corpus + "/v2605-header.7z",
+  ]).output(timeout_ms=120000)
+  assert_true(absent.exit_code() != 0)
+  assert_eq(absent.stdout(), "")
+  let wrong = @shell.Cmd(
+    "moon",
+    [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "--password-env",
+      "MOON7Z_TEST_PASSWORD",
+      "extract",
+      "--contents-only",
+      corpus + "/v1900-data.7z",
+      root,
+      "refused",
+    ],
+    env={ "MOON7Z_TEST_PASSWORD": "deliberately-wrong" },
+  ).output(timeout_ms=120000)
+  assert_true(wrong.exit_code() != 0)
+  assert_eq(wrong.stdout(), "")
+  assert_true(!wrong.stderr().contains("deliberately-wrong"))
+  assert_true(!@fs.readdir(root, include_hidden=true).contains("refused"))
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 4)
+  println(
+    "Encrypted header/data exports match originals; missing/wrong passwords release no files or secret text",
+  )
+}

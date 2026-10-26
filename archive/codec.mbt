@@ -5,6 +5,7 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
     return
   }
   match coder.codec_id {
+    b"\x06\xf1\x07\x01" => ignore(aes_properties(coder.properties))
     b"\x04\x01\x08" | b"\x04\x02\x02" =>
       if !coder.properties.is_empty() {
         raise Invalid(offset=0, reason="DEFLATE/BZip2 have no coder properties")
@@ -72,6 +73,7 @@ fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
     return 0UL
   }
   match coder.codec_id {
+    b"\x06\xf1\x07\x01" => 0UL
     b"\x04\x02\x02" => 0UL // Block size is checked from each compressed stream header.
     b"\x04\x01\x08" => 32768UL
     b"\x00" | b"\x03\x03\x01\x1b" => 0UL
@@ -151,10 +153,21 @@ fn decode(
   block : Block,
   packed : Bytes,
   limits : Limits,
+  crypto~ : CryptState? = None,
 ) -> Bytes raise ArchiveError {
   let coder = block.coders[0]
   validate_dictionary(coder, limits)
   let mut output = match coder.codec_id {
+    b"\x06\xf1\x07\x01" =>
+      decode_aes(
+        packed,
+        block.size,
+        coder.properties,
+        match crypto {
+          Some(state) => state
+          None => CryptState::new(None, limits)
+        },
+      )
     b"\x04\x02\x02" => decode_bzip2(packed, block.size, limits.dictionary_bytes)
     b"\x04\x01\x08" => decode_deflate(packed, block.size)
     b"\x00" => packed
@@ -216,11 +229,14 @@ fn decode_streams(
   input : Bytes,
   streams : Streams,
   limits : Limits,
+  crypto~ : CryptState? = None,
 ) -> Array[Bytes] raise ArchiveError {
   let output : Array[Bytes] = []
   let mut offset = 32 + streams.pack_offset
   for i in 0..<streams.blocks.length() {
-    output.push(decode_packed_stream(input, streams, i, offset, limits))
+    output.push(
+      decode_packed_stream(input, streams, i, offset, limits, crypto~),
+    )
     offset += packed_folder_bytes(streams, i)
   }
   output
@@ -233,6 +249,7 @@ fn decode_packed_stream(
   id : Int32,
   start : Int32,
   limits : Limits,
+  crypto~ : CryptState? = None,
 ) -> Bytes raise ArchiveError {
   let (first, count) = pack_range(streams, id)
   let packed : Array[Bytes] = []
@@ -250,10 +267,14 @@ fn decode_packed_stream(
     offset += length
   }
   if streams.layouts.is_empty() {
-    decode(streams.blocks[id], packed[0], limits)
+    decode(streams.blocks[id], packed[0], limits, crypto~)
   } else {
-    let result = decode_graph(streams.layouts[id], packed, limits)
-    check_crc(result, streams.blocks[id].crc, "folder")
+    let result = decode_graph(streams.layouts[id], packed, limits, crypto~) catch {
+      error => raise encrypted_error(streams.blocks[id], error)
+    }
+    check_crc(result, streams.blocks[id].crc, "folder") catch {
+      error => raise encrypted_error(streams.blocks[id], error)
+    }
     result
   }
 }

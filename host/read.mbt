@@ -4,6 +4,7 @@
 pub async fn open_file(
   path : String,
   limits~ : @archive.Limits = @archive.Limits::new(),
+  password? : String,
 ) -> @archive.Archive {
   let file = @fs.open(path, mode=ReadOnly)
   defer file.close()
@@ -23,5 +24,5 @@ pub async fn open_file(
   guard file.read_some(max_len=1) is None else {
     fail("archive input grew while being read; retry from a stable file")
   }
-  @archive.Archive::open(bytes, limits~)
+  @archive.Archive::open(bytes, limits~, password?)
 }
