@@ -1,0 +1,63 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/bzip2")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-bzip2")
+  defer @fs.rmdir(root, recursive=true)
+  for
+    id in [
+      "v1900-solid", "v2605-solid", "v2605-separate", "v2605-runs", "v2605-blocks",
+    ] {
+    @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).run(timeout_ms=120000)
+    if id == "v2605-runs" {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/runs.bin").binary(),
+        b"a".repeat(1100000),
+      )
+    } else if id == "v2605-blocks" {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/blocks.bin").binary(),
+        Bytes::makei(210123, i => ((i * 73 + i / 257) & 255).to_byte()),
+      )
+    } else {
+      for
+        (original, file) in [
+          ("corpus/audio/left.wav", "left.wav"),
+          ("corpus/audio/right.wav", "right.wav"),
+          ("corpus/source/清单.json", "清单.json"),
+        ] {
+        assert_eq(
+          @fs.read_file(root + "/" + id + "/" + file).binary(),
+          @fs.read_file(original).binary(),
+        )
+      }
+    }
+  }
+  println(
+    "Five real BZip2 archives exported byte-for-byte, including long RLE and multiple blocks",
+  )
+}

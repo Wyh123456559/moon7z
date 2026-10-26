@@ -1,0 +1,204 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+}
+----
+
+///|
+fn crc_bzip(bytes : Bytes) -> UInt32 {
+  let mut crc = 0xffffffffU
+  for byte in bytes {
+    crc = crc ^ (byte.to_uint() << 24)
+    for _ in 0..<8 {
+      crc = (crc << 1) ^
+        (if (crc & 0x80000000U) != 0U { 0x04c11db7U } else { 0U })
+    }
+  }
+  crc ^ 0xffffffffU
+}
+
+///|
+fn bit_at(bytes : Bytes, index : Int32) -> UInt64 {
+  (bytes[index / 8].to_uint64() >> (7 - index % 8)) & 1UL
+}
+
+///|
+async fn randomized_fixture(packer : String, root : String) -> Unit {
+  let original = Bytes::makei(1536, i => (i % 251).to_byte())
+  let table_text = @fs.read_file("archive/bzip_random.mbt").text()
+  let table : Array[Int32] = []
+  for
+    word in table_text.split("= [").to_array()[1].split("]").to_array()[0].split(
+      ",",
+    ) {
+    let number = word.trim().to_owned()
+    if !number.is_empty() {
+      table.push(@string.parse_int(number))
+    }
+  }
+  assert_eq(table.length(), 512)
+  let changed = original.to_array()
+  let mut left = 0
+  let mut index = 0
+  for i in 0..<changed.length() {
+    if left == 0 {
+      left = table[index]
+      index = (index + 1) % 512
+    }
+    left -= 1
+    if left == 1 {
+      changed[i] = (changed[i].to_int() ^ 1).to_byte()
+    }
+  }
+  // Neither input has four equal consecutive bytes, so RLE1 is the identity.
+  for i in 3..<changed.length() {
+    assert_true(
+      !(changed[i] == changed[i - 1] &&
+      changed[i] == changed[i - 2] &&
+      changed[i] == changed[i - 3]),
+    )
+  }
+  @fs.write_file(root + "/source/transformed.bin", Bytes::from_array(changed))
+  @shell.Cmd(
+    packer,
+    ["a", root + "/ordinary.bz2", "transformed.bin", "-tbzip2", "-md=100k"],
+    cwd=root + "/source",
+  ).run()
+  let raw = @fs.read_file(root + "/ordinary.bz2").binary()
+  let bytes = raw.to_array()
+  assert_eq(raw[:4], b"BZh1"[:])
+  let crc = crc_bzip(original)
+  for i in 0..<4 {
+    bytes[10 + i] = (crc >> (24 - i * 8)).to_byte()
+  }
+  bytes[14] = (bytes[14].to_int() | 128).to_byte()
+  let mut footer = -1
+  for padding in 0..<8 {
+    let start = raw.length() * 8 - 80 - padding
+    let mut magic = 0UL
+    for bit in 0..<48 {
+      magic = (magic << 1) | bit_at(raw, start + bit)
+    }
+    if magic == 0x177245385090UL {
+      assert_eq(footer, -1)
+      footer = start
+    }
+  }
+  assert_true(footer >= 0)
+  for i in 0..<32 {
+    let bit = footer + 48 + i
+    let mask = 1 << (7 - bit % 8)
+    let value = bytes[bit / 8].to_int()
+    bytes[bit / 8] = ((value & (255 ^ mask)) |
+    (((crc >> (31 - i)).reinterpret_as_int() & 1) * mask)).to_byte()
+  }
+  @fs.write_file(root + "/randomized.bz2", Bytes::from_array(bytes))
+  @shell.Cmd(packer, ["t", root + "/randomized.bz2"]).run()
+  @shell.Cmd(packer, [
+    "x",
+    root + "/randomized.bz2",
+    "-o" + root + "/randomized-output",
+  ]).run()
+  assert_eq(
+    @fs.read_file(root + "/randomized-output/randomized").binary(),
+    original,
+  )
+  println("Independent legacy randomized-block extraction passed")
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else {
+    fail("usage: generate.mbtx 7ZA19 7ZA26 NEW_DIRECTORY")
+  }
+  for (packer, version) in [(args[1], "19.00"), (args[2], "26.05")] {
+    guard @shell.Cmd(packer, []).output().stdout().contains(version) else {
+      fail("wrong producer version: " + version)
+    }
+  }
+  @fs.mkdir(args[3])
+  let root = @fs.realpath(args[3])
+  let source = root + "/source"
+  @fs.mkdir(source)
+  for
+    (original, file) in [
+      ("corpus/audio/left.wav", "left.wav"),
+      ("corpus/audio/right.wav", "right.wav"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    @fs.write_file(source + "/" + file, @fs.read_file(original).binary())
+  }
+  @fs.write_file(source + "/runs.bin", b"a".repeat(1100000))
+  @fs.write_file(
+    source + "/blocks.bin",
+    Bytes::makei(210123, i => ((i * 73 + i / 257) & 255).to_byte()),
+  )
+  for
+    (id, old, separate, special) in [
+      ("v1900-solid", true, false, ""),
+      ("v2605-solid", false, false, ""),
+      ("v2605-separate", false, true, ""),
+      ("v2605-runs", false, false, "runs.bin"),
+      ("v2605-blocks", false, false, "blocks.bin"),
+    ] {
+    let archive = root + "/" + id + ".7z"
+    let files = if special == "" {
+      ["left.wav", "right.wav", "清单.json"]
+    } else {
+      [special]
+    }
+    let command = ["a", archive] +
+      files +
+      [
+        "-t7z",
+        "-m0=BZip2:d=100k",
+        if separate {
+          "-ms=off"
+        } else {
+          "-ms=on"
+        },
+        "-mhc=on",
+        "-mtm=off",
+        "-mtc=off",
+        "-mta=off",
+      ]
+    let result = @shell.Cmd(
+      if old {
+        args[1]
+      } else {
+        args[2]
+      },
+      command,
+      cwd=source,
+    ).output()
+    guard result.exit_code() == 0 else {
+      fail(result.stdout() + result.stderr())
+    }
+    @shell.Cmd(args[2], ["t", archive]).run()
+    let output = root + "/unpacked-" + id
+    @shell.Cmd(args[2], ["x", archive, "-o" + output]).run()
+    for file in files {
+      assert_eq(
+        @fs.read_file(output + "/" + file).binary(),
+        @fs.read_file(source + "/" + file).binary(),
+      )
+    }
+    println("Independent BZip2 extraction passed: " + id)
+  }
+  @shell.Cmd(
+    args[2],
+    ["a", root + "/runs.bz2", "runs.bin", "-tbzip2", "-md=100k"],
+    cwd=source,
+  ).run()
+  @shell.Cmd(
+    args[2],
+    ["a", root + "/blocks.bz2", "blocks.bin", "-tbzip2", "-md=100k"],
+    cwd=source,
+  ).run()
+  randomized_fixture(args[2], root)
+}

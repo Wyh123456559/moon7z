@@ -17,6 +17,94 @@ import {
 } for "wbtest"
 
 rule(
+  name: "bzip_1900",
+  command: ":embed --binary -i $input -o $output --name bzip_1900",
+)
+
+dev_build(
+  rule: "bzip_1900",
+  input: "../corpus/bzip2/v1900-solid.7z",
+  output: "bzip_1900_archive_test.mbt",
+)
+
+rule(
+  name: "bzip_2605",
+  command: ":embed --binary -i $input -o $output --name bzip_2605",
+)
+
+dev_build(
+  rule: "bzip_2605",
+  input: "../corpus/bzip2/v2605-solid.7z",
+  output: "bzip_2605_archive_test.mbt",
+)
+
+rule(
+  name: "bzip_separate",
+  command: ":embed --binary -i $input -o $output --name bzip_separate",
+)
+
+dev_build(
+  rule: "bzip_separate",
+  input: "../corpus/bzip2/v2605-separate.7z",
+  output: "bzip_separate_archive_test.mbt",
+)
+
+rule(
+  name: "bzip_runs",
+  command: ":embed --binary -i $input -o $output --name bzip_runs",
+)
+
+dev_build(
+  rule: "bzip_runs",
+  input: "../corpus/bzip2/v2605-runs.7z",
+  output: "bzip_runs_archive_test.mbt",
+)
+
+rule(
+  name: "bzip_blocks",
+  command: ":embed --binary -i $input -o $output --name bzip_blocks",
+)
+
+dev_build(
+  rule: "bzip_blocks",
+  input: "../corpus/bzip2/v2605-blocks.7z",
+  output: "bzip_blocks_archive_test.mbt",
+)
+
+rule(
+  name: "bzip_raw_runs",
+  command: ":embed --binary -i $input -o $output --name bzip_raw_runs",
+)
+
+dev_build(
+  rule: "bzip_raw_runs",
+  input: "../corpus/bzip2/runs.bz2",
+  output: "bzip_runs_resource_wbtest.mbt",
+)
+
+rule(
+  name: "bzip_randomized",
+  command: ":embed --binary -i $input -o $output --name bzip_randomized",
+)
+
+dev_build(
+  rule: "bzip_randomized",
+  input: "../corpus/bzip2/randomized.bz2",
+  output: "bzip_randomized_resource_wbtest.mbt",
+)
+
+rule(
+  name: "bzip_raw_blocks",
+  command: ":embed --binary -i $input -o $output --name bzip_raw_blocks",
+)
+
+dev_build(
+  rule: "bzip_raw_blocks",
+  input: "../corpus/bzip2/blocks.bz2",
+  output: "bzip_blocks_resource_wbtest.mbt",
+)
+
+rule(
   name: "deflate_1900",
   command: ":embed --binary -i $input -o $output --name deflate_1900",
 )

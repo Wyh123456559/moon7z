@@ -60,6 +60,7 @@ of ecosystem uniqueness or approval.
 | `archive/bcj.mbt` | Classic x86 BCJ decoding translated from Igor Pavlov's `Bra86.c` (7-Zip 21.07) | Public Domain adaptation, not an original algorithm |
 | `archive/bcj2.mbt` | Four-input reconstruction adapted from 7-Zip 26.05 BCJ2 | Public Domain adaptation |
 | `archive/deflate.mbt` | Bounded whole-node raw DEFLATE decoding integrated with 7z graph/integrity policies | Project code from RFC 1951 format rules; the established algorithm is not claimed as novel |
+| `archive/bzip2.mbt`, `bzip_random.mbt` | Bounded BZip2 reading, CRCs and legacy de-randomization | Partial Go BSD-3-Clause adaptation and bzip2-licensed table; exact provenance in SOURCES.md |
 | `archive/binary.mbt`, `streams.mbt`, `files.mbt`, `open.mbt` | 7z framing, bounded fields, coder topology, inventory and decode integration | Project code; format references and consulted BSD reference recorded in SOURCES.md |
 | `reader.mbt`, `ranges.mbt`, `paths.mbt`, `compare.mbt`, `audit.mbt`, `report.mbt`, `host/` | Public workflow logic and diagnostics | Project code, Apache-2.0 |
 

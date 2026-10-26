@@ -5,9 +5,9 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
     return
   }
   match coder.codec_id {
-    b"\x04\x01\x08" =>
+    b"\x04\x01\x08" | b"\x04\x02\x02" =>
       if !coder.properties.is_empty() {
-        raise Invalid(offset=0, reason="DEFLATE has no coder properties")
+        raise Invalid(offset=0, reason="DEFLATE/BZip2 have no coder properties")
       }
     b"\x03\x03\x01\x1b" =>
       if !coder.properties.is_empty() {
@@ -72,6 +72,7 @@ fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
     return 0UL
   }
   match coder.codec_id {
+    b"\x04\x02\x02" => 0UL // Block size is checked from each compressed stream header.
     b"\x04\x01\x08" => 32768UL
     b"\x00" | b"\x03\x03\x01\x1b" => 0UL
     b"\x03\x01\x01" => {
@@ -154,6 +155,7 @@ fn decode(
   let coder = block.coders[0]
   validate_dictionary(coder, limits)
   let mut output = match coder.codec_id {
+    b"\x04\x02\x02" => decode_bzip2(packed, block.size, limits.dictionary_bytes)
     b"\x04\x01\x08" => decode_deflate(packed, block.size)
     b"\x00" => packed
     b"\x03\x01\x01" => {

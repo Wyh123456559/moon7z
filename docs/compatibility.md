@@ -29,7 +29,7 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Headers | Plain and single-stream compressed headers, start/next/header CRC checks, ordered opaque archive properties | Additional/external metadata streams, all declared header placements and encoded-header mappings |
 | Inventory | Files, directories, zero-length files, solid and separate folders, original UTF-16 names/IDs, three FILETIMEs and attributes | Anti-items, links/special-file metadata and extension properties retained without destructive export |
 | Coder graph | Bounded acyclic graphs, independently mapped packed inputs, four-input BCJ2, arbitrary stored coder order; [five real cases](bcj2.md) | Preserve this mapping/integrity behavior for every remaining codec and header structure |
-| Compression | Copy, LZMA1, LZMA2 and raw DEFLATE; [four real DEFLATE cases](deflate.md) plus stored/fixed/dynamic boundary tests | Also PPMd7 and BZip2; preserve method/property compatibility against independent encoders |
+| Compression | Copy, LZMA1, LZMA2, raw DEFLATE and BZip2; [DEFLATE](deflate.md) and [BZip2](bzip2.md) include independent producer/boundary evidence | Also PPMd7; preserve method/property compatibility against independent encoders |
 | LZMA properties | Codec-backed supported lc/lp range; exact decoded size and dictionary policy enforced | All property combinations emitted by the declared producer matrix, or a documented remaining blocker |
 | Filters | Delta, classic x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4; see [evidence](filters.md) | Also RISC-V and all valid properties; classic methods use empty properties, unlike ARM64/RISC-V |
 | Encryption | Explicitly unsupported | Password API, AES-256/SHA-256 7z derivation with work limits, encrypted headers and data, missing/wrong-password cases |
@@ -38,7 +38,7 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Integrity | All available pack/folder/member CRCs in verified scope; missing member CRCs explicit | Same behavior for all new graph/method/volume paths; CRC is not authenticity |
 | Publishing | No-replace staging, exact selected IDs, metadata returned rather than applied | Preserve these contracts while expanding readable inputs; unsafe export must fail clearly |
 
-Every pending row is a real gap. In particular, AES, PPMd and BZip2 must
+Every pending row is a real gap. In particular, AES and PPMd must
 not remain excluded while the project is described as having completed this
 profile. A small demo or a larger test count cannot substitute for these rows.
 
