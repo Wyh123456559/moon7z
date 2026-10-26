@@ -1,0 +1,68 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let path = "corpus/properties/properties.7z"
+  let inventory = @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "list", "--json", path,
+  ]).output(timeout_ms=120000)
+  assert_eq(inventory.exit_code(), 0)
+  assert_true(
+    @json.parse(inventory.stdout())
+    is {
+      "archive_properties": Array(
+        [
+          { "id": String("128"), "data_base64": String("AP9BCg=="), .. },
+          { "id": String("255"), "data_base64": String(""), .. },
+          { "id": String("128"), "data_base64": String("eA=="), .. },
+        ]
+      ),
+      ..
+    },
+  )
+  let diff = @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "diff", "--json", "corpus/copy-plain.7z",
+    path,
+  ]).output(timeout_ms=120000)
+  assert_eq(diff.exit_code(), 0)
+  assert_true(
+    @json.parse(diff.stdout())
+    is {
+      "identical": False,
+      "changes": Array([]),
+      "archive_properties_changed": True,
+      ..
+    },
+  )
+  let root = @fs.tmpdir(prefix="moon7z-properties")
+  defer @fs.rmdir(root, recursive=true)
+  @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "extract", "--contents-only", path, root,
+    "contents",
+  ]).run(timeout_ms=120000)
+  for
+    file in [
+      "lzma-mbt/LICENSE", "lzma-mbt/README.md", "lzma-mbt/moon.mod", "清单.json",
+      "empty.txt",
+    ] {
+    assert_eq(
+      @fs.read_file(root + "/contents/" + file).binary(),
+      @fs.read_file("corpus/source/" + file).binary(),
+    )
+  }
+  println(
+    "Archive property bytes survive JSON and comparison without changing exported files",
+  )
+}

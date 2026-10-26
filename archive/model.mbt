@@ -110,6 +110,7 @@ pub struct Archive {
   priv limits : Limits
   priv streams : Streams
   priv inventory : Array[Entry]
+  priv archive_properties : Array[ArchiveProperty]
 }
 
 ///|

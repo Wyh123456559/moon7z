@@ -22,6 +22,8 @@ pub struct Comparison {
   priv differences : Array[EntryChange]
   priv left_report : Verification
   priv right_report : Verification
+  priv before_properties : Array[ArchiveProperty]
+  priv after_properties : Array[ArchiveProperty]
 }
 
 ///|
@@ -31,7 +33,12 @@ pub fn Comparison::changes(self : Comparison) -> Array[EntryChange] {
 
 ///|
 pub fn Comparison::identical(self : Comparison) -> Bool {
-  self.differences.is_empty()
+  self.differences.is_empty() && !self.archive_properties_changed()
+}
+
+///|
+pub fn Comparison::archive_properties_changed(self : Comparison) -> Bool {
+  self.before_properties != self.after_properties
 }
 
 ///|
@@ -105,7 +112,13 @@ pub fn Archive::compare(
     }
     differences.push({ name, kind, left: before, right: after, })
   }
-  { differences, left_report, right_report, }
+  {
+    differences,
+    left_report,
+    right_report,
+    before_properties: self.properties(),
+    after_properties: other.properties(),
+  }
 }
 
 ///|
@@ -143,6 +156,13 @@ pub impl ToJson for Comparison with fn to_json(self) {
     "left_verification": self.left_report.to_json(),
     "right_verification": self.right_report.to_json(),
     "changes": Json::array(self.differences.map(change => change.to_json())),
+    "archive_properties_changed": Json(self.archive_properties_changed()),
+    "left_archive_properties": Json::array(
+      self.before_properties.map(property => property.to_json()),
+    ),
+    "right_archive_properties": Json::array(
+      self.after_properties.map(property => property.to_json()),
+    ),
   }
 }
 

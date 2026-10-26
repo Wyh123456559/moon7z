@@ -26,7 +26,7 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Area | Current 0.1.x evidence | Required for the 1.0 profile |
 | --- | --- | --- |
 | File versions | Header major 0 / minor 0–4 accepted; current fixtures are mainly 7zr 26.04, 0.4 | Independently generated 0.3 and 0.4 archives; acceptance of a version byte alone is insufficient |
-| Headers | Plain and single-stream compressed headers, start/next/header CRC checks | Archive properties, additional/external metadata streams, all declared header placements and encoded-header mappings |
+| Headers | Plain and single-stream compressed headers, start/next/header CRC checks, ordered opaque archive properties | Additional/external metadata streams, all declared header placements and encoded-header mappings |
 | Inventory | Files, directories, zero-length files, solid and separate folders, original UTF-16 names/IDs, three FILETIMEs and attributes | Anti-items, links/special-file metadata and extension properties retained without destructive export |
 | Coder graph | At most eight unary coders in one linear decode path, one pack stream per folder | General bounded graph validation, multiple packed inputs, BCJ2 and every mapped output/substream |
 | Compression | Copy, LZMA1 and LZMA2 | Also PPMd7, BZip2 and DEFLATE; method/property compatibility tested against independent encoders |

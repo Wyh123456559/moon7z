@@ -3,6 +3,7 @@ fn path_archive(entries : Array[(String, EntryKind)]) -> Archive {
   {
     input: b"",
     limits: Limits::new(),
+    archive_properties: [],
     streams: { pack_offset: 0, pack_sizes: [], pack_crcs: [], blocks: [], },
     inventory: entries.mapi((id, pair) => {
       let (name, kind) = pair

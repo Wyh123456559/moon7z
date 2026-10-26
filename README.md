@@ -149,6 +149,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
 | Integrity | Start/next header, available packed/folder/member CRC-32 |
 | Metadata | Creation/access/modification FILETIME and Windows/POSIX attribute word retained |
+| Archive properties | Original ordered UInt64 IDs and opaque bytes, including duplicate IDs and empty values |
 | Resources | Configurable input/header/output/dictionary/member limits |
 
 Encryption, split volumes, SFX, branching/multiple-input coder graphs, BCJ2,
@@ -189,6 +190,12 @@ layout, entry IDs and CRC presence do not create false content changes.
 Duplicate names are refused as ambiguous. Output uses deterministic UTF-16
 lexical name order and retains each side's original entry metadata. See
 [archive comparison](docs/comparison.md) for the schema and verification scope.
+
+`archive.properties()` retains archive-level property records as opaque data.
+Inventory JSON includes their decimal-string UInt64 IDs and Base64 bytes;
+comparison reports archive-property changes independently of file changes.
+Properties are not interpreted or applied to disk. Unsupported file properties
+remain refused. See [archive metadata preservation](docs/properties.md).
 
 For damaged-archive triage, `archive.audit()` and `audit --json ARCHIVE` check
 every data folder independently and retain typed errors while continuing past

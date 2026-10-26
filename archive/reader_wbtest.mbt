@@ -21,6 +21,7 @@ test "a bad sibling CRC prevents returning or caching a selected solid folder" {
   let archive : Archive = {
     input: b"x".repeat(32) + b"abcdef",
     limits: Limits::new(),
+    archive_properties: [],
     streams: {
       pack_offset: 0,
       pack_sizes: [6],

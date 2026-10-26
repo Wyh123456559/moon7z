@@ -27,6 +27,7 @@ fn comparison_archive(
   {
     input: input.to_bytes(),
     limits: Limits::new(),
+    archive_properties: [],
     inventory,
     streams: {
       pack_offset: 0,

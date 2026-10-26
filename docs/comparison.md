@@ -42,3 +42,8 @@ not authenticity. To require CRCs for every file, verify both archives with
 again to compare bytes and uses the existing reader cache policy; no streaming,
 peak-memory or performance claim is made. A successful CLI comparison exits zero
 whether equal or different; inspect `identical` in JSON. Failures emit no stdout.
+
+Archive-level properties are compared separately from member changes. Reports
+include `archive_properties_changed` and both original property arrays. When only
+those records differ, `changes` is empty but `identical` is false. See
+[archive properties](properties.md) for the lossless representation.

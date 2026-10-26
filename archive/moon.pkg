@@ -5,6 +5,7 @@ import {
   "moonbitlang/core/buffer",
   "moonbitlang/core/encoding/utf16",
   "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/base64",
 }
 
 import {
@@ -14,6 +15,17 @@ import {
 import {
   "moonbitlang/core/json",
 } for "wbtest"
+
+rule(
+  name: "property_archive",
+  command: ":embed --binary -i $input -o $output --name property_archive",
+)
+
+dev_build(
+  rule: "property_archive",
+  input: "../corpus/properties/properties.7z",
+  output: "property_archive_test.mbt",
+)
 
 rule(
   name: "branch_head",

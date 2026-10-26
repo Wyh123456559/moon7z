@@ -11,6 +11,7 @@ test "folderwise verification checks member CRCs when no folder CRC exists" {
   let archive : Archive = {
     input,
     limits: Limits::new(),
+    archive_properties: [],
     streams: {
       pack_offset: 0,
       pack_sizes: [6],

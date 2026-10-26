@@ -65,6 +65,9 @@ pub fn Archive::inventory_json(self : Archive) -> Json {
     "schema": "moon7z.inventory.v1",
     "contents_verified": false,
     "entries": Json::array(self.inventory.map(entry => entry.to_json())),
+    "archive_properties": Json::array(
+      self.archive_properties.map(property => property.to_json()),
+    ),
   }
 }
 

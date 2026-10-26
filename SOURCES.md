@@ -60,6 +60,15 @@ and [Methods.txt](https://github.com/ip7z/7zip/blob/main/DOC/Methods.txt) were
 consulted for method IDs and the difference between classic empty properties
 and ARM64/RISC-V offset properties; no additional C/C++ code was copied.
 
+`corpus/properties/properties.7z` is a project-authored transformation of the
+existing Copy corpus with three opaque archive-level metadata records. Its
+generator repairs framing CRCs and checks independent 7zr test/extraction against
+the originals. The official reader's
+[7zIn.cpp](https://github.com/ip7z/7zip/blob/main/CPP/7zip/Archive/7z/7zIn.cpp)
+was consulted to confirm variable UInt64 property IDs (`ReadID`) and bounded
+value skipping; no C++ code was copied. Metadata is retained here rather than
+skipped. JSON Base64 coding uses `moonbitlang/core/encoding/base64` (Apache-2.0).
+
 Development was rechecked on 2026-10-26 with official stable
 `moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).
 Windows compiler/runtime/formatter/interface executables were checked against

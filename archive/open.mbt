@@ -1,6 +1,7 @@
 ///|
-/// Read an unencrypted single-volume 7z archive. Unknown semantic data is
-/// rejected explicitly. Input bytes are immutable and remain owned by the archive.
+/// Read an unencrypted single-volume 7z archive. Archive properties are retained
+/// as opaque bytes; unsupported file/coder semantics are refused explicitly.
+/// Input bytes are immutable and remain owned by the archive.
 pub fn Archive::open(
   bytes : Bytes,
   limits~ : Limits = Limits::new(),
@@ -52,6 +53,7 @@ pub fn Archive::open(
       limits,
       streams: { pack_offset: 0, pack_sizes: [], pack_crcs: [], blocks: [], },
       inventory: [],
+      archive_properties: [],
     }
   }
   let mut header = Cursor::new(input[offset:offset + size].to_owned())
@@ -84,6 +86,13 @@ pub fn Archive::open(
     blocks: [],
   }
   id = header.byte()
+  let archive_properties = if id == 2 {
+    let properties = read_archive_properties(header, limits)
+    id = header.byte()
+    properties
+  } else {
+    []
+  }
   if id == 4 {
     streams = read_streams(header, limits, limits.output_bytes)
     validate_pack_ranges(streams, data_boundary)
@@ -115,7 +124,7 @@ pub fn Archive::open(
       reason="archive data has no file inventory",
     )
   }
-  { input, limits, streams, inventory, }
+  { input, limits, streams, inventory, archive_properties, }
 }
 
 ///|

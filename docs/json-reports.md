@@ -1,5 +1,9 @@
 # JSON inventory and verification
 
+Archive-level properties are retained in the additive `archive_properties`
+array: UInt64 IDs are decimal strings and values are Base64 bytes, including
+duplicates and empty records. See [property schema and preservation](properties.md).
+
 Use versioned reports to index uploaded archives, select member IDs for preview,
 or make a CI import decision without parsing the human-readable CLI output.
 Run these commands from the checkout; no private service or 7-Zip is required:

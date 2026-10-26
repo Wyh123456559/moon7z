@@ -1,0 +1,76 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+fn checksum(bytes : Bytes) -> UInt32 {
+  let mut crc = 0xffffffffU
+  for byte in bytes {
+    crc = crc ^ byte.to_int().reinterpret_as_uint()
+    for _ in 0..<8 {
+      crc = (crc >> 1) ^ (if (crc & 1U) != 0U { 0xedb88320U } else { 0U })
+    }
+  }
+  crc ^ 0xffffffffU
+}
+
+///|
+async fn main {
+  assert_eq(checksum(b"123456789"), 0xcbf43926U)
+  println(
+    "Empty header CRC: " + checksum(b"\x00".repeat(20)).to_string(radix=16),
+  )
+  let args = @env.args()
+  guard args.length() == 3 else {
+    fail(
+      "usage: moon run corpus/properties/generate.mbtx -- PACKER NEW-OUTPUT-DIRECTORY",
+    )
+  }
+  let source = @fs.read_file("corpus/copy-plain.7z").binary()
+  let mut offset = 0UL
+  for i in 0..<8 {
+    offset = offset | (source[12 + i].to_int().to_uint64() << (8 * i))
+  }
+  assert_true(offset <= (source.length() - 32).to_uint64())
+  let start = 32 + offset.to_int()
+  let old_header = source[start:].to_owned()
+  assert_eq(old_header[0], b'\x01')
+  // Two repeated IDs, an empty value and non-UTF-8 bytes: all must survive.
+  let header = b"\x01\x02\x80\x80\x04\x00\xffA\n\x80\xff\x00\x80\x80\x01x\x00" +
+    old_header[1:].to_owned()
+  let fields = @buffer.Buffer()
+  fields.write_uint64_le(offset)
+  fields.write_uint64_le(header.length().to_uint64())
+  fields.write_uint_le(checksum(header))
+  let archive = @buffer.Buffer()
+  archive.write_bytes(source[:8].to_owned())
+  archive.write_uint_le(checksum(fields.to_bytes()))
+  archive.write_bytes(fields.to_bytes())
+  archive.write_bytes(source[32:start].to_owned())
+  archive.write_bytes(header)
+  @fs.mkdir(args[2])
+  let path = @fs.realpath(args[2]) + "/properties.7z"
+  @fs.write_file(path, archive.to_bytes(), create_mode=CreateNew)
+  @shell.Cmd(args[1], ["t", path]).run()
+  let output = @fs.realpath(args[2]) + "/independent"
+  @shell.Cmd(args[1], ["x", path, "-o" + output]).run()
+  for
+    file in [
+      "lzma-mbt/LICENSE", "lzma-mbt/README.md", "lzma-mbt/moon.mod", "清单.json",
+      "empty.txt",
+    ] {
+    assert_eq(
+      @fs.read_file(output + "/" + file).binary(),
+      @fs.read_file("corpus/source/" + file).binary(),
+    )
+  }
+  println(
+    "Preserved archive properties independently unpack to the original files",
+  )
+}
