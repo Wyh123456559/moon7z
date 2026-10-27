@@ -28,6 +28,7 @@ pub struct Limits {
   kdf_rounds : Int32
   kdf_bytes : Int32
   password_bytes : Int32
+  file_property_records : Int32
 } derive(Debug, Eq)
 
 ///|
@@ -39,7 +40,9 @@ pub(all) enum EntryKind {
 
 ///|
 /// Optional timestamps are raw 100-nanosecond Windows FILETIME values.
+/// The separate start position is an uninterpreted UInt64 byte position.
 pub struct Metadata {
+  start_position : UInt64?
   created : UInt64?
   accessed : UInt64?
   modified : UInt64?
@@ -49,6 +52,7 @@ pub struct Metadata {
 ///|
 /// Stable IDs preserve archive order, including repeated original names.
 pub struct Entry {
+  anti : Bool
   id : Int32
   name : String
   kind : EntryKind
@@ -88,6 +92,7 @@ pub fn Limits::new(
   kdf_rounds~ : Int32 = 4 * 1024 * 1024,
   kdf_bytes~ : Int32 = 128 * 1024 * 1024,
   password_bytes~ : Int32 = 8192,
+  file_property_records~ : Int32 = 10000,
 ) -> Limits {
   {
     input_bytes,
@@ -100,6 +105,7 @@ pub fn Limits::new(
     kdf_rounds,
     kdf_bytes,
     password_bytes,
+    file_property_records,
   }
 }
 
@@ -130,6 +136,7 @@ priv struct Streams {
 /// Opening validates headers and the complete member-to-block mapping.
 /// Data CRCs are checked by `verify` and `extract_all`, not by listing.
 pub struct Archive {
+  priv file_extensions : Array[FileProperty]
   priv auxiliary : Array[Bytes]
   priv crypto : CryptState
   priv input : Bytes

@@ -1,5 +1,11 @@
 # Interoperability corpus
 
+The five [file-semantic fixtures](../docs/semantics.md) cover anti-items, links,
+special/reparse entries, UInt64 start positions and ordered opaque file-table
+properties. That evidence distinguishes independent listing/testing from
+extraction: unknown-property cases yield upstream warnings and are not claimed
+to restore through 7-Zip.
+
 The [producer matrix](../docs/producers.md) adds 21 required archives generated
 with official 7-Zip 19.00/23.01/24.09/25.01/26.05 and libarchive 3.8.9, recording
 both producer and container versions plus SHA-256 values. Unlike the original

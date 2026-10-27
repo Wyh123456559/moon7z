@@ -56,22 +56,35 @@ fn read_files(
   streams : Streams,
   limits : Limits,
   buffers~ : Array[Bytes] = [],
+  properties~ : Array[FileProperty] = [],
 ) -> Array[Entry] raise ArchiveError {
   let count = r.count(limits.entries, "file entries")
   let mut names : Array[String]? = None
   let mut empty = Array::make(count, false)
   let mut empty_file : Array[Bool] = []
+  let mut anti_file : Array[Bool] = []
+  let mut positions : Array[UInt64?] = Array::make(count, None)
   let mut created : Array[UInt64?] = Array::make(count, None)
   let mut accessed : Array[UInt64?] = Array::make(count, None)
   let mut modified : Array[UInt64?] = Array::make(count, None)
   let mut attributes : Array[UInt32?] = Array::make(count, None)
-  let seen : Set[Int32] = Set([])
+  let seen : Set[UInt64] = Set([])
+  let mut records = 0
   for ;; {
-    let property = r.byte()
-    if property == 0 {
+    let property = r.number()
+    if property == 0UL {
       break
     }
-    guard property == 25 || !seen.contains(property) else {
+    records += 1
+    ignore(
+      bounded(
+        records.to_uint64(),
+        limits.file_property_records,
+        "file property records",
+      ),
+    )
+    let recognized = (property >= 14UL && property <= 21UL) || property == 24UL
+    guard !recognized || !seen.contains(property) else {
       raise Invalid(
         offset=r.pos - 1,
         reason="duplicate file property \{property}",
@@ -82,18 +95,25 @@ fn read_files(
       r.take(r.count(limits.header_bytes, "file property bytes")),
     )
     match property {
-      14 => empty = p.bits(count)
-      15 => {
-        guard seen.contains(14) else {
+      14UL => empty = p.bits(count)
+      15UL => {
+        guard seen.contains(14UL) else {
           raise Invalid(offset=r.pos, reason="EmptyFile precedes EmptyStream")
         }
         empty_file = p.bits(empty.filter(x => x).length())
       }
-      17 => names = Some(read_names(p, count, buffers~))
-      18 => created = read_times(p, count, buffers~)
-      19 => accessed = read_times(p, count, buffers~)
-      20 => modified = read_times(p, count, buffers~)
-      21 => {
+      16UL => {
+        guard seen.contains(14UL) else {
+          raise Invalid(offset=r.pos, reason="Anti precedes EmptyStream")
+        }
+        anti_file = p.bits(empty.filter(x => x).length())
+      }
+      17UL => names = Some(read_names(p, count, buffers~))
+      18UL => created = read_times(p, count, buffers~)
+      19UL => accessed = read_times(p, count, buffers~)
+      20UL => modified = read_times(p, count, buffers~)
+      24UL => positions = read_times(p, count, buffers~)
+      21UL => {
         let defined = p.defined(count)
         let (data, _) = p.external(buffers)
         attributes = []
@@ -102,16 +122,13 @@ fn read_files(
         }
         data.end()
       }
-      25 =>
+      25UL =>
         for byte in p.take(p.data.length()) {
           if byte != b'\x00' {
             raise Invalid(offset=p.pos, reason="nonzero padding")
           }
         }
-      _ =>
-        raise Unsupported(
-          feature="file property \{property}; input was not discarded",
-        )
+      _ => properties.push({ id: property, data: p.take(p.data.length()), })
     }
     p.end()
   }
@@ -134,6 +151,7 @@ fn read_files(
   let mut stream_index = 0
   let mut empty_index = 0
   for id in 0..<count {
+    let anti = empty[id] && anti_file.get(empty_index).unwrap_or(false)
     let (kind, size, crc, block) = if empty[id] {
       let file = empty_file.get(empty_index).unwrap_or(false)
       empty_index += 1
@@ -146,14 +164,17 @@ fn read_files(
       (File, size, crc, Some(block))
     }
     if attributes[id] is Some(attr) {
-      let mode = (attr >> 16) & 0xf000U
-      if (attr & 0x400U) != 0U ||
-        (mode != 0U && mode != 0x8000U && mode != 0x4000U) {
-        raise Unsupported(feature="link or special file: " + names[id])
+      let mode = if (attr & 0x8000U) != 0U {
+        (attr >> 16) & 0xf000U
+      } else {
+        0U
       }
-      if ((attr & 0x10U) != 0U) != (kind == Directory) ||
-        (mode == 0x4000U && kind != Directory) ||
-        (mode == 0x8000U && kind != File) {
+      if classify_attributes(Some(attr)) == Regular &&
+        (
+          ((attr & 0x10U) != 0U) != (kind == Directory) ||
+          (mode == 0x4000U && kind != Directory) ||
+          (mode == 0x8000U && kind != File)
+        ) {
         raise Invalid(
           offset=r.pos,
           reason="file kind disagrees with attributes",
@@ -161,6 +182,7 @@ fn read_files(
       }
     }
     entries.push({
+      anti,
       id,
       name: names[id],
       kind,
@@ -168,6 +190,7 @@ fn read_files(
       crc32: crc,
       block,
       metadata: {
+        start_position: positions[id],
         created: created[id],
         accessed: accessed[id],
         modified: modified[id],

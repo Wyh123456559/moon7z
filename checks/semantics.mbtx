@@ -1,0 +1,117 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/semantics")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-semantics")
+  defer @fs.rmdir(root, recursive=true)
+  @fs.write_file(root + "/obsolete.txt", "keep")
+  let original = @fs.read_file("corpus/source/清单.json").binary()
+  for id in ["safe", "position"] {
+    @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).run(timeout_ms=120000)
+    assert_eq(
+      @fs.read_file(root + "/" + id + "/manifest.json").binary(),
+      original,
+    )
+  }
+  @shell.Cmd("moon", [
+    "run",
+    "--target",
+    target,
+    "app",
+    "--",
+    "extract-selected",
+    "--contents-only",
+    corpus + "/mixed.7z",
+    root,
+    "selected",
+    "0",
+  ]).run(timeout_ms=120000)
+  assert_eq(@fs.read_file(root + "/selected/manifest.json").binary(), original)
+  for
+    (archive, id, name) in [
+      ("mixed", "1", "link-refused"),
+      ("mixed", "2", "special-refused"),
+      ("mixed", "3", "anti-refused"),
+      ("mixed", "5", "reparse-refused"),
+      ("extended", "0", "unknown-refused"),
+    ] {
+    let refused = @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract-selected",
+      "--contents-only",
+      corpus + "/" + archive + ".7z",
+      root,
+      name,
+      id,
+    ]).output(timeout_ms=120000)
+    assert_true(refused.exit_code() != 0)
+    assert_eq(refused.stdout(), "")
+  }
+  assert_eq(@fs.read_file(root + "/obsolete.txt").text(), "keep")
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 4)
+  let link = @shell.Cmd("moon", [
+    "run",
+    "--target",
+    target,
+    "app",
+    "--",
+    "read",
+    corpus + "/mixed.7z",
+    "1",
+  ]).output(timeout_ms=120000)
+  assert_eq(link.exit_code(), 0)
+  assert_eq(link.stdout(), "manifest.json")
+  let diff = @shell.Cmd("moon", [
+    "run",
+    "--target",
+    target,
+    "app",
+    "--",
+    "diff",
+    "--json",
+    corpus + "/extended.7z",
+    corpus + "/changed.7z",
+  ]).output(timeout_ms=120000)
+  assert_eq(diff.exit_code(), 0)
+  assert_true(
+    @json.parse(diff.stdout())
+    is {
+      "file_properties_changed": True,
+      "changes": Array([]),
+      "identical": False,
+      ..
+    },
+  )
+  println(
+    "Entry semantics remain inspectable; unsafe restoration is refused before publication and original files survive",
+  )
+}

@@ -5,6 +5,7 @@ fn named_empty_archive(names : Array[String]) -> Archive {
     limits: Limits::new(),
     archive_properties: [],
     auxiliary: [],
+    file_extensions: [],
     crypto: CryptState::new(None, Limits::new()),
     streams: {
       pack_offset: 0,
@@ -14,6 +15,7 @@ fn named_empty_archive(names : Array[String]) -> Archive {
       layouts: [],
     },
     inventory: names.mapi((id, name) => {
+      anti: false,
       id,
       name,
       kind: File,
@@ -21,6 +23,7 @@ fn named_empty_archive(names : Array[String]) -> Archive {
       crc32: None,
       block: None,
       metadata: {
+        start_position: None,
         created: None,
         accessed: None,
         modified: None,

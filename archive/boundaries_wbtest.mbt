@@ -65,7 +65,7 @@ test "empty archive and no silent unknown properties" {
     Archive::open(envelope(b"\x01\x05\x00\x00\x00")).entries().length(),
     0,
   )
-  for header in [b"\x01\x06\x00", b"\x01\x05\x00\x16\x00\x00\x00"] {
+  for header in [b"\x01\x06\x00"] {
     let error = try {
       ignore(Archive::open(envelope(header)))
       None
@@ -74,6 +74,8 @@ test "empty archive and no silent unknown properties" {
     }
     assert_true(error is Some(Unsupported(..)))
   }
+  let retained = Archive::open(envelope(b"\x01\x05\x00\x16\x00\x00\x00"))
+  assert_eq(retained.file_properties().map(property => property.id), [22UL])
 }
 
 ///|

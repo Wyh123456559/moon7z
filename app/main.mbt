@@ -104,8 +104,15 @@ async fn main {
   let archive = @host.open_file(args[2], password?)
   if args[1] == "list" {
     for entry in archive.entries() {
+      let semantics = if entry.anti {
+        "\tanti-item"
+      } else if entry.semantics() != Regular {
+        "\t" + Repr(entry.semantics()).to_string()
+      } else {
+        ""
+      }
       println(
-        "\{entry.id}\t\{entry.size}\t\{Repr(entry.kind)}\t\{Repr(entry.name)}",
+        "\{entry.id}\t\{entry.size}\t\{Repr(entry.kind)}\t\{Repr(entry.name)}\{semantics}",
       )
     }
   } else {

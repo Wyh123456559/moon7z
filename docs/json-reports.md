@@ -8,6 +8,10 @@ Decoded additional metadata streams appear in the additive `metadata_streams`
 array as integer `id` / Base64 `data_base64` records, including unused buffers.
 See [external metadata and framing](external.md).
 
+Unknown file-table records appear in `file_properties`: ordered decimal-string
+UInt64 `id` / Base64 `data_base64` objects, including duplicates and empty values.
+They remain opaque and block nonempty filesystem export; see [file semantics](semantics.md).
+
 Use versioned reports to index uploaded archives, select member IDs for preview,
 or make a CI import decision without parsing the human-readable CLI output.
 Run these commands from the checkout; no private service or 7-Zip is required:
@@ -48,6 +52,8 @@ Entries retain archive order and stable IDs, including duplicate names. Each has
 | `id`, `size` | Nonnegative integer; size is the uncompressed byte count |
 | `name` | Original Unicode string, JSON-escaped without path rewriting |
 | `kind` | `"file"` or `"directory"` |
+| `anti` | Boolean deletion marker; inspection never deletes a file |
+| `semantics` | `"regular"`, `"symbolic_link"`, `"reparse_point"` or `"special"` |
 | `crc32` | Eight lowercase hexadecimal digits, or `null` when missing |
 | `block` | Solid-folder integer ID, or `null` for an empty-stream entry |
 | `metadata` | Object with every metadata field below |
@@ -57,6 +63,8 @@ are decimal **strings** containing raw unsigned 64-bit FILETIME values (100 ns
 since 1601-01-01), or `null`. `"0"`, `null` and
 `"18446744073709551615"` remain distinct and round-trip without JSON number
 rounding. Values are retained without converting them into calendar dates.
+`start_position` is an optional unsigned 64-bit byte position, also encoded as
+a decimal string or `null`; it is not a timestamp and is never applied by export.
 `attributes` is a raw unsigned 32-bit integer or `null`, exactly representable
 in JavaScript. CRC presence in inventory does not mean the bytes were checked.
 

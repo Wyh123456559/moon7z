@@ -13,6 +13,7 @@ test "folderwise verification checks member CRCs when no folder CRC exists" {
     limits: Limits::new(),
     archive_properties: [],
     auxiliary: [],
+    file_extensions: [],
     crypto: CryptState::new(None, Limits::new()),
     streams: {
       layouts: [],
@@ -22,6 +23,7 @@ test "folderwise verification checks member CRCs when no folder CRC exists" {
       blocks: [block],
     },
     inventory: ["first", "second"].mapi((id, name) => {
+      anti: false,
       id,
       name,
       kind: File,
@@ -29,6 +31,7 @@ test "folderwise verification checks member CRCs when no folder CRC exists" {
       block: Some(0),
       crc32: Some(if id == 0 { crc32(b"abc") } else { second_crc }),
       metadata: {
+        start_position: None,
         created: None,
         accessed: None,
         modified: None,

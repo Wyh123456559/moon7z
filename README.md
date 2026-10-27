@@ -149,14 +149,17 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Encryption | 7z AES-256/SHA-256 password reading for headers/data; bounded cumulative derivation work |
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
 | Integrity | Start/next header, available packed/folder/member CRC-32 |
-| Metadata | Creation/access/modification FILETIME and Windows/POSIX attribute word retained |
+| Metadata | Creation/access/modification FILETIME, UInt64 start position and original Windows/POSIX attribute word retained |
+| File semantics | Anti-items, symbolic links, reparse points and special files inspected as data; unsafe filesystem restoration refused |
+| File properties | Unknown FilesInfo records retain ordered UInt64 IDs and opaque bytes; exporting a nonempty selection requires understood semantics |
 | Archive properties | Original ordered UInt64 IDs and opaque bytes, including duplicate IDs and empty values |
 | Resources | Configurable input/header/output/dictionary/member/coder/intermediate-output limits |
 
-Split volumes, SFX,
-unlisted filters,
-anti-items, links, special files, unknown semantic properties and writing are
-rejected. Zero padding may repeat. The reader does not silently skip unsupported
+Split volumes, SFX, unlisted methods/filters and writing remain unsupported.
+Unknown file properties are readable as opaque records; they block nonempty
+filesystem export. Anti-items never delete existing files. Links, reparse points
+and special entries are never restored as ordinary files. Zero padding may
+repeat. The reader does not silently skip unsupported
 members or metadata. Metadata values are retained for application use; the
 in-memory API makes no filesystem restoration promise. Duplicate names retain
 distinct IDs and archive order.
@@ -195,8 +198,16 @@ lexical name order and retains each side's original entry metadata. See
 `archive.properties()` retains archive-level property records as opaque data.
 Inventory JSON includes their decimal-string UInt64 IDs and Base64 bytes;
 comparison reports archive-property changes independently of file changes.
-Properties are not interpreted or applied to disk. Unsupported file properties
-remain refused. See [archive metadata preservation](docs/properties.md).
+Properties are not interpreted or applied to disk.
+See [archive metadata preservation](docs/properties.md).
+
+`archive.file_properties()` preserves unrecognized file-table property records
+without guessing their meaning. Entry `anti`, `semantics()` and raw attributes
+identify deletion markers, links and special entries; `metadata.start_position`
+retains a distinct optional UInt64 value. Byte reads remain available. Export
+plans reject unsafe semantics before writing; an explicit safe subset can still
+be exported when no unknown file-table properties are present. See
+[entry semantics, conservative export and evidence](docs/semantics.md).
 
 `archive.metadata_streams()` returns the original decoded additional-stream
 buffers, including unreferenced bytes. Inventory JSON preserves them as Base64;

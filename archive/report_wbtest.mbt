@@ -1,6 +1,7 @@
 ///|
 test "JSON metadata preserves UInt64 maximum zero missing and all attribute bits" {
   let data : Metadata = {
+    start_position: None,
     created: Some(0xffffffffffffffffUL),
     accessed: Some(0UL),
     modified: None,
@@ -24,12 +25,14 @@ test "JSON metadata preserves UInt64 maximum zero missing and all attribute bits
 test "JSON inventory escapes original names and preserves duplicate stable IDs" {
   let name = "目录/\"quoted\"\n\t\\😀"
   let meta : Metadata = {
+    start_position: None,
     created: None,
     accessed: None,
     modified: None,
     attributes: None,
   }
   let entry : Entry = {
+    anti: false,
     id: 0,
     name,
     kind: File,
@@ -72,6 +75,6 @@ test "JSON inventory escapes original names and preserves duplicate stable IDs" 
   )
   assert_eq(
     Archive::open(envelope(b"")).inventory_json().stringify(),
-    "{\"schema\":\"moon7z.inventory.v1\",\"contents_verified\":false,\"entries\":[],\"archive_properties\":[],\"metadata_streams\":[]}",
+    "{\"schema\":\"moon7z.inventory.v1\",\"contents_verified\":false,\"entries\":[],\"archive_properties\":[],\"metadata_streams\":[],\"file_properties\":[]}",
   )
 }

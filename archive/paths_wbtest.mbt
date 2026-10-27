@@ -5,6 +5,7 @@ fn path_archive(entries : Array[(String, EntryKind)]) -> Archive {
     limits: Limits::new(),
     archive_properties: [],
     auxiliary: [],
+    file_extensions: [],
     crypto: CryptState::new(None, Limits::new()),
     streams: {
       pack_offset: 0,
@@ -16,6 +17,7 @@ fn path_archive(entries : Array[(String, EntryKind)]) -> Archive {
     inventory: entries.mapi((id, pair) => {
       let (name, kind) = pair
       {
+        anti: false,
         id,
         name,
         kind,
@@ -23,6 +25,7 @@ fn path_archive(entries : Array[(String, EntryKind)]) -> Archive {
         crc32: None,
         block: None,
         metadata: {
+          start_position: None,
           created: None,
           accessed: None,
           modified: None,

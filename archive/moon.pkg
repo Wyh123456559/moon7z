@@ -18,6 +18,61 @@ import {
 } for "wbtest"
 
 rule(
+  name: "semantics_safe",
+  command: ":embed --binary -i $input -o $output --name semantics_safe",
+)
+
+dev_build(
+  rule: "semantics_safe",
+  input: "../corpus/semantics/safe.7z",
+  output: "semantics_safe_archive_test.mbt",
+)
+
+rule(
+  name: "semantics_position",
+  command: ":embed --binary -i $input -o $output --name semantics_position",
+)
+
+dev_build(
+  rule: "semantics_position",
+  input: "../corpus/semantics/position.7z",
+  output: "semantics_position_archive_test.mbt",
+)
+
+rule(
+  name: "semantics_extended",
+  command: ":embed --binary -i $input -o $output --name semantics_extended",
+)
+
+dev_build(
+  rule: "semantics_extended",
+  input: "../corpus/semantics/extended.7z",
+  output: "semantics_extended_archive_test.mbt",
+)
+
+rule(
+  name: "semantics_changed",
+  command: ":embed --binary -i $input -o $output --name semantics_changed",
+)
+
+dev_build(
+  rule: "semantics_changed",
+  input: "../corpus/semantics/changed.7z",
+  output: "semantics_changed_archive_test.mbt",
+)
+
+rule(
+  name: "semantics_mixed",
+  command: ":embed --binary -i $input -o $output --name semantics_mixed",
+)
+
+dev_build(
+  rule: "semantics_mixed",
+  input: "../corpus/semantics/mixed.7z",
+  output: "semantics_mixed_archive_test.mbt",
+)
+
+rule(
   name: "external_metadata",
   command: ":embed --binary -i $input -o $output --name external_metadata",
 )

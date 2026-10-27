@@ -16,6 +16,7 @@ test "empty data audits retain missing file CRCs without inventing folder failur
 ///|
 test "audit records an invalid decoded length then checks the following folder" {
   let meta : Metadata = {
+    start_position: None,
     created: None,
     accessed: None,
     modified: None,

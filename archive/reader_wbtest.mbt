@@ -23,6 +23,7 @@ test "a bad sibling CRC prevents returning or caching a selected solid folder" {
     limits: Limits::new(),
     archive_properties: [],
     auxiliary: [],
+    file_extensions: [],
     crypto: CryptState::new(None, Limits::new()),
     streams: {
       layouts: [],
@@ -32,6 +33,7 @@ test "a bad sibling CRC prevents returning or caching a selected solid folder" {
       blocks: [block],
     },
     inventory: ["first", "second"].mapi((id, name) => {
+      anti: false,
       id,
       name,
       kind: File,
@@ -39,6 +41,7 @@ test "a bad sibling CRC prevents returning or caching a selected solid folder" {
       crc32: Some(if id == 0 { crc32(b"abc") } else { crc32(b"def") ^ 1U }),
       block: Some(0),
       metadata: {
+        start_position: None,
         created: None,
         accessed: None,
         modified: None,

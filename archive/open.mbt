@@ -21,6 +21,7 @@ pub fn Archive::open(
       limits.kdf_rounds,
       limits.kdf_bytes,
       limits.password_bytes,
+      limits.file_property_records,
     ] {
     guard value >= 0 && value <= 0x3fffffff else {
       raise Invalid(
@@ -71,6 +72,7 @@ pub fn Archive::open(
     }
     return {
       auxiliary: [],
+      file_extensions: [],
       crypto,
       input,
       limits,
@@ -104,6 +106,7 @@ pub fn Archive::open(
       check_regions(regions, offset)
       return {
         auxiliary: [],
+        file_extensions: [],
         crypto,
         input,
         limits,
@@ -161,8 +164,15 @@ pub fn Archive::open(
     regions.push(packed_region(streams))
     id = header.byte()
   }
+  let file_extensions : Array[FileProperty] = []
   let inventory = if id == 5 {
-    let entries = read_files(header, streams, limits, buffers=auxiliary)
+    let entries = read_files(
+      header,
+      streams,
+      limits,
+      buffers=auxiliary,
+      properties=file_extensions,
+    )
     id = header.byte()
     entries
   } else {
@@ -183,7 +193,16 @@ pub fn Archive::open(
     streams.blocks.any(block => {
       block.coders.any(coder => coder.codec_id == b"\x06\xf1\x07\x01")
     })
-  { auxiliary, crypto, input, limits, streams, inventory, archive_properties, }
+  {
+    file_extensions,
+    auxiliary,
+    crypto,
+    input,
+    limits,
+    streams,
+    inventory,
+    archive_properties,
+  }
 }
 
 ///|

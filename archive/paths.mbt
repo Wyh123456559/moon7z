@@ -75,6 +75,7 @@ pub fn validate_path(name : String) -> Unit raise ArchiveError {
 /// Check every member before the first filesystem write. This plan rejects
 /// exact duplicates, ASCII case aliases and file/directory prefix conflicts.
 pub fn Archive::plan_contents(self : Archive) -> ContentPlan raise ArchiveError {
+  self.check_file_metadata(self.inventory.length())
   plan_entries(self.inventory)
 }
 
@@ -97,7 +98,21 @@ pub fn Archive::plan_selection(
     }
     entries.push(self.inventory[id])
   }
+  self.check_file_metadata(ids.length())
   plan_entries(entries)
+}
+
+///|
+fn Archive::check_file_metadata(
+  self : Archive,
+  selected : Int32,
+) -> Unit raise ArchiveError {
+  guard selected == 0 || self.file_extensions.is_empty() else {
+    raise UnsafePath(
+      path="<file metadata>",
+      reason="opaque file properties have unknown per-entry semantics; inspect file_properties() and use an explicit import policy",
+    )
+  }
 }
 
 ///|
@@ -106,6 +121,12 @@ fn plan_entries(entries : Array[Entry]) -> ContentPlan raise ArchiveError {
   let explicit : Set[String] = Set([])
   let folders : Array[String] = []
   for entry in entries {
+    guard !entry.anti && entry.semantics() == Regular else {
+      raise UnsafePath(
+        path=entry.name,
+        reason="anti-items, links, reparse points and special files require a separate restoration policy",
+      )
+    }
     validate_path(entry.name)
     guard !explicit.contains(entry.name) else {
       raise UnsafePath(path=entry.name, reason="duplicate archive entry")

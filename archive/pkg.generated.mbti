@@ -39,6 +39,7 @@ pub fn Archive::audit(Self) -> AuditReport
 pub fn Archive::compare(Self, Self) -> Comparison raise ArchiveError
 pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
+pub fn Archive::file_properties(Self) -> Array[FileProperty]
 pub fn Archive::inventory_json(Self) -> Json
 pub fn Archive::is_encrypted(Self) -> Bool
 pub fn Archive::metadata_streams(Self) -> Array[Bytes]
@@ -92,6 +93,7 @@ pub struct Comparison {
 }
 pub fn Comparison::archive_properties_changed(Self) -> Bool
 pub fn Comparison::changes(Self) -> Array[EntryChange]
+pub fn Comparison::file_properties_changed(Self) -> Bool
 pub fn Comparison::identical(Self) -> Bool
 pub fn Comparison::metadata_streams_changed(Self) -> Bool
 pub fn Comparison::to_json(Self) -> Json
@@ -104,6 +106,7 @@ pub fn ContentPlan::directories(Self) -> Array[String]
 pub fn ContentPlan::entries(Self) -> Array[Entry]
 
 pub struct Entry {
+  anti : Bool
   id : Int32
   name : String
   kind : EntryKind
@@ -116,6 +119,7 @@ pub struct Entry {
 pub fn Entry::equal(Self, Self) -> Bool
 #deprecated
 pub fn Entry::not_equal(Self, Self) -> Bool
+pub fn Entry::semantics(Self) -> EntrySemantics
 pub fn Entry::to_json(Self) -> Json
 #deprecated
 pub fn Entry::to_repr(Self) -> @debug.Repr
@@ -147,6 +151,32 @@ pub fn EntryKind::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn EntryKind::to_repr(Self) -> @debug.Repr
 
+pub(all) enum EntrySemantics {
+  Regular
+  SymbolicLink
+  ReparsePoint
+  Special
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn EntrySemantics::equal(Self, Self) -> Bool
+#deprecated
+pub fn EntrySemantics::not_equal(Self, Self) -> Bool
+#deprecated
+pub fn EntrySemantics::to_repr(Self) -> @debug.Repr
+
+pub struct FileProperty {
+  id : UInt64
+  data : Bytes
+} derive(Eq, @debug.Debug)
+#deprecated
+pub fn FileProperty::equal(Self, Self) -> Bool
+#deprecated
+pub fn FileProperty::not_equal(Self, Self) -> Bool
+pub fn FileProperty::to_json(Self) -> Json
+#deprecated
+pub fn FileProperty::to_repr(Self) -> @debug.Repr
+pub impl ToJson for FileProperty
+
 pub struct FolderAudit {
   id : Int32
   bytes : Int32
@@ -169,10 +199,11 @@ pub struct Limits {
   kdf_rounds : Int32
   kdf_bytes : Int32
   password_bytes : Int32
+  file_property_records : Int32
 } derive(Eq, @debug.Debug)
 #deprecated
 pub fn Limits::equal(Self, Self) -> Bool
-pub fn Limits::new(input_bytes? : Int32, header_bytes? : Int32, output_bytes? : Int32, dictionary_bytes? : Int32, entries? : Int32, working_bytes? : Int32, coders? : Int32, kdf_rounds? : Int32, kdf_bytes? : Int32, password_bytes? : Int32) -> Self
+pub fn Limits::new(input_bytes? : Int32, header_bytes? : Int32, output_bytes? : Int32, dictionary_bytes? : Int32, entries? : Int32, working_bytes? : Int32, coders? : Int32, kdf_rounds? : Int32, kdf_bytes? : Int32, password_bytes? : Int32, file_property_records? : Int32) -> Self
 #deprecated
 pub fn Limits::not_equal(Self, Self) -> Bool
 #deprecated
@@ -190,6 +221,7 @@ pub fn Member::not_equal(Self, Self) -> Bool
 pub fn Member::to_repr(Self) -> @debug.Repr
 
 pub struct Metadata {
+  start_position : UInt64?
   created : UInt64?
   accessed : UInt64?
   modified : UInt64?

@@ -32,16 +32,23 @@ test "optional metadata retains all FILETIME bits and raw attributes" {
 }
 
 ///|
-test "links special files and malformed external metadata are refused explicitly" {
-  for attr in [0xa1ff0020U, 0x11a40020U, 0x420U] {
+test "links and special metadata remain readable while restoration and malformed references are refused" {
+  for
+    (attr, semantics) in [
+      (0xa1ff8020U, SymbolicLink),
+      (0x11a48020U, Special),
+      (0x420U, ReparsePoint),
+    ] {
     let properties = @buffer.Buffer()
     properties.write_bytes(b"\x15\x06\x01\x00")
     properties.write_uint_le(attr)
+    let entries = metadata_entries(properties.to_bytes())
+    assert_eq(entries[0].semantics(), semantics)
     let refused = try {
-      ignore(metadata_entries(properties.to_bytes()))
+      ignore(plan_entries(entries))
       false
     } catch {
-      Unsupported(..) => true
+      UnsafePath(..) => true
       _ => false
     }
     assert_true(refused)

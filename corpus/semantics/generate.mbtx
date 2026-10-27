@@ -1,0 +1,197 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/env",
+  "moonbitlang/core/encoding/utf16",
+}
+----
+
+///|
+fn crc(bytes : Bytes) -> UInt32 {
+  let mut value = 0xffffffffU
+  for byte in bytes {
+    value = value ^ byte.to_uint()
+    for _ in 0..<8 {
+      value = (value >> 1) ^ (if (value & 1U) != 0U { 0xedb88320U } else { 0U })
+    }
+  }
+  value ^ 0xffffffffU
+}
+
+///|
+fn number(out : @buffer.Buffer, value : UInt64) -> Unit {
+  out.write_byte(b'\xff')
+  out.write_uint64_le(value)
+}
+
+///|
+fn property(out : @buffer.Buffer, id : UInt64, bytes : Bytes) -> Unit {
+  number(out, id)
+  number(out, bytes.length().to_uint64())
+  out.write_bytes(bytes)
+}
+
+///|
+fn archive(
+  payload : Bytes,
+  mixed~ : Bool,
+  changed~ : Bool = false,
+  extensions~ : Bool = false,
+  with_position~ : Bool = false,
+) -> Bytes {
+  let parts = if mixed { [payload, b"manifest.json"] } else { [payload] }
+  let names = if mixed {
+    [
+      "manifest.json", "manifest.link", "named.pipe", "obsolete.txt", "obsolete",
+      "junction",
+    ]
+  } else {
+    ["manifest.json"]
+  }
+  let header = @buffer.Buffer()
+  header.write_bytes(b"\x01\x04\x06\x00")
+  number(header, parts.length().to_uint64())
+  header.write_byte(b'\x09')
+  for part in parts {
+    number(header, part.length().to_uint64())
+  }
+  header.write_bytes(b"\x0a\x01")
+  for part in parts {
+    header.write_uint_le(crc(part))
+  }
+  header.write_bytes(b"\x00\x07\x0b")
+  number(header, parts.length().to_uint64())
+  header.write_byte(b'\x00')
+  for _ in parts {
+    header.write_bytes(b"\x01\x01\x00")
+  }
+  header.write_byte(b'\x0c')
+  for part in parts {
+    number(header, part.length().to_uint64())
+  }
+  header.write_bytes(b"\x0a\x01")
+  for part in parts {
+    header.write_uint_le(crc(part))
+  }
+  header.write_bytes(b"\x00\x00\x05")
+  number(header, names.length().to_uint64())
+  if mixed {
+    property(header, 14UL, b"\x3c")
+    property(header, 15UL, b"\xc0")
+    property(header, 16UL, b"\x60")
+  }
+  property(
+    header,
+    17UL,
+    b"\x00" +
+    @utf16.encode(
+      (names.join("\u{0000}") + "\u{0000}")[:],
+      bom=false,
+      endianness=Little,
+    ),
+  )
+  let attrs = @buffer.Buffer()
+  attrs.write_bytes(b"\x01\x00")
+  for
+    value in (if mixed {
+      [0x20U, 0xa1ff8020U, 0x11a48020U, 0x20U, 0x10U, 0x410U]
+    } else {
+      [0x20U]
+    }) {
+    attrs.write_uint_le(value)
+  }
+  property(header, 21UL, attrs.to_bytes())
+  let positions = @buffer.Buffer()
+  positions.write_bytes(b"\x01\x00")
+  for i in 0..<names.length() {
+    positions.write_uint64_le(
+      if i == 1 {
+        0xffffffffffffffffUL
+      } else {
+        i.to_uint64()
+      },
+    )
+  }
+  if with_position {
+    property(header, 24UL, positions.to_bytes())
+  }
+  if extensions {
+    property(header, 128UL, b"\x00\xffextension")
+    property(header, 128UL, b"")
+    property(
+      header,
+      0xffffffffffffffffUL,
+      if changed {
+        b"changed"
+      } else {
+        b"original"
+      },
+    )
+  }
+  header.write_bytes(b"\x00\x00")
+  let body = @buffer.Buffer()
+  for part in parts {
+    body.write_bytes(part)
+  }
+  let fields = @buffer.Buffer()
+  fields.write_uint64_le(body.length().to_uint64())
+  fields.write_uint64_le(header.length().to_uint64())
+  fields.write_uint_le(crc(header.to_bytes()))
+  let result = @buffer.Buffer()
+  result.write_bytes(b"7z\xbc\xaf\x27\x1c\x00\x04")
+  result.write_uint_le(crc(fields.to_bytes()))
+  result.write_bytes(fields.to_bytes())
+  result.write_bytes(body.to_bytes())
+  result.write_bytes(header.to_bytes())
+  result.to_bytes()
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else {
+    fail("usage: generate.mbtx 7ZA26 NEW_DIRECTORY")
+  }
+  @fs.mkdir(args[2])
+  let root = @fs.realpath(args[2])
+  let payload = @fs.read_file("corpus/source/清单.json").binary()
+  for id in ["safe", "position", "extended", "changed", "mixed"] {
+    let path = root + "/" + id + ".7z"
+    @fs.write_file(
+      path,
+      archive(
+        payload,
+        mixed=id == "mixed",
+        changed=id == "changed",
+        extensions=id == "extended" || id == "changed",
+        with_position=id == "position",
+      ),
+    )
+    let tested = @shell.Cmd(args[1], ["t", path]).output()
+    guard tested.exit_code() == 0 else {
+      fail(tested.stdout() + tested.stderr())
+    }
+    let listing = @shell.Cmd(args[1], ["l", "-slt", path]).output()
+    assert_eq(listing.exit_code(), 0)
+    @fs.write_file(root + "/" + id + "-listing.txt", listing.stdout())
+    @fs.write_file(root + "/" + id + "-test.txt", tested.stdout())
+    if id == "safe" {
+      let exported = @shell.Cmd(args[1], [
+        "x",
+        path,
+        "-o" + root + "/unpacked-" + id,
+      ]).output()
+      guard exported.exit_code() == 0 else {
+        fail(exported.stdout() + exported.stderr())
+      }
+      assert_eq(
+        @fs.read_file(root + "/unpacked-" + id + "/manifest.json").binary(),
+        payload,
+      )
+    }
+    println("Independent test/list completed: " + id)
+  }
+}

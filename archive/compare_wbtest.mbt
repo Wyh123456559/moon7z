@@ -22,13 +22,23 @@ fn comparison_archive(
     } else {
       None
     }
-    { id, name, kind, size: bytes.length(), crc32: None, block, metadata, }
+    {
+      anti: false,
+      id,
+      name,
+      kind,
+      size: bytes.length(),
+      crc32: None,
+      block,
+      metadata,
+    }
   })
   {
     input: input.to_bytes(),
     limits: Limits::new(),
     archive_properties: [],
     auxiliary: [],
+    file_extensions: [],
     crypto: CryptState::new(None, Limits::new()),
     inventory,
     streams: {
@@ -44,12 +54,14 @@ fn comparison_archive(
 ///|
 test "comparison distinguishes content metadata both and type changes without CRC shortcuts" {
   let meta : Metadata = {
+    start_position: None,
     created: None,
     accessed: None,
     modified: None,
     attributes: None,
   }
   let new_meta : Metadata = {
+    start_position: None,
     created: Some(0xffffffffffffffffUL),
     accessed: Some(0UL),
     modified: None,

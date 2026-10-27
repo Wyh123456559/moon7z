@@ -32,6 +32,8 @@ Kinds are `added`, `removed`, `type_changed`, `content_changed`,
 byte-for-byte after both archives pass all available CRC checks; neither sizes
 nor matching CRCs substitute for byte comparison. Retained timestamps and raw
 attributes are metadata. Missing metadata and numeric zero remain distinct.
+Start positions are metadata too. Anti-flag or interpreted filesystem-type
+changes produce `type_changed`, even when the entry name and bytes match.
 Entry IDs, compression, solid blocks and presence/absence of member CRCs do not
 define content equality; the two verification reports retain missing-CRC counts.
 
@@ -53,3 +55,10 @@ Archive-level properties are compared separately from member changes. Reports
 include `archive_properties_changed` and both original property arrays. When only
 those records differ, `changes` is empty but `identical` is false. See
 [archive properties](properties.md) for the lossless representation.
+
+Unrecognized file-table properties are also compared in original order, including
+duplicate IDs and empty values. `file_properties_changed()` and JSON
+`file_properties_changed`, `left_file_properties`, `right_file_properties`
+preserve their differences separately. If only those records differ, `changes`
+is empty and `identical` is false. IDs are decimal strings and bytes are Base64;
+this does not claim that their unknown per-entry semantics have been decoded.
