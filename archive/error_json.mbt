@@ -4,6 +4,10 @@
 pub impl ToJson for ArchiveError with fn to_json(self) {
   let fields : Map[String, Json] = Map([])
   match self {
+    SourceSignatureNotFound(searched_bytes~) => {
+      fields["code"] = Json("source_signature_not_found")
+      fields["searched_bytes"] = Json(searched_bytes.to_string())
+    }
     SourceLimit(resource~, maximum~) => {
       fields["code"] = Json("source_limit")
       fields["resource"] = Json(resource)

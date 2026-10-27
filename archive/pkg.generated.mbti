@@ -10,6 +10,7 @@ pub fn validate_path(String) -> Unit raise ArchiveError
 
 // Errors
 pub suberror ArchiveError {
+  SourceSignatureNotFound(searched_bytes~ : UInt64)
   SourceLimit(resource~ : String, maximum~ : UInt64)
   SourceRead(offset~ : UInt64, reason~ : String)
   VolumeError(index~ : Int32, reason~ : String)
@@ -293,6 +294,7 @@ pub struct SeekableInput {
 pub fn SeekableInput::concat(ArrayView[Self], max_parts? : Int32) -> Self raise ArchiveError
 pub fn SeekableInput::new(UInt64, async (UInt64, Int32) -> Bytes) -> Self
 pub async fn SeekableInput::read_at(Self, UInt64, Int32) -> Bytes
+pub fn SeekableInput::slice(Self, UInt64, UInt64) -> Self raise ArchiveError
 
 pub struct SourceArchive {
   // private fields
@@ -308,6 +310,17 @@ pub fn SourceArchive::properties(Self) -> Array[ArchiveProperty]
 pub fn SourceArchive::reader(Self, cache_bytes? : Int32) -> SourceReader raise ArchiveError
 pub fn SourceArchive::source_size(Self) -> UInt64
 pub async fn SourceArchive::verify(Self, require_member_crcs? : Bool) -> SourceVerification
+
+pub struct SourceEmbeddedArchive {
+  offset : UInt64
+  prefix : SeekableInput
+  payload : SeekableInput
+  suffix : SeekableInput
+  archive : SourceArchive
+}
+pub fn SourceEmbeddedArchive::inventory_json(Self) -> Json
+pub async fn SourceEmbeddedArchive::open(SeekableInput, limits? : Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, search_bytes? : UInt64, password? : String) -> Self
+pub async fn SourceEmbeddedArchive::open_at(SeekableInput, UInt64, limits? : Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, password? : String) -> Self
 
 pub struct SourceReader {
   // private fields

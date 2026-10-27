@@ -4,8 +4,7 @@
 /// available until their SourceReader is cleared or dropped.
 pub struct SourceFile {
   archive : @archive.SourceArchive
-  priv files : Array[@fs.File]
-  priv state : SourceFileState
+  priv owner : SourceHandle
 }
 
 ///|
@@ -15,6 +14,18 @@ priv struct SourceFileState {
 
 ///|
 pub fn SourceFile::close(self : SourceFile) -> Unit {
+  self.owner.close()
+}
+
+///|
+priv struct SourceHandle {
+  source : @archive.SeekableInput
+  files : Array[@fs.File]
+  state : SourceFileState
+}
+
+///|
+fn SourceHandle::close(self : SourceHandle) -> Unit {
   if !self.state.closed {
     self.state.closed = true
     for file in self.files {
@@ -75,6 +86,26 @@ async fn open_source_files(
   password~ : String?,
   max_parts~ : Int32,
 ) -> SourceFile {
+  let owner = open_source_handle(paths, max_source_bytes~, max_parts~)
+  let mut opened = false
+  defer (if !opened { owner.close() })
+  let archive = @archive.SourceArchive::open(
+    owner.source,
+    limits~,
+    max_source_bytes~,
+    max_output_bytes~,
+    password?,
+  )
+  opened = true
+  { archive, owner, }
+}
+
+///|
+async fn open_source_handle(
+  paths : ArrayView[String],
+  max_source_bytes~ : UInt64,
+  max_parts~ : Int32,
+) -> SourceHandle {
   let files : Array[@fs.File] = []
   let inputs : Array[@archive.SeekableInput] = []
   let state = { closed: false, }
@@ -128,13 +159,6 @@ async fn open_source_files(
     inputs.push(source)
   }
   let source = @archive.SeekableInput::concat(inputs[:], max_parts~)
-  let archive = @archive.SourceArchive::open(
-    source,
-    limits~,
-    max_source_bytes~,
-    max_output_bytes~,
-    password?,
-  )
   opened = true
-  { archive, files, state, }
+  { source, files, state, }
 }

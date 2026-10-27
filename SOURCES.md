@@ -139,6 +139,15 @@ the entire sparse archive and extracted the final attributed JSON. Its release
 binary is a development oracle with LGPL/BSD components, not redistributed or
 linked. No external source or test suite was added for the source abstraction.
 
+Seekable SFX discovery, source slicing and file/volume adapters are
+project-authored Apache-2.0, following the existing first-CRC-valid-header policy
+documented above. No new external source, test suite or executable stub was
+copied. `corpus/sfx/materialize-large.mbtx` reuses the unchanged attributed SDK
+GUI stub from gui.base64, the project source64 fragments and a new Apache-2.0
+15-byte footer. Official Linux 7zz 26.05 checked the archive and extracted the
+last JSON, with an explicit trailing-data warning for that footer; no envelope
+authentication or stub execution is claimed. Details are in docs/source-sfx.md.
+
 Development was rechecked on 2026-10-27 with official stable
 `moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).
 Windows compiler/runtime/formatter/interface executables were checked against

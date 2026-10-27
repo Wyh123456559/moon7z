@@ -5,6 +5,10 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    SourceSignatureNotFound(searched_bytes~) =>
+      logger.write_string(
+        "No CRC-valid 7z start header among the first \{searched_bytes} eligible source offsets. Check the input, increase search_bytes for a larger stub, or use SourceEmbeddedArchive::open_at with a known offset.",
+      )
     SourceLimit(resource~, maximum~) =>
       logger.write_string(
         "Source policy limit: \{resource} exceeds \{maximum} bytes. Raise the explicit source/total-output policy only for trusted inputs.",

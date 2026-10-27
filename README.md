@@ -143,7 +143,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Capability | Current behavior |
 | --- | --- |
 | Container | Single-volume; real fixtures cover 0.3 and 0.4; header minors 0–4 accepted; signature at byte zero |
-| Embedded/SFX | Opt-in bounded discovery or known offset, exact prefix/payload/suffix retention; three real SDK envelopes tested without running a stub |
+| Embedded/SFX | Bounded memory import and UInt64 positioned file/volume discovery, known offsets and exact envelope views; [SDK and 4 GiB+ evidence](docs/source-sfx.md) |
 | Split volumes | Explicit ordered numeric sets, varying sizes, cumulative input/count limits and encrypted/plain real fixtures; [workflow](docs/volumes.md) |
 | Seekable sources | UInt64 positioned reads, on-demand folders and composed numeric volumes; [actual archive above 4 GiB](docs/seekable.md) |
 | Codecs | Copy, LZMA, LZMA2, PPMd7, BZip2, raw DEFLATE, BCJ2 four-input branch reconstruction |
@@ -160,8 +160,8 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Resources | Configurable input/header/output/dictionary/member/coder/intermediate-output limits |
 
 Unlisted methods/filters and writing remain unsupported.
-SFX/embedded archives have a bounded, explicit opt-in reading API and commands;
-see [SFX import and real installer samples](docs/sfx.md).
+SFX/embedded archives have explicit in-memory and seekable file/volume APIs;
+see [SFX import](docs/sfx.md) and [seekable SFX workflows](docs/source-sfx.md).
 Unknown file properties are readable as opaque records; they block nonempty
 filesystem export. Anti-items never delete existing files. Links, reparse points
 and special entries are never restored as ordinary files. Zero padding may

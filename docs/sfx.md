@@ -1,9 +1,10 @@
 # SFX and embedded 7z import
 
 Applications can inspect an installer bundle, import its resources or compare its
-contents with a plain archive without running the executable stub. This is an
-owned, bounded in-memory API. It does not interpret installer instructions,
-validate an executable or authenticate a signature.
+contents with a plain archive without running the executable stub. This page
+describes the owned, bounded in-memory API; [seekable file/volume SFX](source-sfx.md)
+uses live UInt64 views for larger inputs. Neither API interprets installer instructions,
+validates an executable or authenticates a signature.
 
 ## Public workflow
 
@@ -94,6 +95,5 @@ limit, bad-CRC decoys, credible corrupt/unsupported headers before healthy
 archives, UInt64 overflow, truncated inputs, empty archives at the final eligible
 offset, encrypted-header password recovery and ordinary API behavior.
 
-Numeric split archives have a separate [volume API](volumes.md); split SFX is
-not implemented. [Seekable ordinary files/volumes](seekable.md) now have a separate
-API; seekable SFX discovery and Mooncakes publication remain unfinished.
+Numeric split SFX is now supported through the [seekable SFX API](source-sfx.md).
+Mooncakes publication remains unfinished.

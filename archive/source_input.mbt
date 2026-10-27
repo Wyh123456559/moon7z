@@ -23,6 +23,26 @@ pub fn SeekableInput::new(
 }
 
 ///|
+/// Retain an exact UInt64 subrange without reading or allocating its bytes.
+/// Offsets passed to the resulting input are relative to this view.
+pub fn SeekableInput::slice(
+  self : SeekableInput,
+  offset : UInt64,
+  size : UInt64,
+) -> SeekableInput raise ArchiveError {
+  guard offset <= self.size && size <= self.size - offset else {
+    raise SourceRead(
+      offset~,
+      reason="source view is outside the declared input",
+    )
+  }
+  SeekableInput::new(size, async fn(relative, length) {
+    // The view and exact-read guards prove offset + relative <= self.size.
+    self.read_at(offset + relative, length)
+  })
+}
+
+///|
 fn validate_source_range(
   size : UInt64,
   offset : UInt64,

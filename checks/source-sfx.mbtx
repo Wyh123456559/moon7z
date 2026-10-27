@@ -1,0 +1,211 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/process",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/encoding/base64",
+}
+----
+
+///|
+async fn check_files(directory : String) -> Unit {
+  for
+    (original, name) in [
+      ("corpus/source/lzma-mbt/README.md", "README.md"),
+      ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    assert_eq(
+      @fs.read_file(directory + "/" + name).binary(),
+      @fs.read_file(original).binary(),
+    )
+  }
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-source-sfx")
+  defer @fs.rmdir(root, recursive=true)
+  let command = ["run", "--target", target, "app", "--"]
+  for
+    (id, offset) in [("gui", 35328), ("console", 34816), ("installer", 129082)] {
+    let text = @fs.read_file("corpus/sfx/" + id + ".base64").text()
+    let input = @base64.decode(text.split("\n").join("")) + b"\x00\xfffooter"
+    let path = root + "/" + id + ".bin"
+    @fs.write_file(path, input)
+    let listed = @shell.Cmd(
+      "moon",
+      command + ["source-sfx-list", "--json", path],
+    ).output(timeout_ms=120000)
+    assert_eq(listed.exit_code(), 0)
+    assert_true(
+      @json.parse(listed.stdout())
+      is {
+        "schema": String("moon7z.source_embedded_inventory.v1"),
+        "offset": String(found),
+        "envelope_verified": False,
+        "envelope_bytes_included": False,
+        "suffix_bytes": String("8"),
+        ..
+      } &&
+      found == offset.to_string(),
+    )
+    let verified = @shell.Cmd(
+      "moon",
+      command +
+      ["source-sfx-test", "--offset", offset.to_string(), "--json", path],
+    ).output(timeout_ms=120000)
+    assert_eq(verified.exit_code(), 0)
+    assert_true(
+      @json.parse(verified.stdout())
+      is {
+        "schema": String("moon7z.source_embedded_verification.v1"),
+        "envelope_verified": False,
+        "verification": {
+          "contents_verified": True,
+          "bytes": String("14229"),
+          ..
+        },
+        ..
+      },
+    )
+    @shell.Cmd(
+      "moon",
+      command + ["source-sfx-extract", "--contents-only", path, root, id],
+    ).run(timeout_ms=120000)
+    check_files(root + "/" + id)
+    assert_eq(@fs.read_file(path).binary(), input)
+  }
+  let text = @fs.read_file("corpus/sfx/gui.base64").text()
+  let original = @base64.decode(text.split("\n").join("")) + b"\x00\xfffooter"
+  let boundaries = [0, 35331, 35349, original.length() - 3, original.length()]
+  let paths : Array[String] = []
+  for i in 0..<4 {
+    let path = root + "/split.7z.00" + (i + 1).to_string()
+    @fs.write_file(path, original[boundaries[i]:boundaries[i + 1]].to_owned())
+    paths.push(path)
+  }
+  @shell.Cmd(
+    "moon",
+    command +
+    ["source-sfx-volumes-extract", "--contents-only", root, "split"] +
+    paths,
+  ).run(timeout_ms=120000)
+  check_files(root + "/split")
+  let split_report = @shell.Cmd(
+    "moon",
+    command + ["source-sfx-volumes-test", "--json"] + paths,
+  ).output(timeout_ms=120000)
+  assert_eq(split_report.exit_code(), 0)
+  assert_true(
+    @json.parse(split_report.stdout())
+    is {
+      "offset": String("35328"),
+      "verification": { "bytes": String("14229"), .. },
+      ..
+    },
+  )
+  let (code, bytes, _) = @process.collect_output(
+    "moon",
+    command + ["source-sfx-read-range", root + "/gui.bin", "0", "0", "8"],
+  )
+  assert_eq(code, 0)
+  assert_eq(
+    bytes.binary(),
+    @fs.read_file("corpus/source/lzma-mbt/LICENSE").binary()[:8].to_owned(),
+  )
+  let damaged = original.to_array()
+  damaged[35360] = damaged[35360] ^ b'\x80'
+  @fs.write_file(root + "/damaged.bin", Bytes::from_array(damaged))
+  let baseline = @fs.readdir(root, include_hidden=true).length()
+  let failed = @shell.Cmd(
+    "moon",
+    command +
+    [
+      "source-sfx-extract",
+      "--scan-bytes",
+      "35328",
+      "--contents-only",
+      root + "/gui.bin",
+      root,
+      "refused",
+    ],
+  ).output(timeout_ms=120000)
+  assert_true(failed.exit_code() != 0)
+  assert_eq(failed.stdout(), "")
+  assert_true(failed.stderr().contains("open_at"))
+  let corrupt = @shell.Cmd(
+    "moon",
+    command +
+    [
+      "source-sfx-extract",
+      "--contents-only",
+      root + "/damaged.bin",
+      root,
+      "damaged-output",
+    ],
+  ).output(timeout_ms=120000)
+  assert_true(corrupt.exit_code() != 0)
+  assert_eq(corrupt.stdout(), "")
+  for
+    invalid in [
+      ["source-sfx-list"],
+      ["source-sfx-extract"],
+      ["source-sfx-read", "--offset"],
+      [
+        "source-sfx-list",
+        "--offset",
+        "18446744073709551616",
+        "--json",
+        root + "/gui.bin",
+      ],
+    ] {
+    let result = @shell.Cmd("moon", command + invalid).output(timeout_ms=120000)
+    assert_true(result.exit_code() != 0)
+    assert_eq(result.stdout(), "")
+  }
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), baseline)
+  if !(@async.platform is Windows) {
+    let file = root + "/large-sfx.bin"
+    @shell.Cmd("moon", ["run", "corpus/sfx/materialize-large.mbtx", "--", file]).run(
+      timeout_ms=120000,
+    )
+    let read = @shell.Cmd("moon", command + ["source-sfx-read", file, "64"]).output(
+      timeout_ms=120000,
+    )
+    assert_eq(read.exit_code(), 0)
+    assert_eq(read.stdout(), @fs.read_file("corpus/source/清单.json").text())
+    let checked = @shell.Cmd(
+      "moon",
+      command + ["source-sfx-test", "--json", file],
+    ).output(timeout_ms=120000)
+    assert_eq(checked.exit_code(), 0)
+    assert_true(
+      @json.parse(checked.stdout())
+      is {
+        "offset": String("35328"),
+        "suffix_bytes": String("15"),
+        "envelope_verified": False,
+        "verification": {
+          "bytes": String("4294967348"),
+          "members_without_crc": Number(64, ..),
+          ..
+        },
+        ..
+      },
+    )
+    println(
+      "Actual SDK SFX above four GiB: final member and full available-CRC verification passed",
+    )
+  }
+  println(
+    "Seekable SDK SFX list/test/export, split seams, binary stdout, unchanged input and invalid-command refusal passed",
+  )
+}

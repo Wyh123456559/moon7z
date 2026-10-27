@@ -59,10 +59,11 @@ CRC coverage is unchanged: names do not authenticate contents and renamed or
 substituted parts are only caught where structural checks or available CRCs
 detect the alteration. There is no independent checksum in a plain split part.
 
-GNU-style alphabetic `.aa` sets, split SFX envelopes, self-discovery from a first
+GNU-style alphabetic `.aa` sets, self-discovery from a first
 part and recovery of unfinished archives with an empty StartHeader are outside
 this API. These are explicit scope limits; no part or unsupported bytes are
 silently skipped. Ordinary `Archive::open` and file opening keep their behavior.
+Split SFX envelopes use the separate [seekable SFX API](source-sfx.md).
 
 ## Reproducible evidence
 

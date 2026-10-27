@@ -33,14 +33,14 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | LZMA properties | LZMA1 all 225 legal property combinations independently encoded/extracted; probability-table budget, exact consumption and optional end markers. LZMA2 retains its format's lc+lp≤4 rule | Retain this behavior across remaining source/volume/header paths |
 | Filters | Delta, classic x86 BCJ, ARM64, RISC-V, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4; [classic evidence](filters.md), [RISC-V evidence](riscv.md) | Preserve valid method/property behavior across remaining input/header paths; classic methods use empty properties, unlike ARM64/RISC-V |
 | Encryption | Password API, AES-256-CBC/SHA-256 derivation with cumulative work limits, encrypted headers/data and [four real cases](encrypted.md), missing/wrong password recovery | Preserve these contracts across remaining input/header paths; CRC is not authenticated encryption |
-| SFX/embedded input | Opt-in bounded signature discovery and explicit offset API; original prefix/payload/suffix retained, three [official SDK envelopes](sfx.md) independently tested/extracted; no executable is run | Preserve these contracts across remaining source/volume paths |
-| Split input | Ordered numeric sets with variable sizes, count/total budgets and missing/reordered diagnostics; bounded import and [seekable composition](seekable.md) | Preserve tested behavior across source adapters; alphabetic names and split SFX remain outside the current input APIs |
-| Input scale | Existing bounded memory API plus async UInt64 sources, live positioned files/volumes, and [actual 4 GiB+ verification](seekable.md) | Maintain cross-platform evidence and explicit per-folder/source/total policies; seekable SFX discovery remains pending |
+| SFX/embedded input | In-memory and [seekable UInt64 discovery/explicit offsets](source-sfx.md), exact prefix/payload/suffix views, split SFX and actual 4 GiB+ reading/verification; no executable is run | Maintain corpus, boundary, error and envelope-preservation evidence across supported targets |
+| Split input | Ordered numeric sets with variable sizes, count/total budgets and missing/reordered diagnostics; bounded import, [seekable composition](seekable.md) and [split SFX](source-sfx.md) | Preserve tested behavior across source adapters; alphabetic split names remain outside the current input APIs |
+| Input scale | Existing bounded memory API plus async UInt64 files/volumes/SFX and actual 4 GiB+ verification | Maintain cross-platform evidence and explicit per-folder/source/total policies |
 | Integrity | All available pack/folder/member CRCs in verified scope; missing member CRCs explicit | Same behavior for all new graph/method/volume paths; CRC is not authenticity |
 | Publishing | No-replace staging, exact selected IDs, metadata returned rather than applied | Preserve these contracts while expanding readable inputs; unsafe export must fail clearly |
 
 Every pending row is a real gap. In particular, remaining
-source integration (including seekable SFX), publication and independent installation must not be relabeled complete merely
+publication and independent installation must not be relabeled complete merely
 because additional codecs now pass. A larger test count cannot substitute for
 these rows.
 

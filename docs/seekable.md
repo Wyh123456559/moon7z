@@ -98,8 +98,9 @@ previously checked cached bytes and owned metadata may remain available.
 The core arithmetic, composition contracts and existing synchronous engine are
 checked on all four stable targets. Async source workflows currently run on
 Wasm and native via the host package. No browser/JavaScript Promise adapter is
-provided or claimed. Seekable SFX discovery and source-reader batch/audit/diff
-convenience methods remain future work; the original in-memory APIs retain them.
+provided or claimed. [Seekable SFX discovery and split SFX](source-sfx.md) now
+use the same source engine. Source-reader batch/audit/diff convenience methods
+remain future work; the original in-memory APIs retain them.
 
 ## Reproducible evidence
 

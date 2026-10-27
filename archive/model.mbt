@@ -1,6 +1,7 @@
 ///|
 /// Errors identify an input defect, unsupported feature or resource policy.
 pub suberror ArchiveError {
+  SourceSignatureNotFound(searched_bytes~ : UInt64)
   SourceLimit(resource~ : String, maximum~ : UInt64)
   SourceRead(offset~ : UInt64, reason~ : String)
   VolumeError(index~ : Int32, reason~ : String)

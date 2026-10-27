@@ -18,6 +18,10 @@ pub async fn open_file(String, limits? : @archive.Limits, password? : String) ->
 
 pub async fn open_seekable_file(String, limits? : @archive.Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, password? : String) -> SourceFile
 
+pub async fn open_seekable_sfx_file(String, limits? : @archive.Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, search_bytes? : UInt64, offset? : UInt64, password? : String) -> SourceSfxFile
+
+pub async fn open_seekable_sfx_volumes(ArrayView[String], limits? : @archive.Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, search_bytes? : UInt64, offset? : UInt64, max_volumes? : Int32, password? : String) -> SourceSfxFile
+
 pub async fn open_seekable_volumes(ArrayView[String], limits? : @archive.Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, max_volumes? : Int32, password? : String) -> SourceFile
 
 pub async fn open_volume_files(ArrayView[String], limits? : @archive.Limits, password? : String, max_volumes? : Int32) -> @archive.SplitArchive
@@ -35,6 +39,12 @@ pub struct SourceFile {
   // private fields
 }
 pub fn SourceFile::close(Self) -> Unit
+
+pub struct SourceSfxFile {
+  embedded : @archive.SourceEmbeddedArchive
+  // private fields
+}
+pub fn SourceSfxFile::close(Self) -> Unit
 
 // Type aliases
 

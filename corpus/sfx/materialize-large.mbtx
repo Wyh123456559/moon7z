@@ -1,0 +1,38 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+  "moonbitlang/core/encoding/base64",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 2 else {
+    fail("usage: materialize-large.mbtx NEW_SPARSE_SFX (Linux/macOS)")
+  }
+  guard !(@async.platform is Windows) else {
+    fail(
+      "sparse SFX materialization requires Linux/macOS; Windows also runs virtual UInt64 SFX tests",
+    )
+  }
+  let text = @fs.read_file("corpus/sfx/gui.base64").text()
+  let gui = @base64.decode(text.split("\n").join(""))
+  let prefix = gui[:35328].to_owned()
+  let start = @fs.read_file("corpus/source64/start.bin").binary()
+  let tail = @fs.read_file("corpus/source64/tail.bin").binary()
+  let footer = b"\x00\xffopaque-footer"
+  let file = @fs.open(args[1], mode=ReadWrite, create_mode=CreateNew)
+  defer file.close()
+  file.write_at((prefix + start)[:], position=0L)
+  file.write_at((tail + footer)[:], position=4295002656L)
+  assert_eq(
+    file.size(),
+    4295002656L + tail.length().to_int64() + footer.length().to_int64(),
+  )
+  println(
+    "Created sparse SDK SFX; archive offset=35328, archive bytes=4294970749, opaque suffix=15 bytes; executable stub was not run",
+  )
+}
