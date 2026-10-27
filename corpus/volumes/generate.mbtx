@@ -1,0 +1,97 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/x@0.5.5/crypto",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else {
+    fail("usage: generate.mbtx PACKER_26_05 NEW_OUTPUT_DIRECTORY")
+  }
+  guard @shell.Cmd(args[1], []).output().stdout().contains("26.05") else {
+    fail("expected official 7za 26.05")
+  }
+  @fs.mkdir(args[2])
+  let root = @fs.realpath(args[2])
+  let source = root + "/source"
+  @fs.mkdir(source)
+  for
+    (path, name) in [
+      ("corpus/source/lzma-mbt/README.md", "README.md"),
+      ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    @fs.write_file(source + "/" + name, @fs.read_file(path).binary())
+  }
+  let cases : Array[Json] = []
+  for
+    (id, codec, volumes, encrypted) in [
+      ("fixed", "LZMA2", ["-v2048b"], false),
+      ("variable", "Copy", ["-v13b", "-v23b", "-v4096b"], false),
+      ("encrypted", "LZMA2", ["-v2048b"], true),
+    ] {
+    let dir = root + "/" + id
+    @fs.mkdir(dir)
+    let file = dir + "/package.7z"
+    let password = if encrypted { ["-pmoon7z-volumes", "-mhe=on"] } else { [] }
+    @shell.Cmd(
+      args[1],
+      [
+        "a",
+        file,
+        "README.md",
+        "LICENSE",
+        "清单.json",
+        "-t7z",
+        "-m0=" + codec,
+        "-ms=on",
+        "-mhc=on",
+        "-mtm=off",
+        "-mtc=off",
+        "-mta=off",
+      ] +
+      volumes +
+      password,
+      cwd=source,
+    ).run()
+    @shell.Cmd(args[1], ["t", file + ".001"] + password).run()
+    @shell.Cmd(
+      args[1],
+      ["x", file + ".001", "-o" + root + "/unpacked-" + id] + password,
+    ).run()
+    for name in ["README.md", "LICENSE", "清单.json"] {
+      assert_eq(
+        @fs.read_file(root + "/unpacked-" + id + "/" + name).binary(),
+        @fs.read_file(source + "/" + name).binary(),
+      )
+    }
+    let parts : Array[Json] = []
+    for name in @fs.readdir(dir, sort=true) {
+      let bytes = @fs.read_file(dir + "/" + name).binary()
+      parts.push({
+        "name": Json(name),
+        "bytes": Json(bytes.length()),
+        "sha256": Json(@crypto.bytes_to_hex_string(@crypto.sha256(bytes))),
+      })
+    }
+    cases.push({
+      "id": Json(id),
+      "method": Json(codec),
+      "encrypted": Json(encrypted),
+      "parts": Json(parts),
+    })
+    println("Independent split test/extraction passed: " + id)
+  }
+  let manifest : Json = {
+    "schema": "moon7z.volume_corpus.v1",
+    "producer": "7za 26.05",
+    "cases": Json(cases),
+  }
+  @fs.write_file(root + "/manifest.json", manifest.stringify(indent=2) + "\n")
+}

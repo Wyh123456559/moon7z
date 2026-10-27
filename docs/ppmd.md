@@ -101,5 +101,5 @@ binary stress data and the container builder are project-authored Apache-2.0.
 Regenerated encrypted bytes change because encryption uses random salt/IV.
 The packer binaries are not redistributed or used at library runtime.
 
-PPMd7 closes one codec gap. Remaining seekable/volume and
+PPMd7 closes one codec gap. Remaining seekable input and
 publication work is tracked in [the compatibility contract](compatibility.md).

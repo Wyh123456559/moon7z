@@ -3,3 +3,4 @@
 *.wav binary
 *.elf binary
 *.bin binary
+/corpus/volumes/**/package.7z.* binary

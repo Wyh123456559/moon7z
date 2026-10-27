@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/async",
   "Wyh123456559/moon7z/archive",
   "moonbitlang/async/fs",
   "moonbitlang/async/os_error",

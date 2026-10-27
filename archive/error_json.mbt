@@ -4,6 +4,11 @@
 pub impl ToJson for ArchiveError with fn to_json(self) {
   let fields : Map[String, Json] = Map([])
   match self {
+    VolumeError(index~, reason~) => {
+      fields["code"] = Json("volume")
+      fields["index"] = Json(index)
+      fields["reason"] = Json(reason)
+    }
     SignatureNotFound(searched_bytes~) => {
       fields["code"] = Json("signature_not_found")
       fields["searched_bytes"] = Json(searched_bytes)

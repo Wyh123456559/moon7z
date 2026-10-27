@@ -1,0 +1,87 @@
+{
+  "schema": "moon7z.volume_corpus.v1",
+  "producer": "7za 26.05",
+  "cases": [
+    {
+      "id": "fixed",
+      "method": "LZMA2",
+      "encrypted": false,
+      "parts": [
+        {
+          "name": "package.7z.001",
+          "bytes": 2048,
+          "sha256": "b094a04b789ceee8dad471ed461e45f63fee1a99d62cc3a38e961ab095504571"
+        },
+        {
+          "name": "package.7z.002",
+          "bytes": 2048,
+          "sha256": "dc9a627a6eb8923a2e1a31e5ba0b420da040ae1661fd5af5ddd426b8c70c7a8a"
+        },
+        {
+          "name": "package.7z.003",
+          "bytes": 1454,
+          "sha256": "31f4a7709ec5787b3630a6466d144e720d5db1ced23bd20b7713fae08fa962eb"
+        }
+      ]
+    },
+    {
+      "id": "variable",
+      "method": "Copy",
+      "encrypted": false,
+      "parts": [
+        {
+          "name": "package.7z.001",
+          "bytes": 13,
+          "sha256": "166761e4b99f0432d3dec1dc20c7494b0fd7a0aa55f6492057b9faf76eeb08f8"
+        },
+        {
+          "name": "package.7z.002",
+          "bytes": 23,
+          "sha256": "c4f2f6ccacf3154155b39ba806a877d2c4b9eae5a8b552651ba2debba4a09fb6"
+        },
+        {
+          "name": "package.7z.003",
+          "bytes": 4096,
+          "sha256": "29c268983ae66ec3f6f7510aff04567894c5db2a897fa75092b4b551ae17a784"
+        },
+        {
+          "name": "package.7z.004",
+          "bytes": 4096,
+          "sha256": "2687f7e720db2aa62958a80da287cbe38788e0723ea743ffa5a82bc90be064ee"
+        },
+        {
+          "name": "package.7z.005",
+          "bytes": 4096,
+          "sha256": "9b40e7e9f5e170dce6f5f24092cbceacfea8152109ceecfc38545bd7f871a07b"
+        },
+        {
+          "name": "package.7z.006",
+          "bytes": 2074,
+          "sha256": "fe48ae60ace5399e2bbd019100fb159b9fa8628d538d3f3dc55cda5621ba4602"
+        }
+      ]
+    },
+    {
+      "id": "encrypted",
+      "method": "LZMA2",
+      "encrypted": true,
+      "parts": [
+        {
+          "name": "package.7z.001",
+          "bytes": 2048,
+          "sha256": "55047330acbcc415735b52c60ed1527b7b73eaba2ad7535f441c20606d5ad29e"
+        },
+        {
+          "name": "package.7z.002",
+          "bytes": 2048,
+          "sha256": "5cd22dd78e8cf7bf5a8ac64bd551404f3740d98d96f0156948cbec4a62502185"
+        },
+        {
+          "name": "package.7z.003",
+          "bytes": 1519,
+          "sha256": "dff00ad6166b16197cf7461660f3f8a00a17bf59e22cfce53c0a48e6cac9980a"
+        }
+      ]
+    }
+  ]
+}

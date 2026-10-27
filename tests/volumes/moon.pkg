@@ -1,0 +1,169 @@
+import {
+  "Wyh123456559/moon7z/archive",
+  "moonbitlang/core/json",
+} for "test"
+
+rule(
+  name: "fixed1",
+  command: ":embed --binary -i $input -o $output --name fixed1",
+)
+
+dev_build(
+  rule: "fixed1",
+  input: "../../corpus/volumes/fixed/package.7z.001",
+  output: "fixed1_archive_test.mbt",
+)
+
+rule(
+  name: "fixed2",
+  command: ":embed --binary -i $input -o $output --name fixed2",
+)
+
+dev_build(
+  rule: "fixed2",
+  input: "../../corpus/volumes/fixed/package.7z.002",
+  output: "fixed2_archive_test.mbt",
+)
+
+rule(
+  name: "fixed3",
+  command: ":embed --binary -i $input -o $output --name fixed3",
+)
+
+dev_build(
+  rule: "fixed3",
+  input: "../../corpus/volumes/fixed/package.7z.003",
+  output: "fixed3_archive_test.mbt",
+)
+
+rule(
+  name: "variable1",
+  command: ":embed --binary -i $input -o $output --name variable1",
+)
+
+dev_build(
+  rule: "variable1",
+  input: "../../corpus/volumes/variable/package.7z.001",
+  output: "variable1_archive_test.mbt",
+)
+
+rule(
+  name: "variable2",
+  command: ":embed --binary -i $input -o $output --name variable2",
+)
+
+dev_build(
+  rule: "variable2",
+  input: "../../corpus/volumes/variable/package.7z.002",
+  output: "variable2_archive_test.mbt",
+)
+
+rule(
+  name: "variable3",
+  command: ":embed --binary -i $input -o $output --name variable3",
+)
+
+dev_build(
+  rule: "variable3",
+  input: "../../corpus/volumes/variable/package.7z.003",
+  output: "variable3_archive_test.mbt",
+)
+
+rule(
+  name: "variable4",
+  command: ":embed --binary -i $input -o $output --name variable4",
+)
+
+dev_build(
+  rule: "variable4",
+  input: "../../corpus/volumes/variable/package.7z.004",
+  output: "variable4_archive_test.mbt",
+)
+
+rule(
+  name: "variable5",
+  command: ":embed --binary -i $input -o $output --name variable5",
+)
+
+dev_build(
+  rule: "variable5",
+  input: "../../corpus/volumes/variable/package.7z.005",
+  output: "variable5_archive_test.mbt",
+)
+
+rule(
+  name: "variable6",
+  command: ":embed --binary -i $input -o $output --name variable6",
+)
+
+dev_build(
+  rule: "variable6",
+  input: "../../corpus/volumes/variable/package.7z.006",
+  output: "variable6_archive_test.mbt",
+)
+
+rule(
+  name: "encrypted1",
+  command: ":embed --binary -i $input -o $output --name encrypted1",
+)
+
+dev_build(
+  rule: "encrypted1",
+  input: "../../corpus/volumes/encrypted/package.7z.001",
+  output: "encrypted1_archive_test.mbt",
+)
+
+rule(
+  name: "encrypted2",
+  command: ":embed --binary -i $input -o $output --name encrypted2",
+)
+
+dev_build(
+  rule: "encrypted2",
+  input: "../../corpus/volumes/encrypted/package.7z.002",
+  output: "encrypted2_archive_test.mbt",
+)
+
+rule(
+  name: "encrypted3",
+  command: ":embed --binary -i $input -o $output --name encrypted3",
+)
+
+dev_build(
+  rule: "encrypted3",
+  input: "../../corpus/volumes/encrypted/package.7z.003",
+  output: "encrypted3_archive_test.mbt",
+)
+
+rule(
+  name: "readme",
+  command: ":embed --binary -i $input -o $output --name readme",
+)
+
+dev_build(
+  rule: "readme",
+  input: "../../corpus/source/lzma-mbt/README.md",
+  output: "readme_archive_test.mbt",
+)
+
+rule(
+  name: "license",
+  command: ":embed --binary -i $input -o $output --name license",
+)
+
+dev_build(
+  rule: "license",
+  input: "../../corpus/source/lzma-mbt/LICENSE",
+  output: "license_archive_test.mbt",
+)
+
+rule(
+  name: "manifest",
+  command: ":embed --binary -i $input -o $output --name manifest",
+)
+
+dev_build(
+  rule: "manifest",
+  input: "../../corpus/source/清单.json",
+  output: "manifest_archive_test.mbt",
+)

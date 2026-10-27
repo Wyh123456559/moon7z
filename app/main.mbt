@@ -15,6 +15,9 @@ async fn main {
   if sfx_command(args, password) {
     return
   }
+  if volume_command(args, password) {
+    return
+  }
   if args.length() == 4 && args[1] == "audit" && args[2] == "--json" {
     let archive = @host.open_file(args[3], password?)
     println(archive.audit().to_json().stringify())

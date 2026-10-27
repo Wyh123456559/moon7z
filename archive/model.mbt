@@ -1,6 +1,7 @@
 ///|
 /// Errors identify an input defect, unsupported feature or resource policy.
 pub suberror ArchiveError {
+  VolumeError(index~ : Int32, reason~ : String)
   SignatureNotFound(searched_bytes~ : Int32)
   PasswordRequired
   DecryptionFailed

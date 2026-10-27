@@ -94,5 +94,5 @@ limit, bad-CRC decoys, credible corrupt/unsupported headers before healthy
 archives, UInt64 overflow, truncated inputs, empty archives at the final eligible
 offset, encrypted-header password recovery and ordinary API behavior.
 
-Split volumes, seekable UInt64 input and Mooncakes publication remain separate
-unfinished parts of the reader compatibility target.
+Numeric split archives have a separate [volume API](volumes.md); split SFX is
+not implemented. Seekable UInt64 input and Mooncakes publication remain unfinished.

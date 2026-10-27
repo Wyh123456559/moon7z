@@ -1,0 +1,160 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/x@0.5.5/crypto",
+}
+----
+
+///|
+async fn refuse(command : Array[String], hint : String) -> Unit {
+  let result = @shell.Cmd("moon", command).output(timeout_ms=120000)
+  assert_true(result.exit_code() != 0)
+  assert_eq(result.stdout(), "")
+  assert_true(result.stderr().contains(hint))
+}
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-volumes")
+  defer @fs.rmdir(root, recursive=true)
+  let command = ["run", "--target", target, "app", "--"]
+  let document = @json.parse(
+    @fs.read_file("corpus/volumes/manifest.json").text(),
+  )
+  guard document
+    is {
+      "schema": String("moon7z.volume_corpus.v1"),
+      "cases": Array(cases),
+      ..
+    } else {
+    fail("invalid volume manifest")
+  }
+  assert_eq(cases.length(), 3)
+  let seen : Set[String] = Set([])
+  for data in cases {
+    guard data
+      is { "id": String(id), "encrypted": encrypted, "parts": Array(parts), .. } else {
+      fail("invalid volume case")
+    }
+    assert_true(
+      ["fixed", "variable", "encrypted"].contains(id) && !seen.contains(id),
+    )
+    seen.add(id)
+    let paths : Array[String] = []
+    let bytes_by_part : Array[Bytes] = []
+    for part in parts {
+      guard part
+        is {
+          "name": String(name),
+          "bytes": Number(size, ..),
+          "sha256": String(hash),
+          ..
+        } else {
+        fail("invalid volume record")
+      }
+      let path = "corpus/volumes/" + id + "/" + name
+      let bytes = @fs.read_file(path).binary()
+      assert_eq(bytes.length().to_double(), size)
+      assert_eq(@crypto.bytes_to_hex_string(@crypto.sha256(bytes)), hash)
+      paths.push(path)
+      bytes_by_part.push(bytes)
+    }
+    let password = if encrypted is True {
+      ["--password-env", "MOON7Z_VOLUME_TEST_PASSWORD"]
+    } else {
+      []
+    }
+    let environment : Map[String, String] = {
+      "MOON7Z_VOLUME_TEST_PASSWORD": "moon7z-volumes",
+    }
+    let invoke = command + password
+    let inventory = @shell.Cmd(
+      "moon",
+      invoke + ["volumes-list", "--json"] + paths,
+      env=environment,
+    ).output(timeout_ms=120000)
+    assert_eq(inventory.exit_code(), 0)
+    assert_true(
+      @json.parse(inventory.stdout())
+      is {
+        "schema": String("moon7z.split_inventory.v1"),
+        "contents_verified": False,
+        "volumes": Array(records),
+        ..
+      } &&
+      records.length() == parts.length(),
+    )
+    let tested = @shell.Cmd(
+      "moon",
+      invoke + ["volumes-test", "--json"] + paths,
+      env=environment,
+    ).output(timeout_ms=120000)
+    assert_eq(tested.exit_code(), 0)
+    assert_true(
+      @json.parse(tested.stdout())
+      is {
+        "schema": String("moon7z.split_verification.v1"),
+        "verification": {
+          "contents_verified": True,
+          "bytes": Number(14229, ..),
+          ..
+        },
+        ..
+      },
+    )
+    @shell.Cmd(
+      "moon",
+      invoke + ["volumes-extract", "--contents-only", root, id] + paths,
+      env=environment,
+    ).run(timeout_ms=120000)
+    for
+      (original, name) in [
+        ("corpus/source/lzma-mbt/README.md", "README.md"),
+        ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+        ("corpus/source/清单.json", "清单.json"),
+      ] {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + name).binary(),
+        @fs.read_file(original).binary(),
+      )
+    }
+    for i, path in paths {
+      assert_eq(@fs.read_file(path).binary(), bytes_by_part[i])
+    }
+  }
+  let fixed = Array::makei(3, i => {
+    "corpus/volumes/fixed/package.7z.00" + (i + 1).to_string()
+  })
+  let extract = command +
+    ["volumes-extract", "--contents-only", root, "refused"]
+  refuse(extract + [fixed[0], fixed[2]], "expected package.7z.002")
+  refuse(extract + fixed[:2].to_owned(), "last volume")
+  refuse(extract + [fixed[0], fixed[0]], "duplicated")
+  refuse(extract + [fixed[1], fixed[0], fixed[2]], "first supplied volume")
+  @fs.mkdir(root + "/broken")
+  let broken : Array[String] = []
+  for i, source in fixed {
+    let array = @fs.read_file(source).binary().to_array()
+    if i == 0 {
+      array[32] = array[32] ^ b'\x80'
+    }
+    let path = root + "/broken/package.7z.00" + (i + 1).to_string()
+    @fs.write_file(path, Bytes::from_array(array))
+    broken.push(path)
+  }
+  let corrupt = @shell.Cmd("moon", extract + broken).output(timeout_ms=120000)
+  assert_true(corrupt.exit_code() != 0)
+  assert_eq(corrupt.stdout(), "")
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 4)
+  println(
+    "Three real volume sets: hashed inventory, verification, exact export, unchanged source, sequence errors and corrupt-export cleanup passed",
+  )
+}

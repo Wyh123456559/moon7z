@@ -119,6 +119,17 @@ The official 26.05 `7zIn.cpp` search policy was consulted (first CRC-valid start
 header); no C++ implementation or upstream tests were copied. Envelope framing,
 preservation, API/CLI integration and boundary tests are project-authored.
 
+`corpus/volumes/` contains newly packed numeric split archives of the existing
+attributed Apache-2.0 README/LICENSE and project JSON payload. The Apache-2.0
+generator uses official 7za 26.05 for packing, testing and independent extraction
+with exact byte comparisons. It records per-part SHA-256 values in manifest.json;
+no upstream archive or test suite was copied. The official
+[SplitHandler.cpp, 26.05](https://github.com/ip7z/7zip/blob/26.05/CPP/7zip/Archive/SplitHandler.cpp)
+was consulted for sequential raw-stream concatenation and numeric suffix carry;
+no C++ implementation was copied. The ordinary numeric 7z volume workflow is
+implemented here; the upstream handler's alphabetic split style is outside this
+API. Packer licensing and development-only use are recorded above.
+
 Development was rechecked on 2026-10-27 with official stable
 `moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).
 Windows compiler/runtime/formatter/interface executables were checked against

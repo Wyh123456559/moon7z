@@ -144,6 +144,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | --- | --- |
 | Container | Single-volume; real fixtures cover 0.3 and 0.4; header minors 0–4 accepted; signature at byte zero |
 | Embedded/SFX | Opt-in bounded discovery or known offset, exact prefix/payload/suffix retention; three real SDK envelopes tested without running a stub |
+| Split volumes | Explicit ordered numeric sets, varying sizes, cumulative input/count limits and encrypted/plain real fixtures; [workflow](docs/volumes.md) |
 | Codecs | Copy, LZMA, LZMA2, PPMd7, BZip2, raw DEFLATE, BCJ2 four-input branch reconstruction |
 | Filters | Delta (distance 1–256), x86 BCJ, ARM64, RISC-V, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder graph | Bounded acyclic graphs of supported unary coders and four-input BCJ2; explicit physical input mappings |
@@ -157,7 +158,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Archive properties | Original ordered UInt64 IDs and opaque bytes, including duplicate IDs and empty values |
 | Resources | Configurable input/header/output/dictionary/member/coder/intermediate-output limits |
 
-Split volumes, unlisted methods/filters and writing remain unsupported.
+Unlisted methods/filters and writing remain unsupported.
 SFX/embedded archives have a bounded, explicit opt-in reading API and commands;
 see [SFX import and real installer samples](docs/sfx.md).
 Unknown file properties are readable as opaque records; they block nonempty
@@ -350,7 +351,7 @@ regular-file reads before allocating input; `app/` is the
 host command; `examples/import/` consumes verified members; `corpus/` records
 interoperability inputs; `checks/` runs repeatable verification.
 
-Seekable input, split volumes and archive writing require separate compatibility
+Seekable input and archive writing require separate compatibility
 work and are not implemented.
 
 Moon7z supplies the 7z container/member layer. Existing MoonBit LZMA/XZ codecs

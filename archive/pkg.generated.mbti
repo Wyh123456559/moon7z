@@ -10,6 +10,7 @@ pub fn validate_path(String) -> Unit raise ArchiveError
 
 // Errors
 pub suberror ArchiveError {
+  VolumeError(index~ : Int32, reason~ : String)
   SignatureNotFound(searched_bytes~ : Int32)
   PasswordRequired
   DecryptionFailed
@@ -283,6 +284,13 @@ pub fn ReaderStats::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ReaderStats::to_repr(Self) -> @debug.Repr
 
+pub struct SplitArchive {
+  archive : Archive
+  // private fields
+}
+pub fn SplitArchive::inventory_json(Self) -> Json
+pub fn SplitArchive::volumes(Self) -> Array[VolumeInfo]
+
 pub struct Verification {
   files : Int32
   bytes : Int32
@@ -298,6 +306,22 @@ pub fn Verification::to_json(Self) -> Json
 #deprecated
 pub fn Verification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Verification
+
+pub struct VolumeInfo {
+  name : String
+  offset : UInt64
+  bytes : Int32
+} derive(Eq, @debug.Debug)
+pub fn VolumeInfo::equal(Self, Self) -> Bool
+pub fn VolumeInfo::not_equal(Self, Self) -> Bool
+pub fn VolumeInfo::to_repr(Self) -> @debug.Repr
+
+pub struct VolumeSequence {
+  // private fields
+}
+pub fn VolumeSequence::names(Self) -> Array[String]
+pub fn VolumeSequence::new(ArrayView[String], max_volumes? : Int32) -> Self raise ArchiveError
+pub fn VolumeSequence::open(Self, ArrayView[Bytes], limits? : Limits, password? : String) -> SplitArchive raise ArchiveError
 
 // Type aliases
 
