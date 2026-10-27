@@ -62,6 +62,7 @@ of ecosystem uniqueness or approval.
 | `archive/riscv.mbt` | Scalar RISC-V JAL/AUIPC decoding and 7z offset integration | Public Domain 7-Zip 26.05 Bra.c adaptation |
 | `archive/deflate.mbt` | Bounded whole-node raw DEFLATE decoding integrated with 7z graph/integrity policies | Project code from RFC 1951 format rules; the established algorithm is not claimed as novel |
 | `archive/bzip2.mbt`, `bzip_random.mbt` | Bounded BZip2 reading, CRCs and legacy de-randomization | Partial Go BSD-3-Clause adaptation and bzip2-licensed table; exact provenance in SOURCES.md |
+| `archive/ppmd.mbt`, `ppmd_memory.mbt`, `ppmd_model.mbt` | Checked offset-arena, PPMdH model/allocator and 7z range decoder | Public Domain 7-Zip 26.05 SDK adaptation; Igor Pavlov / Dmitry Shkarin notices retained |
 | `moonbitlang/x@0.5.5/crypto` and `archive/crypto.mbt` | Existing AES/SHA primitives plus 7z password/property/work-budget integration | Upstream Apache-2.0 cryptography; project-authored bounded 7z integration, not a new cryptographic algorithm |
 | `archive/binary.mbt`, `streams.mbt`, `files.mbt`, `open.mbt` | 7z framing, bounded fields, coder topology, inventory and decode integration | Project code; format references and consulted BSD reference recorded in SOURCES.md |
 | `reader.mbt`, `ranges.mbt`, `paths.mbt`, `compare.mbt`, `audit.mbt`, `report.mbt`, `host/` | Public workflow logic and diagnostics | Project code, Apache-2.0 |

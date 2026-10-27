@@ -1,0 +1,23 @@
+Sources: 7-Zip 26.05, C/Ppmd7.c, C/Ppmd7Dec.c, C/Ppmd7.h, C/Ppmd.h
+https://github.com/ip7z/7zip/tree/26.05/C
+
+Ppmd7.c -- PPMdH codec
+2023-09-07 : Igor Pavlov : Public domain
+This code is based on PPMd var.H (2001): Dmitry Shkarin : Public domain
+
+Ppmd7Dec.c -- Ppmd7z (PPMdH with 7z Range Coder) Decoder
+2023-09-07 : Igor Pavlov : Public domain
+This code is based on:
+  PPMd var.H (2001): Dmitry Shkarin : Public domain
+
+Ppmd7.h -- Ppmd7 (PPMdH) compression codec
+2023-04-02 : Igor Pavlov : Public domain
+This code is based on:
+  PPMd var.H (2001): Dmitry Shkarin : Public domain
+
+Ppmd.h -- PPMD codec common code
+2023-03-05 : Igor Pavlov : Public domain
+This code is based on PPMd var.H (2001): Dmitry Shkarin : Public domain
+
+Moon7z translates these algorithms into a checked, offset-based MoonBit arena
+and scalar range decoder. No C/C++ binary is linked or executed at runtime.

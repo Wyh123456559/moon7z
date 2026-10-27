@@ -6,7 +6,7 @@ writing temporary files. It is intended for importers, resource managers and
 batch data tools that need to consume archives through an API.
 
 The project is a 7z container and verified-import implementation built on an
-existing LZMA/LZMA2 codec. It includes public-domain BCJ/BCJ2 adaptations; it
+existing LZMA/LZMA2 codec. It includes public-domain BCJ/BCJ2/PPMd7 adaptations; it
 does not claim that the compression algorithms are original. Basic archive
 reading overlaps the recently published `Sxy11112/moon7z`; the independent work
 is the broader compatibility path plus bounded, verified member processing.
@@ -142,7 +142,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Capability | Current behavior |
 | --- | --- |
 | Container | Single-volume; real fixtures cover 0.3 and 0.4; header minors 0–4 accepted; signature at byte zero |
-| Codecs | Copy, LZMA, LZMA2, BZip2, raw DEFLATE, BCJ2 four-input branch reconstruction |
+| Codecs | Copy, LZMA, LZMA2, PPMd7, BZip2, raw DEFLATE, BCJ2 four-input branch reconstruction |
 | Filters | Delta (distance 1–256), x86 BCJ, ARM64, RISC-V, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder graph | Bounded acyclic graphs of supported unary coders and four-input BCJ2; explicit physical input mappings |
 | Headers | Plain/compressed headers; additional streams and external names/times/attributes/folder definitions |
@@ -265,6 +265,13 @@ concatenated streams and legacy randomized blocks. Its block/stream CRCs are
 checked alongside 7z CRCs. The data header's block size is checked against the
 dictionary policy before building the inverse-transform data, and RLE expansion
 is bounded by the declared coder output. See [BZip2 evidence](docs/bzip2.md).
+
+PPMd7 (`03 04 01`) uses the 7z range coder and a bounded offset-based model arena.
+Both file data and encoded headers use the same decoder, including after AES
+decryption. Exact packed consumption and final range state are checked; model
+exhaustion follows the format's restart rules. See [PPMd7 workflow and independent
+producer evidence](docs/ppmd.md). The reused model/range algorithms are Public
+Domain SDK adaptations, not original compression algorithms.
 
 `Archive::open(bytes, password="...")` and `host.open_file(path, password="...")`
 read encrypted headers/data. `is_encrypted()` reports encryption presence.

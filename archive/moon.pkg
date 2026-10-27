@@ -18,6 +18,94 @@ import {
 } for "wbtest"
 
 rule(
+  name: "ppmd_header",
+  command: ":embed --binary -i $input -o $output --name ppmd_header",
+)
+
+dev_build(
+  rule: "ppmd_header",
+  input: "../corpus/ppmd/v2605-ppmd-header.7z",
+  output: "ppmd_header_archive_test.mbt",
+)
+
+rule(
+  name: "ppmd19",
+  command: ":embed --binary -i $input -o $output --name ppmd19",
+)
+
+dev_build(
+  rule: "ppmd19",
+  input: "../corpus/ppmd/v1900-order2.7z",
+  output: "ppmd19_archive_test.mbt",
+)
+
+rule(
+  name: "ppmd26",
+  command: ":embed --binary -i $input -o $output --name ppmd26",
+)
+
+dev_build(
+  rule: "ppmd26",
+  input: "../corpus/ppmd/v2605-solid.7z",
+  output: "ppmd26_archive_test.mbt",
+)
+
+rule(
+  name: "ppmd32",
+  command: ":embed --binary -i $input -o $output --name ppmd32",
+)
+
+dev_build(
+  rule: "ppmd32",
+  input: "../corpus/ppmd/v2605-order32.7z",
+  output: "ppmd32_archive_test.mbt",
+)
+
+rule(
+  name: "ppmd_separate",
+  command: ":embed --binary -i $input -o $output --name ppmd_separate",
+)
+
+dev_build(
+  rule: "ppmd_separate",
+  input: "../corpus/ppmd/v2605-separate.7z",
+  output: "ppmd_separate_archive_test.mbt",
+)
+
+rule(
+  name: "ppmd_restart",
+  command: ":embed --binary -i $input -o $output --name ppmd_restart",
+)
+
+dev_build(
+  rule: "ppmd_restart",
+  input: "../corpus/ppmd/v2605-restart.7z",
+  output: "ppmd_restart_archive_test.mbt",
+)
+
+rule(
+  name: "ppmd_encrypted",
+  command: ":embed --binary -i $input -o $output --name ppmd_encrypted",
+)
+
+dev_build(
+  rule: "ppmd_encrypted",
+  input: "../corpus/ppmd/v2605-encrypted.7z",
+  output: "ppmd_encrypted_archive_test.mbt",
+)
+
+rule(
+  name: "ppmd_internal",
+  command: ":embed --binary -i $input -o $output --name ppmd_internal",
+)
+
+dev_build(
+  rule: "ppmd_internal",
+  input: "../corpus/ppmd/v2605-restart.7z",
+  output: "ppmd_resource_wbtest.mbt",
+)
+
+rule(
   name: "semantics_safe",
   command: ":embed --binary -i $input -o $output --name semantics_safe",
 )

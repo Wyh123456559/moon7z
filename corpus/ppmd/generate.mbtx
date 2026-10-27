@@ -1,0 +1,190 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+fn crc(bytes : Bytes) -> UInt32 {
+  let mut value = 0xffffffffU
+  for byte in bytes {
+    value = value ^ byte.to_uint()
+    for _ in 0..<8 {
+      value = (value >> 1) ^ (if (value & 1U) != 0U { 0xedb88320U } else { 0U })
+    }
+  }
+  value ^ 0xffffffffU
+}
+
+///|
+fn number(out : @buffer.Buffer, value : Int32) -> Unit {
+  out.write_byte(b'\xff')
+  out.write_uint64_le(value.to_uint64())
+}
+
+///|
+fn next_offset(archive : Bytes) -> Int32 raise {
+  let mut value = 0UL
+  for i in 0..<8 {
+    value = value | (archive[12 + i].to_uint64() << (i * 8))
+  }
+  assert_true(value <= 1048576UL)
+  value.to_int()
+}
+
+///|
+async fn compressed_header(packer : String, root : String) -> Unit {
+  let original = @fs.read_file(root + "/v1900-order2.7z").binary()
+  let main_size = next_offset(original)
+  let head = original[32 + main_size:].to_owned()
+  @fs.write_file(root + "/source/header.bin", head)
+  @shell.Cmd(
+    packer,
+    [
+      "a",
+      root + "/header-stream.7z",
+      "header.bin",
+      "-t7z",
+      "-m0=PPMd:o=6:mem=64k",
+      "-mhc=off",
+      "-mtm=off",
+      "-mtc=off",
+      "-mta=off",
+    ],
+    cwd=root + "/source",
+  ).run()
+  let encoded = @fs.read_file(root + "/header-stream.7z").binary()
+  let packed = encoded[32:32 + next_offset(encoded)].to_owned()
+  let descriptor = @buffer.Buffer()
+  descriptor.write_bytes(b"\x17\x06")
+  number(descriptor, main_size)
+  descriptor.write_bytes(b"\x01\x09")
+  number(descriptor, packed.length())
+  descriptor.write_bytes(b"\x0a\x01")
+  descriptor.write_uint_le(crc(packed))
+  descriptor.write_bytes(
+    b"\x00\x07\x0b\x01\x00\x01\x23\x03\x04\x01\x05\x06\x00\x00\x01\x00\x0c",
+  )
+  number(descriptor, head.length())
+  descriptor.write_bytes(b"\x0a\x01")
+  descriptor.write_uint_le(crc(head))
+  descriptor.write_bytes(b"\x00\x00")
+  let next = descriptor.to_bytes()
+  let body = original[32:32 + main_size].to_owned() + packed
+  let fields = @buffer.Buffer()
+  fields.write_uint64_le(body.length().to_uint64())
+  fields.write_uint64_le(next.length().to_uint64())
+  fields.write_uint_le(crc(next))
+  let output = @buffer.Buffer()
+  output.write_bytes(b"7z\xbc\xaf\x27\x1c\x00\x04")
+  output.write_uint_le(crc(fields.to_bytes()))
+  output.write_bytes(fields.to_bytes())
+  output.write_bytes(body)
+  output.write_bytes(next)
+  let path = root + "/v2605-ppmd-header.7z"
+  @fs.write_file(path, output.to_bytes())
+  @shell.Cmd(packer, ["t", path]).run()
+  @shell.Cmd(packer, ["x", path, "-o" + root + "/unpacked-header"]).run()
+  for name in ["README.md", "LICENSE", "清单.json"] {
+    assert_eq(
+      @fs.read_file(root + "/unpacked-header/" + name).binary(),
+      @fs.read_file(root + "/source/" + name).binary(),
+    )
+  }
+  println("Independent PPMd7 encoded-header extraction passed")
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else {
+    fail("usage: generate.mbtx 7ZA19 7ZA26 NEW_DIRECTORY")
+  }
+  for (packer, version) in [(args[1], "19.00"), (args[2], "26.05")] {
+    guard @shell.Cmd(packer, []).output().stdout().contains(version) else {
+      fail("wrong producer version: " + version)
+    }
+  }
+  @fs.mkdir(args[3])
+  let root = @fs.realpath(args[3])
+  let source = root + "/source"
+  @fs.mkdir(source)
+  for
+    (original, name) in [
+      ("corpus/source/lzma-mbt/README.md", "README.md"),
+      ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    @fs.write_file(source + "/" + name, @fs.read_file(original).binary())
+  }
+  @fs.write_file(
+    source + "/blocks.bin",
+    Bytes::makei(210123, i => ((i * 73 + i / 257) & 255).to_byte()),
+  )
+  for
+    (id, old, order, memory, separate, blocks, encrypted) in [
+      ("v1900-order2", true, "2", "64k", false, false, false),
+      ("v2605-solid", false, "6", "64k", false, false, false),
+      ("v2605-order32", false, "32", "64k", false, false, false),
+      ("v2605-separate", false, "6", "64k", true, false, false),
+      ("v2605-restart", false, "16", "64k", false, true, false),
+      ("v2605-encrypted", false, "6", "64k", false, false, true),
+    ] {
+    let files = if blocks {
+      ["blocks.bin"]
+    } else {
+      ["README.md", "LICENSE", "清单.json"]
+    }
+    let archive = root + "/" + id + ".7z"
+    let command = ["a", archive] +
+      files +
+      [
+        "-t7z",
+        "-m0=PPMd:o=" + order + ":mem=" + memory,
+        if separate {
+          "-ms=off"
+        } else {
+          "-ms=on"
+        },
+        if old {
+          "-mhc=off"
+        } else {
+          "-mhc=on"
+        },
+        "-mtm=off",
+        "-mtc=off",
+        "-mta=off",
+      ] +
+      (if encrypted { ["-pmoon7z-ppmd", "-mhe=on"] } else { [] })
+    let result = @shell.Cmd(
+      if old {
+        args[1]
+      } else {
+        args[2]
+      },
+      command,
+      cwd=source,
+    ).output()
+    guard result.exit_code() == 0 else {
+      fail(result.stdout() + result.stderr())
+    }
+    let password = if encrypted { ["-pmoon7z-ppmd"] } else { [] }
+    @shell.Cmd(args[2], ["t", archive] + password).run()
+    @shell.Cmd(
+      args[2],
+      ["x", archive, "-o" + root + "/unpacked-" + id] + password,
+    ).run()
+    for file in files {
+      assert_eq(
+        @fs.read_file(root + "/unpacked-" + id + "/" + file).binary(),
+        @fs.read_file(source + "/" + file).binary(),
+      )
+    }
+    println("Independent PPMd7 test/extraction passed: " + id)
+  }
+  compressed_header(args[2], root)
+}

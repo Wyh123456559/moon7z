@@ -29,7 +29,7 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Headers | Plain/encoded headers, additional streams, external names/times/attributes/folder definitions, ordered opaque archive properties; [placement and framing evidence](external.md) | Preserve mappings/integrity across remaining file-property/input paths; unsupported structures stay explicit |
 | Inventory | Files/directories, original UTF-16 names/IDs, FILETIMEs/attributes, UInt64 start positions, anti-items, links/special entries and ordered opaque file properties; [read/export evidence](semantics.md) | Preserve these semantics across remaining codecs and input paths; no destructive restoration |
 | Coder graph | Bounded acyclic graphs, independently mapped packed inputs, four-input BCJ2, arbitrary stored coder order; [five real cases](bcj2.md) | Preserve this mapping/integrity behavior for every remaining codec and header structure |
-| Compression | Copy, LZMA1, LZMA2, raw DEFLATE and BZip2; [DEFLATE](deflate.md) and [BZip2](bzip2.md) include independent producer/boundary evidence | Also PPMd7; preserve method/property compatibility against independent encoders |
+| Compression | Copy, LZMA1, LZMA2, PPMd7, raw DEFLATE and BZip2; [PPMd7](ppmd.md), [DEFLATE](deflate.md) and [BZip2](bzip2.md) include independent producer/boundary evidence | Preserve method/property compatibility across remaining LZMA-property and input work; each format's decoder limits remain explicit |
 | LZMA properties | Codec-backed supported lc/lp range; exact decoded size and dictionary policy enforced | All property combinations emitted by the declared producer matrix, or a documented remaining blocker |
 | Filters | Delta, classic x86 BCJ, ARM64, RISC-V, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4; [classic evidence](filters.md), [RISC-V evidence](riscv.md) | Preserve valid method/property behavior across remaining input/header paths; classic methods use empty properties, unlike ARM64/RISC-V |
 | Encryption | Password API, AES-256-CBC/SHA-256 derivation with cumulative work limits, encrypted headers/data and [four real cases](encrypted.md), missing/wrong password recovery | Preserve these contracts across remaining input/header paths; CRC is not authenticated encryption |
@@ -38,9 +38,10 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Integrity | All available pack/folder/member CRCs in verified scope; missing member CRCs explicit | Same behavior for all new graph/method/volume paths; CRC is not authenticity |
 | Publishing | No-replace staging, exact selected IDs, metadata returned rather than applied | Preserve these contracts while expanding readable inputs; unsafe export must fail clearly |
 
-Every pending row is a real gap. In particular, PPMd must
-not remain excluded while the project is described as having completed this
-profile. A small demo or a larger test count cannot substitute for these rows.
+Every pending row is a real gap. In particular, remaining LZMA properties,
+seekable/volume/SFX input and publication must not be relabeled complete merely
+because additional codecs now pass. A larger test count cannot substitute for
+these rows.
 
 ## Producer and feature matrix
 

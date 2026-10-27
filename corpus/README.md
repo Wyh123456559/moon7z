@@ -1,5 +1,10 @@
 # Interoperability corpus
 
+[PPMd7 evidence](../docs/ppmd.md) records seven independent test/extraction cases,
+including actual package documentation/metadata, binary restart stress, AES data
+and a project-assembled PPMd encoded header. All required checks run without a
+7-Zip installation; packers are needed only for regeneration.
+
 The five [file-semantic fixtures](../docs/semantics.md) cover anti-items, links,
 special/reparse entries, UInt64 start positions and ordered opaque file-table
 properties. That evidence distinguishes independent listing/testing from

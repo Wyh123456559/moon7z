@@ -22,6 +22,7 @@ reviewed direct peer, not a dependency or a source of code/fixtures here.
 | x86 BCJ decoder | [Igor Pavlov, Bra86.c, 7-Zip 21.07](https://github.com/ip7z/7zip/blob/21.07/C/Bra86.c), file dated 2021-02-09 | Public Domain; decoder translated into `archive/bcj.mbt`, with whole-folder state and explicit UInt32 arithmetic. Original notice retained in source and `licenses/7zip-BCJ-Public-Domain.txt` |
 | BCJ2 decoder | [Bcj2.c](https://github.com/ip7z/7zip/blob/26.05/C/Bcj2.c) and [Bcj2.h](https://github.com/ip7z/7zip/blob/26.05/C/Bcj2.h), Igor Pavlov, 7-Zip 26.05 | Public Domain; bounded whole-folder MoonBit adaptation in `archive/bcj2.mbt`; original notices in `licenses/7zip-BCJ2-Public-Domain.txt`. The BSD-3-Clause sevenzip BCJ2 reader was also consulted; its retained license applies to that reference |
 | RISC-V branch decoder | [Bra.c, 7-Zip 26.05](https://github.com/ip7z/7zip/blob/26.05/C/Bra.c), 2024-01-20, Igor Pavlov | Public Domain; scalar decoder adaptation in `archive/riscv.mbt`, with original notice retained in `licenses/7zip-RISCV-Public-Domain.txt`. Test instructions/generator are project-authored Apache-2.0; five archives independently packed/tested/extracted by 7-Zip Extra 26.05 |
+| PPMd7 model, allocator and 7z range decoder | [Ppmd7.c](https://github.com/ip7z/7zip/blob/26.05/C/Ppmd7.c), [Ppmd7Dec.c](https://github.com/ip7z/7zip/blob/26.05/C/Ppmd7Dec.c), `Ppmd7.h`, `Ppmd.h`; checked release commit `b88c6bc09339de32f7d18bbab900686b244f42ba` | Public Domain, Igor Pavlov / Dmitry Shkarin; adapted in `archive/ppmd*.mbt` with checked offsets and explicit failure/budget integration. Notices in `licenses/7zip-PPMd-Public-Domain.txt`. No SDK tests copied. Official `PpmdDecoder.cpp`/`PpmdEncoder.cpp` consulted for properties/finish behavior and CLI encoder bounds; no C++ source copied. The MIT stangelandcl/ppmd reader was inspected during research but no Go code, fixtures or tests were used |
 | Raw DEFLATE format | [RFC 1951](https://www.rfc-editor.org/rfc/rfc1951), sections 3.1–3.2 | Format rules/canonical coding and numeric tables used to write `archive/deflate.mbt`; no implementation or external test vectors copied. Documentation was consulted, not redistributed |
 | BZip2 decoder structure | [Go 1.25.3 compress/bzip2/bzip2.go](https://github.com/golang/go/blob/go1.25.3/src/compress/bzip2/bzip2.go) | Copyright 2011 The Go Authors, BSD-3-Clause; MTF/run and inverse-BWT adaptation in `archive/bzip2.mbt`, with bounded RLE, diagnostics and concatenated/randomized handling. License in `licenses/go-BSD-3-Clause.txt`; no Go tests copied |
 | BZip2 legacy randomization table | [bzip2/libbzip2 1.0.8](https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz), `randtable.c` | Copyright 1996–2019 Julian Seward, bzip2 license retained in `licenses/bzip2-1.0.8.txt`. `archive/bzip_random.mbt` is marked as an altered MoonBit declaration of the unchanged 512 integers; not a new algorithm |
@@ -32,6 +33,14 @@ The corpus's empty file, Unicode directory, manifest and project tests were
 written for this repository. No external test cases or archive binaries were
 copied. The complete 7-Zip application has additional license conditions and
 must not be confused with the SDK's Public Domain terms. No py7zr code is used.
+
+`corpus/ppmd/` reuses the attributed README/license/manifest originals and the
+project-authored binary stress sequence. Six archives were independently packed
+with official 7-Zip Extra 19.00/26.05; a seventh uses a project-assembled container
+whose encoded file-table header was compressed by 26.05 PPMd. All seven pass
+independent test/extraction and exact byte comparison. The builder and new
+tests are project-authored Apache-2.0; [docs/ppmd.md](docs/ppmd.md) records hashes,
+arguments, encoder limits and which decoder boundaries have only local tests.
 
 The two PCM WAV originals in `corpus/audio/` and their generator are
 project-authored Apache-2.0 interoperability data. Their Delta-filtered archives

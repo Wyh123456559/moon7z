@@ -5,6 +5,7 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
     return
   }
   match coder.codec_id {
+    b"\x03\x04\x01" => ignore(ppm_properties(coder.properties))
     b"\x06\xf1\x07\x01" => ignore(aes_properties(coder.properties))
     b"\x04\x01\x08" | b"\x04\x02\x02" =>
       if !coder.properties.is_empty() {
@@ -81,6 +82,7 @@ fn dictionary(coder : Coder) -> UInt64 raise ArchiveError {
     return 0UL
   }
   match coder.codec_id {
+    b"\x03\x04\x01" => ppm_properties(coder.properties).1
     b"\x06\xf1\x07\x01" => 0UL
     b"\x04\x02\x02" => 0UL // Block size is checked from each compressed stream header.
     b"\x04\x01\x08" => 32768UL
@@ -166,6 +168,7 @@ fn decode(
   let coder = block.coders[0]
   validate_dictionary(coder, limits)
   let mut output = match coder.codec_id {
+    b"\x03\x04\x01" => decode_ppmd(packed, block.size, coder.properties, limits)
     b"\x06\xf1\x07\x01" =>
       decode_aes(
         packed,

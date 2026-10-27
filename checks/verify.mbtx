@@ -37,6 +37,8 @@ async fn main {
       ["fmt", "--check", "checks/riscv.mbtx"],
       ["fmt", "--check", "checks/external.mbtx"],
       ["fmt", "--check", "checks/semantics.mbtx"],
+      ["fmt", "--check", "checks/ppmd.mbtx"],
+      ["fmt", "--check", "corpus/ppmd/generate.mbtx"],
       ["fmt", "--check", "corpus/semantics/generate.mbtx"],
       ["fmt", "--check", "corpus/external/generate.mbtx"],
       ["fmt", "--check", "corpus/riscv/generate.mbtx"],
@@ -59,6 +61,9 @@ async fn main {
   }
   @shell.Cmd("git", ["diff", "--exit-code", "--", "*.mbti"]).run()
   if target == "wasm" || target == "native" {
+    @shell.Cmd("moon", ["run", "checks/ppmd.mbtx", "--", target]).run(
+      timeout_ms=360000,
+    )
     @shell.Cmd("moon", ["run", "checks/semantics.mbtx", "--", target]).run(
       timeout_ms=480000,
     )

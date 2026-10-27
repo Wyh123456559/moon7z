@@ -1,0 +1,66 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/ppmd")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-ppmd")
+  defer @fs.rmdir(root, recursive=true)
+  for
+    id in [
+      "v1900-order2", "v2605-solid", "v2605-order32", "v2605-separate", "v2605-restart",
+      "v2605-encrypted", "v2605-ppmd-header",
+    ] {
+    let result = @shell.Cmd(
+      "moon",
+      [
+        "run",
+        "--target",
+        target,
+        "app",
+        "--",
+        "--password-env",
+        "MOON7Z_TEST_PASSWORD",
+        "extract",
+        "--contents-only",
+        corpus + "/" + id + ".7z",
+        root,
+        id,
+      ],
+      env={ "MOON7Z_TEST_PASSWORD": "moon7z-ppmd" },
+    ).output(timeout_ms=120000)
+    assert_eq(result.exit_code(), 0)
+    if id == "v2605-restart" {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/blocks.bin").binary(),
+        Bytes::makei(210123, i => ((i * 73 + i / 257) & 255).to_byte()),
+      )
+    } else {
+      for
+        (original, name) in [
+          ("corpus/source/lzma-mbt/README.md", "README.md"),
+          ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+          ("corpus/source/清单.json", "清单.json"),
+        ] {
+        assert_eq(
+          @fs.read_file(root + "/" + id + "/" + name).binary(),
+          @fs.read_file(original).binary(),
+        )
+      }
+    }
+  }
+  println(
+    "Seven independent PPMd7 archives export original bytes, including encoded headers, encrypted data and model restarts",
+  )
+}
