@@ -72,6 +72,6 @@ test "JSON inventory escapes original names and preserves duplicate stable IDs" 
   )
   assert_eq(
     Archive::open(envelope(b"")).inventory_json().stringify(),
-    "{\"schema\":\"moon7z.inventory.v1\",\"contents_verified\":false,\"entries\":[],\"archive_properties\":[]}",
+    "{\"schema\":\"moon7z.inventory.v1\",\"contents_verified\":false,\"entries\":[],\"archive_properties\":[],\"metadata_streams\":[]}",
   )
 }

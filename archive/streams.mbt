@@ -3,6 +3,7 @@ fn read_streams(
   r : Cursor,
   limits : Limits,
   output_limit : Int32,
+  buffers~ : Array[Bytes] = [],
 ) -> Streams raise ArchiveError {
   let mut id = r.byte()
   let mut pack_offset = 0
@@ -33,11 +34,9 @@ fn read_streams(
   if id == 7 {
     r.expect(11)
     let n = r.count(limits.entries, "folders")
-    if r.byte() != 0 {
-      raise Unsupported(feature="external folder metadata")
-    }
+    let (folders, external) = r.external(buffers)
     for _ in 0..<n {
-      let layout = read_pipeline(r, limits~)
+      let layout = read_pipeline(folders, limits~)
       layouts.push(layout)
       blocks.push({
         coders: layout.ordered_coders(),
@@ -45,6 +44,9 @@ fn read_streams(
         crc: None,
         pieces: [],
       })
+    }
+    if external {
+      folders.end()
     }
     r.expect(12)
     let mut total = 0

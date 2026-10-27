@@ -1,0 +1,80 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/external")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-external")
+  defer @fs.rmdir(root, recursive=true)
+  let original = @fs.read_file("corpus/source/清单.json").binary()
+  for id in ["external", "changed", "encoded-first", "encoded-pieces", "inline"] {
+    @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).run(timeout_ms=120000)
+    assert_eq(
+      @fs.read_file(root + "/" + id + "/清单.json").binary(),
+      original,
+    )
+  }
+  let inventory = @shell.Cmd("moon", [
+    "run",
+    "--target",
+    target,
+    "app",
+    "--",
+    "list",
+    "--json",
+    corpus + "/external.7z",
+  ]).output(timeout_ms=120000)
+  assert_eq(inventory.exit_code(), 0)
+  guard @json.parse(inventory.stdout())
+    is { "metadata_streams": Array(buffers), .. } else {
+    fail("missing preserved metadata streams")
+  }
+  assert_eq(buffers.length(), 7)
+  let diff = @shell.Cmd("moon", [
+    "run",
+    "--target",
+    target,
+    "app",
+    "--",
+    "diff",
+    "--json",
+    corpus + "/external.7z",
+    corpus + "/changed.7z",
+  ]).output(timeout_ms=120000)
+  assert_eq(diff.exit_code(), 0)
+  assert_true(
+    @json.parse(diff.stdout())
+    is {
+      "changes": Array([]),
+      "metadata_streams_changed": True,
+      "identical": False,
+      ..
+    },
+  )
+  println(
+    "External metadata and encoded-header placements export original JSON; unreferenced bytes survive inventory/comparison",
+  )
+}

@@ -17,6 +17,12 @@ Use `-- native` on the check to execute the native CLI.
 
 Call `left.compare(right)` to obtain a `Comparison`. `identical()` describes
 member names, kinds, bytes and metadata; `changes()` returns a detached array.
+Retained archive properties and raw additional metadata streams also contribute
+to `identical()`. `metadata_streams_changed()` and the JSON fields
+`metadata_streams_changed`, `left_metadata_streams`, `right_metadata_streams`
+report the latter independently. Inline versus external storage may therefore
+have identical file values and no entry changes but different retained raw
+metadata; see [external metadata comparison](external.md).
 `to_json()` emits `moon7z.comparison.v1`, with `identical`, `left_verification`,
 `right_verification` and `changes`. Each change contains its exact `name`,
 `kind`, and original `left` / `right` entry documents (absent sides are `null`).

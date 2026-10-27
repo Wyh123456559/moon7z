@@ -28,6 +28,7 @@ fn comparison_archive(
     input: input.to_bytes(),
     limits: Limits::new(),
     archive_properties: [],
+    auxiliary: [],
     crypto: CryptState::new(None, Limits::new()),
     inventory,
     streams: {

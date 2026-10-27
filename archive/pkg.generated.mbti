@@ -41,6 +41,7 @@ pub fn Archive::entries(Self) -> Array[Entry]
 pub fn Archive::extract_all(Self) -> Array[Member] raise ArchiveError
 pub fn Archive::inventory_json(Self) -> Json
 pub fn Archive::is_encrypted(Self) -> Bool
+pub fn Archive::metadata_streams(Self) -> Array[Bytes]
 pub fn Archive::open(Bytes, limits? : Limits, password? : String) -> Self raise ArchiveError
 pub fn Archive::plan_contents(Self) -> ContentPlan raise ArchiveError
 pub fn Archive::plan_selection(Self, ArrayView[Int32]) -> ContentPlan raise ArchiveError
@@ -92,6 +93,7 @@ pub struct Comparison {
 pub fn Comparison::archive_properties_changed(Self) -> Bool
 pub fn Comparison::changes(Self) -> Array[EntryChange]
 pub fn Comparison::identical(Self) -> Bool
+pub fn Comparison::metadata_streams_changed(Self) -> Bool
 pub fn Comparison::to_json(Self) -> Json
 pub impl ToJson for Comparison
 

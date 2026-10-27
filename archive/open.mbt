@@ -70,6 +70,7 @@ pub fn Archive::open(
       raise Invalid(offset=32, reason="empty archive contains unclaimed data")
     }
     return {
+      auxiliary: [],
       crypto,
       input,
       limits,
@@ -85,20 +86,31 @@ pub fn Archive::open(
     }
   }
   let mut header = Cursor::new(input[offset:offset + size].to_owned())
-  let mut data_boundary = offset
+  let regions : Array[(Int32, Int32)] = []
   let mut id = header.byte()
   if id == 23 {
     let streams = read_streams(header, limits, limits.header_bytes)
     header.end()
     validate_pack_ranges(streams, offset)
-    data_boundary = 32 + streams.pack_offset
-    guard streams.blocks.length() == 1 && streams.blocks[0].pieces.length() == 1 else {
-      raise Unsupported(feature="encoded header with multiple streams")
+    regions.push(packed_region(streams))
+    let decoded = decode_metadata_streams(input, streams, limits, crypto)
+    guard decoded.length() <= 1 else {
+      raise Invalid(
+        offset=header.pos,
+        reason="encoded header must have at most one folder output",
+      )
     }
-    let decoded = decode_streams(input, streams, limits, crypto=Some(crypto))
-    let (_, crc) = streams.blocks[0].pieces[0]
-    check_crc(decoded[0], crc, "encoded header substream") catch {
-      error => raise encrypted_error(streams.blocks[0], error)
+    if decoded.is_empty() {
+      check_regions(regions, offset)
+      return {
+        auxiliary: [],
+        crypto,
+        input,
+        limits,
+        streams,
+        inventory: [],
+        archive_properties: [],
+      }
     }
     header = Cursor::new(decoded[0])
     id = header.byte()
@@ -124,13 +136,33 @@ pub fn Archive::open(
   } else {
     []
   }
+  let auxiliary = if id == 3 {
+    let additional = read_streams(
+      header,
+      limits,
+      limits.header_bytes - header.data.length(),
+    )
+    validate_pack_ranges(additional, offset)
+    regions.push(packed_region(additional))
+    let buffers = decode_metadata_streams(input, additional, limits, crypto)
+    id = header.byte()
+    buffers
+  } else {
+    []
+  }
   if id == 4 {
-    streams = read_streams(header, limits, limits.output_bytes)
-    validate_pack_ranges(streams, data_boundary)
+    streams = read_streams(
+      header,
+      limits,
+      limits.output_bytes,
+      buffers=auxiliary,
+    )
+    validate_pack_ranges(streams, offset)
+    regions.push(packed_region(streams))
     id = header.byte()
   }
   let inventory = if id == 5 {
-    let entries = read_files(header, streams, limits)
+    let entries = read_files(header, streams, limits, buffers=auxiliary)
     id = header.byte()
     entries
   } else {
@@ -140,15 +172,7 @@ pub fn Archive::open(
     raise Unsupported(feature="archive header property \{id}")
   }
   header.end()
-  let mut packed_end = 32 + streams.pack_offset
-  for length in streams.pack_sizes {
-    packed_end += length
-  }
-  guard streams.pack_offset == 0 && packed_end == data_boundary else {
-    raise Unsupported(
-      feature="unclaimed bytes or gaps before packed data/header",
-    )
-  }
+  check_regions(regions, offset)
   guard !inventory.is_empty() || streams.blocks.is_empty() else {
     raise Invalid(
       offset=header.pos,
@@ -159,7 +183,7 @@ pub fn Archive::open(
     streams.blocks.any(block => {
       block.coders.any(coder => coder.codec_id == b"\x06\xf1\x07\x01")
     })
-  { crypto, input, limits, streams, inventory, archive_properties, }
+  { auxiliary, crypto, input, limits, streams, inventory, archive_properties, }
 }
 
 ///|

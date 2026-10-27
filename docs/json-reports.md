@@ -4,6 +4,10 @@ Archive-level properties are retained in the additive `archive_properties`
 array: UInt64 IDs are decimal strings and values are Base64 bytes, including
 duplicates and empty records. See [property schema and preservation](properties.md).
 
+Decoded additional metadata streams appear in the additive `metadata_streams`
+array as integer `id` / Base64 `data_base64` records, including unused buffers.
+See [external metadata and framing](external.md).
+
 Use versioned reports to index uploaded archives, select member IDs for preview,
 or make a CI import decision without parsing the human-readable CLI output.
 Run these commands from the checkout; no private service or 7-Zip is required:
@@ -31,7 +35,8 @@ The flag order is `list --json PATH` or
 ## Inventory v1
 
 `Archive::inventory_json() -> Json` emits `schema: "moon7z.inventory.v1"`,
-`contents_verified: false` and an `entries` array. Listing is header-only, even
+`contents_verified: false` and an `entries` array. Listing checks metadata while
+leaving member payloads unchecked, even
 when the caller previously verified this immutable archive through another call.
 Every call creates detached JSON arrays and objects; callers may change them
 without modifying the archive or later reports.

@@ -32,7 +32,7 @@ test "optional metadata retains all FILETIME bits and raw attributes" {
 }
 
 ///|
-test "links special files and external metadata are refused explicitly" {
+test "links special files and malformed external metadata are refused explicitly" {
   for attr in [0xa1ff0020U, 0x11a40020U, 0x420U] {
     let properties = @buffer.Buffer()
     properties.write_bytes(b"\x15\x06\x01\x00")
@@ -50,7 +50,7 @@ test "links special files and external metadata are refused explicitly" {
     ignore(metadata_entries(b"\x14\x02\x01\x01"))
     false
   } catch {
-    Unsupported(..) => true
+    Invalid(..) => true
     _ => false
   }
   assert_true(refused)

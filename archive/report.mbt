@@ -68,6 +68,7 @@ pub fn Archive::inventory_json(self : Archive) -> Json {
     "archive_properties": Json::array(
       self.archive_properties.map(property => property.to_json()),
     ),
+    "metadata_streams": metadata_streams_json(self.auxiliary),
   }
 }
 

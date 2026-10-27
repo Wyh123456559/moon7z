@@ -1,21 +1,26 @@
 ///|
-fn read_times(r : Cursor, count : Int32) -> Array[UInt64?] raise ArchiveError {
+fn read_times(
+  r : Cursor,
+  count : Int32,
+  buffers~ : Array[Bytes] = [],
+) -> Array[UInt64?] raise ArchiveError {
   let defined = r.defined(count)
-  if r.byte() != 0 {
-    raise Unsupported(feature="external timestamps")
-  }
+  let (data, _) = r.external(buffers)
   let values : Array[UInt64?] = []
   for present in defined {
-    values.push(if present { Some(r.u64()) } else { None })
+    values.push(if present { Some(data.u64()) } else { None })
   }
+  data.end()
   values
 }
 
 ///|
-fn read_names(r : Cursor, count : Int32) -> Array[String] raise ArchiveError {
-  if r.byte() != 0 {
-    raise Unsupported(feature="external filenames")
-  }
+fn read_names(
+  source : Cursor,
+  count : Int32,
+  buffers~ : Array[Bytes] = [],
+) -> Array[String] raise ArchiveError {
+  let (r, _) = source.external(buffers)
   let names : Array[String] = []
   let mut start = r.pos
   while r.pos < r.data.length() {
@@ -50,6 +55,7 @@ fn read_files(
   r : Cursor,
   streams : Streams,
   limits : Limits,
+  buffers~ : Array[Bytes] = [],
 ) -> Array[Entry] raise ArchiveError {
   let count = r.count(limits.entries, "file entries")
   let mut names : Array[String]? = None
@@ -83,19 +89,18 @@ fn read_files(
         }
         empty_file = p.bits(empty.filter(x => x).length())
       }
-      17 => names = Some(read_names(p, count))
-      18 => created = read_times(p, count)
-      19 => accessed = read_times(p, count)
-      20 => modified = read_times(p, count)
+      17 => names = Some(read_names(p, count, buffers~))
+      18 => created = read_times(p, count, buffers~)
+      19 => accessed = read_times(p, count, buffers~)
+      20 => modified = read_times(p, count, buffers~)
       21 => {
         let defined = p.defined(count)
-        if p.byte() != 0 {
-          raise Unsupported(feature="external attributes")
-        }
+        let (data, _) = p.external(buffers)
         attributes = []
         for present in defined {
-          attributes.push(if present { Some(p.u32()) } else { None })
+          attributes.push(if present { Some(data.u32()) } else { None })
         }
+        data.end()
       }
       25 =>
         for byte in p.take(p.data.length()) {

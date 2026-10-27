@@ -145,7 +145,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Codecs | Copy, LZMA, LZMA2, BZip2, raw DEFLATE, BCJ2 four-input branch reconstruction |
 | Filters | Delta (distance 1–256), x86 BCJ, ARM64, RISC-V, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder graph | Bounded acyclic graphs of supported unary coders and four-input BCJ2; explicit physical input mappings |
-| Headers | Plain and compressed headers |
+| Headers | Plain/compressed headers; additional streams and external names/times/attributes/folder definitions |
 | Encryption | 7z AES-256/SHA-256 password reading for headers/data; bounded cumulative derivation work |
 | Members | Solid and separate folders, directories, empty files, UTF-16 names |
 | Integrity | Start/next header, available packed/folder/member CRC-32 |
@@ -154,7 +154,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Resources | Configurable input/header/output/dictionary/member/coder/intermediate-output limits |
 
 Split volumes, SFX,
-unlisted filters, additional streams,
+unlisted filters,
 anti-items, links, special files, unknown semantic properties and writing are
 rejected. Zero padding may repeat. The reader does not silently skip unsupported
 members or metadata. Metadata values are retained for application use; the
@@ -197,6 +197,13 @@ Inventory JSON includes their decimal-string UInt64 IDs and Base64 bytes;
 comparison reports archive-property changes independently of file changes.
 Properties are not interpreted or applied to disk. Unsupported file properties
 remain refused. See [archive metadata preservation](docs/properties.md).
+
+`archive.metadata_streams()` returns the original decoded additional-stream
+buffers, including unreferenced bytes. Inventory JSON preserves them as Base64;
+comparison reports their changes separately from member changes. Opening checks
+their CRCs and external references before exposing the inventory. Packed regions
+may surround an encoded header but must not overlap or leave unclaimed gaps.
+See [external metadata workflow and framing evidence](docs/external.md).
 
 For damaged-archive triage, `archive.audit()` and `audit --json ARCHIVE` check
 every data folder independently and retain typed errors while continuing past

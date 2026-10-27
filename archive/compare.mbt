@@ -24,6 +24,8 @@ pub struct Comparison {
   priv right_report : Verification
   priv before_properties : Array[ArchiveProperty]
   priv after_properties : Array[ArchiveProperty]
+  priv before_streams : Array[Bytes]
+  priv after_streams : Array[Bytes]
 }
 
 ///|
@@ -33,7 +35,15 @@ pub fn Comparison::changes(self : Comparison) -> Array[EntryChange] {
 
 ///|
 pub fn Comparison::identical(self : Comparison) -> Bool {
-  self.differences.is_empty() && !self.archive_properties_changed()
+  self.differences.is_empty() &&
+  !self.archive_properties_changed() &&
+  !self.metadata_streams_changed()
+}
+
+///|
+/// Compare raw additional-stream metadata independently of member differences.
+pub fn Comparison::metadata_streams_changed(self : Comparison) -> Bool {
+  self.before_streams != self.after_streams
 }
 
 ///|
@@ -118,6 +128,8 @@ pub fn Archive::compare(
     right_report,
     before_properties: self.properties(),
     after_properties: other.properties(),
+    before_streams: self.metadata_streams(),
+    after_streams: other.metadata_streams(),
   }
 }
 
@@ -157,6 +169,9 @@ pub impl ToJson for Comparison with fn to_json(self) {
     "right_verification": self.right_report.to_json(),
     "changes": Json::array(self.differences.map(change => change.to_json())),
     "archive_properties_changed": Json(self.archive_properties_changed()),
+    "metadata_streams_changed": Json(self.metadata_streams_changed()),
+    "left_metadata_streams": metadata_streams_json(self.before_streams),
+    "right_metadata_streams": metadata_streams_json(self.after_streams),
     "left_archive_properties": Json::array(
       self.before_properties.map(property => property.to_json()),
     ),

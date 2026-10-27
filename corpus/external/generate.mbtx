@@ -1,0 +1,222 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/env",
+  "moonbitlang/core/encoding/utf16",
+}
+----
+
+///|
+fn crc(bytes : Bytes) -> UInt32 {
+  let mut value = 0xffffffffU
+  for byte in bytes {
+    value = value ^ byte.to_uint()
+    for _ in 0..<8 {
+      value = (value >> 1) ^ (if (value & 1U) != 0U { 0xedb88320U } else { 0U })
+    }
+  }
+  value ^ 0xffffffffU
+}
+
+///|
+fn number(out : @buffer.Buffer, value : Int32) -> Unit {
+  out.write_byte(b'\xff')
+  out.write_uint64_le(value.to_uint64())
+}
+
+///|
+fn streams(
+  offset : Int32,
+  parts : Array[Bytes],
+  external~ : Bool = false,
+  split~ : Bool = false,
+) -> Bytes raise {
+  let out = @buffer.Buffer()
+  out.write_byte(b'\x06')
+  number(out, offset)
+  number(out, parts.length())
+  out.write_byte(b'\x09')
+  for part in parts {
+    number(out, part.length())
+  }
+  out.write_bytes(b"\x0a\x01")
+  for part in parts {
+    out.write_uint_le(crc(part))
+  }
+  out.write_bytes(b"\x00\x07\x0b")
+  number(out, parts.length())
+  if external {
+    out.write_byte(b'\x01')
+    number(out, 5)
+  } else {
+    out.write_byte(b'\x00')
+    for _ in parts {
+      out.write_bytes(b"\x01\x01\x00")
+    }
+  }
+  out.write_byte(b'\x0c')
+  for part in parts {
+    number(out, part.length())
+  }
+  out.write_bytes(b"\x0a\x01")
+  for part in parts {
+    out.write_uint_le(crc(part))
+  }
+  out.write_byte(b'\x00')
+  if split {
+    assert_eq(parts.length(), 1)
+    let part = parts[0]
+    out.write_bytes(b"\x08\x0d")
+    number(out, 2)
+    out.write_byte(b'\x09')
+    number(out, part.length() / 2)
+    out.write_bytes(b"\x0a\x01")
+    out.write_uint_le(crc(part[:part.length() / 2].to_owned()))
+    out.write_uint_le(crc(part[part.length() / 2:].to_owned()))
+    out.write_byte(b'\x00')
+  }
+  out.write_byte(b'\x00')
+  out.to_bytes()
+}
+
+///|
+fn property(out : @buffer.Buffer, id : Int32, bytes : Bytes) -> Unit {
+  out.write_byte(id.to_byte())
+  number(out, bytes.length())
+  out.write_bytes(bytes)
+}
+
+///|
+fn reference(index : Int32) -> Bytes {
+  let out = @buffer.Buffer()
+  out.write_byte(b'\x01')
+  number(out, index)
+  out.to_bytes()
+}
+
+///|
+fn metadata(changed~ : Bool = false) -> Array[Bytes] {
+  let result = [
+    @utf16.encode("清单.json\u{0000}"[:], bom=false, endianness=Little),
+  ]
+  for
+    value in [133876800000000000UL, 133876800000000001UL, 133876800000000002UL] {
+    let out = @buffer.Buffer()
+    out.write_uint64_le(value)
+    result.push(out.to_bytes())
+  }
+  result.push(b"\x20\x00\x00\x00")
+  result.push(b"\x01\x01\x00") // Main folder definition, referenced externally.
+  result.push(if changed { b"\x00\xffchanged" } else { b"\x00\xffopaque" })
+  result
+}
+
+///|
+fn header(
+  payload : Bytes,
+  main_offset : Int32,
+  additional_offset : Int32,
+  changed~ : Bool = false,
+  inline~ : Bool = false,
+) -> Bytes raise {
+  let buffers = metadata(changed~)
+  let out = @buffer.Buffer()
+  out.write_byte(b'\x01')
+  if !inline {
+    out.write_byte(b'\x03')
+    out.write_bytes(streams(additional_offset, buffers))
+  }
+  out.write_byte(b'\x04')
+  out.write_bytes(streams(main_offset, [payload], external=!inline))
+  out.write_byte(b'\x05')
+  number(out, 1)
+  property(out, 17, if inline { b"\x00" + buffers[0] } else { reference(0) })
+  for (id, index) in [(18, 1), (19, 2), (20, 3), (21, 4)] {
+    property(
+      out,
+      id,
+      b"\x01" +
+      (if inline { b"\x00" + buffers[index] } else { reference(index) }),
+    )
+  }
+  out.write_bytes(b"\x00\x00")
+  out.to_bytes()
+}
+
+///|
+fn envelope(body : Bytes, next : Bytes) -> Bytes {
+  let fields = @buffer.Buffer()
+  fields.write_uint64_le(body.length().to_uint64())
+  fields.write_uint64_le(next.length().to_uint64())
+  fields.write_uint_le(crc(next))
+  let result = @buffer.Buffer()
+  result.write_bytes(b"7z\xbc\xaf\x27\x1c\x00\x04")
+  result.write_uint_le(crc(fields.to_bytes()))
+  result.write_bytes(fields.to_bytes())
+  result.write_bytes(body)
+  result.write_bytes(next)
+  result.to_bytes()
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else {
+    fail("usage: generate.mbtx 7ZA26 NEW_DIRECTORY")
+  }
+  @fs.mkdir(args[2])
+  let root = @fs.realpath(args[2])
+  let payload = @fs.read_file("corpus/source/清单.json").binary()
+  for id in ["external", "changed", "encoded-first", "encoded-pieces", "inline"] {
+    let changed = id == "changed"
+    let inline = id == "inline"
+    let preliminary = header(payload, 0, payload.length(), changed~, inline~)
+    let head = if id.has_prefix("encoded-") {
+      header(
+        payload,
+        preliminary.length(),
+        preliminary.length() + payload.length(),
+      )
+    } else {
+      preliminary
+    }
+    let body = @buffer.Buffer()
+    if id.has_prefix("encoded-") {
+      assert_eq(head.length(), preliminary.length())
+      body.write_bytes(head)
+    }
+    body.write_bytes(payload)
+    if !inline {
+      for part in metadata(changed~) {
+        body.write_bytes(part)
+      }
+    }
+    let next = if id.has_prefix("encoded-") {
+      b"\x17" + streams(0, [head], split=id == "encoded-pieces")
+    } else {
+      head
+    }
+    let path = root + "/" + id + ".7z"
+    @fs.write_file(path, envelope(body.to_bytes(), next))
+    let tested = @shell.Cmd(args[1], ["t", path]).output()
+    guard tested.exit_code() == 0 else {
+      fail(tested.stdout() + tested.stderr())
+    }
+    let result = @shell.Cmd(args[1], [
+      "x",
+      path,
+      "-o" + root + "/unpacked-" + id,
+    ]).output()
+    guard result.exit_code() == 0 else {
+      fail(result.stdout() + result.stderr())
+    }
+    assert_eq(
+      @fs.read_file(root + "/unpacked-" + id + "/清单.json").binary(),
+      payload,
+    )
+    println("Independent metadata/header extraction passed: " + id)
+  }
+}

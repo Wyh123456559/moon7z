@@ -4,6 +4,7 @@ fn path_archive(entries : Array[(String, EntryKind)]) -> Archive {
     input: b"",
     limits: Limits::new(),
     archive_properties: [],
+    auxiliary: [],
     crypto: CryptState::new(None, Limits::new()),
     streams: {
       pack_offset: 0,

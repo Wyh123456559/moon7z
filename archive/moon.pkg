@@ -18,6 +18,61 @@ import {
 } for "wbtest"
 
 rule(
+  name: "external_metadata",
+  command: ":embed --binary -i $input -o $output --name external_metadata",
+)
+
+dev_build(
+  rule: "external_metadata",
+  input: "../corpus/external/external.7z",
+  output: "external_metadata_archive_test.mbt",
+)
+
+rule(
+  name: "external_changed",
+  command: ":embed --binary -i $input -o $output --name external_changed",
+)
+
+dev_build(
+  rule: "external_changed",
+  input: "../corpus/external/changed.7z",
+  output: "external_changed_archive_test.mbt",
+)
+
+rule(
+  name: "external_encoded_first",
+  command: ":embed --binary -i $input -o $output --name external_encoded_first",
+)
+
+dev_build(
+  rule: "external_encoded_first",
+  input: "../corpus/external/encoded-first.7z",
+  output: "external_encoded_first_archive_test.mbt",
+)
+
+rule(
+  name: "external_encoded_pieces",
+  command: ":embed --binary -i $input -o $output --name external_encoded_pieces",
+)
+
+dev_build(
+  rule: "external_encoded_pieces",
+  input: "../corpus/external/encoded-pieces.7z",
+  output: "external_encoded_pieces_archive_test.mbt",
+)
+
+rule(
+  name: "external_inline",
+  command: ":embed --binary -i $input -o $output --name external_inline",
+)
+
+dev_build(
+  rule: "external_inline",
+  input: "../corpus/external/inline.7z",
+  output: "external_inline_archive_test.mbt",
+)
+
+rule(
   name: "riscv_copy",
   command: ":embed --binary -i $input -o $output --name riscv_copy",
 )

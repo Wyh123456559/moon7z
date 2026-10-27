@@ -130,6 +130,7 @@ priv struct Streams {
 /// Opening validates headers and the complete member-to-block mapping.
 /// Data CRCs are checked by `verify` and `extract_all`, not by listing.
 pub struct Archive {
+  priv auxiliary : Array[Bytes]
   priv crypto : CryptState
   priv input : Bytes
   priv limits : Limits
