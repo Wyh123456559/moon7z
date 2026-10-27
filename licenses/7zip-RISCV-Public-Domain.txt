@@ -1,0 +1,11 @@
+Original source notice:
+
+/* Bra.c -- Branch converters for RISC code
+2024-01-20 : Igor Pavlov : Public domain */
+
+Source: https://github.com/ip7z/7zip/blob/26.05/C/Bra.c
+
+archive/riscv.mbt adapts the RISC-V decoder's 16-bit scan path into scalar
+MoonBit with explicit UInt32 arithmetic. Public Domain status is preserved.
+The repository's Apache-2.0 license covers project-authored integration and
+tests; it does not restrict the original Public Domain algorithm.

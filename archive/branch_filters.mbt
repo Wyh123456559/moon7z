@@ -25,6 +25,7 @@ fn is_filter(codec : Bytes) -> Bool {
   codec == b"\x03" ||
   codec == b"\x03\x03\x01\x03" ||
   codec == b"\x0a" ||
+  codec == b"\x0b" ||
   codec == b"\x02\x03\x02" ||
   codec == b"\x02\x03\x04"
 }

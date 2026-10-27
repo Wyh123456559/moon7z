@@ -1,0 +1,98 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/buffer",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else {
+    fail("usage: generate.mbtx 7ZA26 NEW_DIRECTORY")
+  }
+  guard @shell.Cmd(args[1], []).output().stdout().contains("26.05") else {
+    fail("expected 7-Zip 26.05")
+  }
+  @fs.mkdir(args[2])
+  let root = @fs.realpath(args[2])
+  @fs.mkdir(root + "/source")
+  let out = @buffer.Buffer()
+  for i in 0..<2048 {
+    let rd = (i % 32).reinterpret_as_uint()
+    let relative = ((i * 1778).reinterpret_as_uint() ^ 0x100000U) & 0x1ffffeU
+    let jal = 0x6fU |
+      (rd << 7) |
+      ((relative & 0x100000U) << 11) |
+      ((relative & 0x7feU) << 20) |
+      ((relative & 0x800U) << 9) |
+      (relative & 0xff000U)
+    out.write_uint_le(jal)
+    out.write_bytes(b"\x01\x00") // compressed instruction / two-byte alignment
+    out.write_uint_le(
+      0x17U | (rd << 7) | ((i * 0x12345).reinterpret_as_uint() & 0xfffff000U),
+    )
+    out.write_uint_le(
+      0x13U |
+      (((rd + 1U) & 31U) << 7) |
+      (rd << 15) |
+      ((i * 17).reinterpret_as_uint() << 20),
+    )
+    // Marker-like AUIPC pairs exercise escape handling, including x0/x2.
+    out.write_uint_le((rd << 27) | 0x3117U)
+    out.write_uint_le((i * 0x10301).reinterpret_as_uint() ^ 0x81234567U)
+    out.write_uint_le(0x17U | (rd << 7))
+    out.write_uint_le(0x13U | (((rd + 1U) & 31U) << 15)) // unmatched register
+  }
+  out.write_bytes(b"\xef\x00\x01\x02\x03")
+  let original = out.to_bytes()
+  @fs.write_file(root + "/source/a-head.bin", original[:3].to_owned())
+  @fs.write_file(root + "/source/b-tail.bin", original[3:].to_owned())
+  for
+    (id, filter, codec, separate) in [
+      ("copy", "RISCV", "Copy", false),
+      ("lzma2", "RISCV", "LZMA2:d=64k", false),
+      ("offset", "RISCV:4096", "Copy", false),
+      ("wrap", "RISCV:4294967294", "LZMA:d=64k", false),
+      ("separate", "RISCV", "LZMA2:d=64k", true),
+    ] {
+    let archive = root + "/" + id + ".7z"
+    let result = @shell.Cmd(
+      args[1],
+      [
+        "a",
+        archive,
+        "a-head.bin",
+        "b-tail.bin",
+        "-t7z",
+        "-m0=" + filter,
+        "-m1=" + codec,
+        if separate {
+          "-ms=off"
+        } else {
+          "-ms=on"
+        },
+        "-mhc=on",
+        "-mtm=off",
+        "-mtc=off",
+        "-mta=off",
+      ],
+      cwd=root + "/source",
+    ).output()
+    guard result.exit_code() == 0 else {
+      fail(result.stderr() + result.stdout())
+    }
+    @shell.Cmd(args[1], ["t", archive]).run()
+    @shell.Cmd(args[1], ["x", archive, "-o" + root + "/unpacked-" + id]).run()
+    for file in ["a-head.bin", "b-tail.bin"] {
+      assert_eq(
+        @fs.read_file(root + "/unpacked-" + id + "/" + file).binary(),
+        @fs.read_file(root + "/source/" + file).binary(),
+      )
+    }
+    println("Independent RISC-V extraction passed: " + id)
+  }
+}

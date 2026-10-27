@@ -34,6 +34,8 @@ async fn main {
       ["fmt", "--check", "checks/deflate.mbtx"],
       ["fmt", "--check", "checks/bzip2.mbtx"],
       ["fmt", "--check", "checks/encrypted.mbtx"],
+      ["fmt", "--check", "checks/riscv.mbtx"],
+      ["fmt", "--check", "corpus/riscv/generate.mbtx"],
       ["fmt", "--check", "corpus/encrypted/generate.mbtx"],
       ["fmt", "--check", "corpus/bzip2/generate.mbtx"],
       ["fmt", "--check", "corpus/deflate/generate.mbtx"],
@@ -53,6 +55,9 @@ async fn main {
   }
   @shell.Cmd("git", ["diff", "--exit-code", "--", "*.mbti"]).run()
   if target == "wasm" || target == "native" {
+    @shell.Cmd("moon", ["run", "checks/riscv.mbtx", "--", target]).run(
+      timeout_ms=240000,
+    )
     @shell.Cmd("moon", ["run", "checks/encrypted.mbtx", "--", target]).run(
       timeout_ms=360000,
     )

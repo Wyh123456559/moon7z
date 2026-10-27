@@ -18,6 +18,83 @@ import {
 } for "wbtest"
 
 rule(
+  name: "riscv_copy",
+  command: ":embed --binary -i $input -o $output --name riscv_copy",
+)
+
+dev_build(
+  rule: "riscv_copy",
+  input: "../corpus/riscv/copy.7z",
+  output: "riscv_copy_archive_test.mbt",
+)
+
+rule(
+  name: "riscv_lzma2",
+  command: ":embed --binary -i $input -o $output --name riscv_lzma2",
+)
+
+dev_build(
+  rule: "riscv_lzma2",
+  input: "../corpus/riscv/lzma2.7z",
+  output: "riscv_lzma2_archive_test.mbt",
+)
+
+rule(
+  name: "riscv_offset",
+  command: ":embed --binary -i $input -o $output --name riscv_offset",
+)
+
+dev_build(
+  rule: "riscv_offset",
+  input: "../corpus/riscv/offset.7z",
+  output: "riscv_offset_archive_test.mbt",
+)
+
+rule(
+  name: "riscv_wrap",
+  command: ":embed --binary -i $input -o $output --name riscv_wrap",
+)
+
+dev_build(
+  rule: "riscv_wrap",
+  input: "../corpus/riscv/wrap.7z",
+  output: "riscv_wrap_archive_test.mbt",
+)
+
+rule(
+  name: "riscv_separate",
+  command: ":embed --binary -i $input -o $output --name riscv_separate",
+)
+
+dev_build(
+  rule: "riscv_separate",
+  input: "../corpus/riscv/separate.7z",
+  output: "riscv_separate_archive_test.mbt",
+)
+
+rule(
+  name: "riscv_head",
+  command: ":embed --binary -i $input -o $output --name riscv_head",
+)
+
+dev_build(
+  rule: "riscv_head",
+  input: "../corpus/riscv/source/a-head.bin",
+  output: "riscv_head_archive_test.mbt",
+)
+
+rule(
+  name: "riscv_tail",
+  command: ":embed --binary -i $input -o $output --name riscv_tail",
+)
+
+dev_build(
+  rule: "riscv_tail",
+  input: "../corpus/riscv/source/b-tail.bin",
+  output: "riscv_tail_archive_test.mbt",
+)
+
+rule(
   name: "encrypted_data",
   command: ":embed --binary -i $input -o $output --name encrypted_data",
 )

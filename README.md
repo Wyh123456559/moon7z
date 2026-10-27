@@ -143,7 +143,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | --- | --- |
 | Container | Single-volume; real fixtures cover 0.3 and 0.4; header minors 0–4 accepted; signature at byte zero |
 | Codecs | Copy, LZMA, LZMA2, BZip2, raw DEFLATE, BCJ2 four-input branch reconstruction |
-| Filters | Delta (distance 1–256), x86 BCJ, ARM64, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
+| Filters | Delta (distance 1–256), x86 BCJ, ARM64, RISC-V, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4 |
 | Coder graph | Bounded acyclic graphs of supported unary coders and four-input BCJ2; explicit physical input mappings |
 | Headers | Plain and compressed headers |
 | Encryption | 7z AES-256/SHA-256 password reading for headers/data; bounded cumulative derivation work |
@@ -154,7 +154,7 @@ one ID. See [selective export workflow](docs/selective-export.md).
 | Resources | Configurable input/header/output/dictionary/member/coder/intermediate-output limits |
 
 Split volumes, SFX,
-unlisted filters (including RISC-V), additional streams,
+unlisted filters, additional streams,
 anti-items, links, special files, unknown semantic properties and writing are
 rejected. Zero padding may repeat. The reader does not silently skip unsupported
 members or metadata. Metadata values are retained for application use; the
@@ -231,6 +231,10 @@ final folder outputs share `output_bytes`. BCJ2 consumes independently mapped
 main, call, jump and range-control inputs, including LZMA/LZMA2-compressed
 branches. Each physical input CRC is checked before releasing folder contents.
 See [BCJ2 workflow, evidence and resource policy](docs/bcj2.md).
+
+RISC-V (`0b`) supports empty or four-byte, two-byte-aligned initial offsets,
+including UInt32 wraparound. Like the other filters it transforms whole folders
+before member slicing. See [RISC-V evidence](docs/riscv.md).
 
 The 7z DEFLATE method (`04 01 08`, empty properties) accepts stored, fixed and
 dynamic Huffman blocks, a 32 KiB history window and overlapping matches. The

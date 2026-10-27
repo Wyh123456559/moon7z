@@ -59,6 +59,7 @@ of ecosystem uniqueness or approval.
 | `aurora0x27/lzma-mbt@0.1.0/filters` | `delta_decode`, `bcj_arm64`, `bcj_arm`, `bcj_armthumb`, `bcj_powerpc`, `bcj_ia64`, `bcj_sparc`; independent 7-Zip cases exercise each used filter | Upstream Apache-2.0 algorithms |
 | `archive/bcj.mbt` | Classic x86 BCJ decoding translated from Igor Pavlov's `Bra86.c` (7-Zip 21.07) | Public Domain adaptation, not an original algorithm |
 | `archive/bcj2.mbt` | Four-input reconstruction adapted from 7-Zip 26.05 BCJ2 | Public Domain adaptation |
+| `archive/riscv.mbt` | Scalar RISC-V JAL/AUIPC decoding and 7z offset integration | Public Domain 7-Zip 26.05 Bra.c adaptation |
 | `archive/deflate.mbt` | Bounded whole-node raw DEFLATE decoding integrated with 7z graph/integrity policies | Project code from RFC 1951 format rules; the established algorithm is not claimed as novel |
 | `archive/bzip2.mbt`, `bzip_random.mbt` | Bounded BZip2 reading, CRCs and legacy de-randomization | Partial Go BSD-3-Clause adaptation and bzip2-licensed table; exact provenance in SOURCES.md |
 | `moonbitlang/x@0.5.5/crypto` and `archive/crypto.mbt` | Existing AES/SHA primitives plus 7z password/property/work-budget integration | Upstream Apache-2.0 cryptography; project-authored bounded 7z integration, not a new cryptographic algorithm |

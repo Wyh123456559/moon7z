@@ -1,0 +1,43 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/riscv")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-riscv")
+  defer @fs.rmdir(root, recursive=true)
+  for id in ["copy", "lzma2", "offset", "wrap", "separate"] {
+    @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).run(timeout_ms=120000)
+    for file in ["a-head.bin", "b-tail.bin"] {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + file).binary(),
+        @fs.read_file(corpus + "/source/" + file).binary(),
+      )
+    }
+  }
+  println(
+    "Five real RISC-V archives export every original byte, including offsets and separate folders",
+  )
+}

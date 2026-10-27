@@ -18,18 +18,26 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
       if !coder.properties.is_empty() {
         raise Invalid(offset=0, reason="Swap2/Swap4 have no coder properties")
       }
-    b"\x0a" => {
+    b"\x0a" | b"\x0b" => {
       guard coder.properties.is_empty() || coder.properties.length() == 4 else {
         raise Invalid(
           offset=0,
-          reason="ARM64 needs zero or four offset property bytes",
+          reason="ARM64/RISC-V need zero or four offset property bytes",
         )
       }
       if !coder.properties.is_empty() &&
-        (Cursor::new(coder.properties).u32() & 3U) != 0U {
+        (
+          Cursor::new(coder.properties).u32() &
+          (if coder.codec_id == b"\x0a" { 3U } else { 1U })
+        ) !=
+        0U {
         raise Invalid(
           offset=0,
-          reason="ARM64 start offset must be a multiple of four",
+          reason=if coder.codec_id == b"\x0a" {
+            "ARM64 start offset must be a multiple of four"
+          } else {
+            "RISC-V start offset must be a multiple of two"
+          },
         )
       }
     }
@@ -209,13 +217,17 @@ fn decode(
           _ => raise Codec(reason="invalid Delta filter distance")
         }
       b"\x03\x03\x01\x03" => bcj_decode(output)
-      b"\x0a" => {
+      b"\x0a" | b"\x0b" => {
         let start = if filter.properties.is_empty() {
           0U
         } else {
           Cursor::new(filter.properties).u32()
         }
-        @filters.bcj_arm64(output[:], start, false)
+        if filter.codec_id == b"\x0b" {
+          riscv_decode(output, start)
+        } else {
+          @filters.bcj_arm64(output[:], start, false)
+        }
       }
       _ => raise Unsupported(feature="filter in decode chain")
     }
