@@ -29,6 +29,7 @@ pub struct Limits {
   kdf_bytes : Int32
   password_bytes : Int32
   file_property_records : Int32
+  lzma_probability_bytes : Int32
 } derive(Debug, Eq)
 
 ///|
@@ -93,6 +94,7 @@ pub fn Limits::new(
   kdf_bytes~ : Int32 = 128 * 1024 * 1024,
   password_bytes~ : Int32 = 8192,
   file_property_records~ : Int32 = 10000,
+  lzma_probability_bytes~ : Int32 = 16 * 1024 * 1024,
 ) -> Limits {
   {
     input_bytes,
@@ -106,6 +108,7 @@ pub fn Limits::new(
     kdf_bytes,
     password_bytes,
     file_property_records,
+    lzma_probability_bytes,
   }
 }
 

@@ -1,0 +1,1802 @@
+[
+  {
+    "name": "lc0-lp0-pb0.7z",
+    "lc": 0,
+    "lp": 0,
+    "pb": 0,
+    "size": 5534,
+    "sha256": "633cf6b8a80e82ab50ece6705bbf5ed3a76d9e18cd3cbac2ee5c1c839b12e73c"
+  },
+  {
+    "name": "lc1-lp0-pb0.7z",
+    "lc": 1,
+    "lp": 0,
+    "pb": 0,
+    "size": 5480,
+    "sha256": "c6624b06c49051df04cb788cb4f7bf3e1723f6f49c8097fa9f14440dcdb07b3c"
+  },
+  {
+    "name": "lc2-lp0-pb0.7z",
+    "lc": 2,
+    "lp": 0,
+    "pb": 0,
+    "size": 5494,
+    "sha256": "9072f8b2e376d250e0974095d877daaa8f093b3a315c5e7adb091f90a98565c9"
+  },
+  {
+    "name": "lc3-lp0-pb0.7z",
+    "lc": 3,
+    "lp": 0,
+    "pb": 0,
+    "size": 5495,
+    "sha256": "2ad7d0e97f0c5d48d0350c77d56d7e09ca1d9c19c8ed97e271484668ce00ed6c"
+  },
+  {
+    "name": "lc4-lp0-pb0.7z",
+    "lc": 4,
+    "lp": 0,
+    "pb": 0,
+    "size": 5547,
+    "sha256": "68f63c5ebab0a4af7769e9592399b26d93a74354c9011c3b3c122a79c1d5bc9c"
+  },
+  {
+    "name": "lc5-lp0-pb0.7z",
+    "lc": 5,
+    "lp": 0,
+    "pb": 0,
+    "size": 5616,
+    "sha256": "d73b59ffcb911e0bf2cd4ab72afc1f8dc7dda0fa8df61e37e5b2cfc166ebec0d"
+  },
+  {
+    "name": "lc6-lp0-pb0.7z",
+    "lc": 6,
+    "lp": 0,
+    "pb": 0,
+    "size": 5701,
+    "sha256": "ecc6eda7aacb4dfaf43663abf94e66548827607fe596024dfab206bc4e753077"
+  },
+  {
+    "name": "lc7-lp0-pb0.7z",
+    "lc": 7,
+    "lp": 0,
+    "pb": 0,
+    "size": 5753,
+    "sha256": "0aacf8f625cbe11ed5480fe07f56255bdba7d88051d4ed1ccdd5112866042689"
+  },
+  {
+    "name": "lc8-lp0-pb0.7z",
+    "lc": 8,
+    "lp": 0,
+    "pb": 0,
+    "size": 5782,
+    "sha256": "cd4d9a94c95cec9b9cd0b9b2f5df2efb36117ec7e4e6942852032d14ffb6b397"
+  },
+  {
+    "name": "lc0-lp1-pb0.7z",
+    "lc": 0,
+    "lp": 1,
+    "pb": 0,
+    "size": 5602,
+    "sha256": "de6f9d332560cd5321df552bad67a36d111ecbb7e74c674eddf3e5b0ccc2f077"
+  },
+  {
+    "name": "lc1-lp1-pb0.7z",
+    "lc": 1,
+    "lp": 1,
+    "pb": 0,
+    "size": 5544,
+    "sha256": "0a4f0ca81f0b945e22c1ee3384cdfc721c3d36a6e476c569e8fcb14051a343a8"
+  },
+  {
+    "name": "lc2-lp1-pb0.7z",
+    "lc": 2,
+    "lp": 1,
+    "pb": 0,
+    "size": 5575,
+    "sha256": "74c110ce1c94b6cb8ddaa02341ba28a06e5e36296889e34291a16d17a9820687"
+  },
+  {
+    "name": "lc3-lp1-pb0.7z",
+    "lc": 3,
+    "lp": 1,
+    "pb": 0,
+    "size": 5580,
+    "sha256": "f86ad47ad5145d32625a4539ba0fc39ef9835c8864dbf9d09257d36617c712ec"
+  },
+  {
+    "name": "lc4-lp1-pb0.7z",
+    "lc": 4,
+    "lp": 1,
+    "pb": 0,
+    "size": 5664,
+    "sha256": "506465eaf17936f35602a394d71a0ffbfbb828ac25ac5b6a48cdc21ec5d72953"
+  },
+  {
+    "name": "lc5-lp1-pb0.7z",
+    "lc": 5,
+    "lp": 1,
+    "pb": 0,
+    "size": 5727,
+    "sha256": "6bb7c9fbfaa7d42f21bc512ebca5a5c23323d5f117b6a4a44f242cc14f59559f"
+  },
+  {
+    "name": "lc6-lp1-pb0.7z",
+    "lc": 6,
+    "lp": 1,
+    "pb": 0,
+    "size": 5770,
+    "sha256": "dac83ba29862d0336e4ad5035bc167a382768043547d42d11d93cff3e94eaa34"
+  },
+  {
+    "name": "lc7-lp1-pb0.7z",
+    "lc": 7,
+    "lp": 1,
+    "pb": 0,
+    "size": 5796,
+    "sha256": "7f5b304c6c13689c91a9cf3de54fb2f495b067f4ca939ce92289359b17d81cf6"
+  },
+  {
+    "name": "lc8-lp1-pb0.7z",
+    "lc": 8,
+    "lp": 1,
+    "pb": 0,
+    "size": 5820,
+    "sha256": "ecad906c47ec566c57841ec5635811d2882f1361d79b96a177a2353b5e852c79"
+  },
+  {
+    "name": "lc0-lp2-pb0.7z",
+    "lc": 0,
+    "lp": 2,
+    "pb": 0,
+    "size": 5688,
+    "sha256": "8c0988868aabecce6ffa24c96f7877e0c9c7ee70feb7094b54605443d7e45ff5"
+  },
+  {
+    "name": "lc1-lp2-pb0.7z",
+    "lc": 1,
+    "lp": 2,
+    "pb": 0,
+    "size": 5627,
+    "sha256": "df9ce3bc4552eff46eea0da1c119ca8813351651abd3aad9e491b8dc8d5e33ab"
+  },
+  {
+    "name": "lc2-lp2-pb0.7z",
+    "lc": 2,
+    "lp": 2,
+    "pb": 0,
+    "size": 5677,
+    "sha256": "02acb64cdf6a9f52b63a1daeb6e28e9ecbe98c612c8e54f62d41923a10ed4e2e"
+  },
+  {
+    "name": "lc3-lp2-pb0.7z",
+    "lc": 3,
+    "lp": 2,
+    "pb": 0,
+    "size": 5692,
+    "sha256": "57b696f1760b0c629454601713ed28c447340b77b5cb70bf7805fce2fc06d5c0"
+  },
+  {
+    "name": "lc4-lp2-pb0.7z",
+    "lc": 4,
+    "lp": 2,
+    "pb": 0,
+    "size": 5748,
+    "sha256": "e39017c631d96c16e7fbcb3b1052ee0e3e0f98276f9c94d89a680d7babff6b71"
+  },
+  {
+    "name": "lc5-lp2-pb0.7z",
+    "lc": 5,
+    "lp": 2,
+    "pb": 0,
+    "size": 5782,
+    "sha256": "bc3ed1734a60e74ef310c1c7c1cf1dfc7c9b06165d0f565aa424d16eabed3dec"
+  },
+  {
+    "name": "lc6-lp2-pb0.7z",
+    "lc": 6,
+    "lp": 2,
+    "pb": 0,
+    "size": 5819,
+    "sha256": "5c9a492f5b279e0a6a0a97b6cfb0c5b440a4dfc453a82024105e1fd265535f02"
+  },
+  {
+    "name": "lc7-lp2-pb0.7z",
+    "lc": 7,
+    "lp": 2,
+    "pb": 0,
+    "size": 5837,
+    "sha256": "74dba20f7e5ce318883aee6b8bbbba84cf15daea6605be7bf7b2b074ffa27d7b"
+  },
+  {
+    "name": "lc8-lp2-pb0.7z",
+    "lc": 8,
+    "lp": 2,
+    "pb": 0,
+    "size": 5846,
+    "sha256": "46e2ffe618f48fc817fefcfa068e89b77b30124181050c87a56e0bd08b2d8f57"
+  },
+  {
+    "name": "lc0-lp3-pb0.7z",
+    "lc": 0,
+    "lp": 3,
+    "pb": 0,
+    "size": 5767,
+    "sha256": "c6cf754cfe4af8b397b724da9984a5444c6ff0ed954e5f48458f7310d16a8433"
+  },
+  {
+    "name": "lc1-lp3-pb0.7z",
+    "lc": 1,
+    "lp": 3,
+    "pb": 0,
+    "size": 5715,
+    "sha256": "a3c972727f96effe5c6856dcb06ac0d44098f7fba8104b7f74c7028997a06173"
+  },
+  {
+    "name": "lc2-lp3-pb0.7z",
+    "lc": 2,
+    "lp": 3,
+    "pb": 0,
+    "size": 5748,
+    "sha256": "b08209e766d1a0d814ea0d884f41163efa0ee32cdd1aa87d41bef93541d3381f"
+  },
+  {
+    "name": "lc3-lp3-pb0.7z",
+    "lc": 3,
+    "lp": 3,
+    "pb": 0,
+    "size": 5763,
+    "sha256": "1ad1e8147b8db739838c8e5c57edd2929eccc0100e9f8251140c7bc8ebfb65b5"
+  },
+  {
+    "name": "lc4-lp3-pb0.7z",
+    "lc": 4,
+    "lp": 3,
+    "pb": 0,
+    "size": 5804,
+    "sha256": "3fec97086bb62b49cb58fd6d7367b935f316c6527b7d10c531b08959bd831412"
+  },
+  {
+    "name": "lc5-lp3-pb0.7z",
+    "lc": 5,
+    "lp": 3,
+    "pb": 0,
+    "size": 5832,
+    "sha256": "b6567b7a29864e448e94630c7115419138cfb8732e9b1692b6c6b3cb16a2015a"
+  },
+  {
+    "name": "lc6-lp3-pb0.7z",
+    "lc": 6,
+    "lp": 3,
+    "pb": 0,
+    "size": 5845,
+    "sha256": "f42cc0492212b0087b7e20fc35018d549bc6b73e14c8c3fa727e84dbdc1a1df5"
+  },
+  {
+    "name": "lc7-lp3-pb0.7z",
+    "lc": 7,
+    "lp": 3,
+    "pb": 0,
+    "size": 5852,
+    "sha256": "d4c791784275244fec16cd96ea7bae111dfadfe39477aa32afa48b9c216e2a35"
+  },
+  {
+    "name": "lc8-lp3-pb0.7z",
+    "lc": 8,
+    "lp": 3,
+    "pb": 0,
+    "size": 5858,
+    "sha256": "fc7c8a34fcf7a21347efebcde1d07fd2dc777fe5650b406fad4a6180115bbcc8"
+  },
+  {
+    "name": "lc0-lp4-pb0.7z",
+    "lc": 0,
+    "lp": 4,
+    "pb": 0,
+    "size": 5809,
+    "sha256": "54f40bc8757485f770da74b6855697b80e50510fdae65a3b98dbdc18214d7deb"
+  },
+  {
+    "name": "lc1-lp4-pb0.7z",
+    "lc": 1,
+    "lp": 4,
+    "pb": 0,
+    "size": 5773,
+    "sha256": "14f54b5fc2071f3721dea6bc95d15473590082b66c6ad24b7dfd2129bbca642e"
+  },
+  {
+    "name": "lc2-lp4-pb0.7z",
+    "lc": 2,
+    "lp": 4,
+    "pb": 0,
+    "size": 5798,
+    "sha256": "2d376fdc354e05307fdf4ff8572a2e0258ea1a46944548ac0ca5fd327d51f167"
+  },
+  {
+    "name": "lc3-lp4-pb0.7z",
+    "lc": 3,
+    "lp": 4,
+    "pb": 0,
+    "size": 5816,
+    "sha256": "3ce35cf847d18fad34eadacbbc02a49df7af222df2a6d619cc1eea438a92f051"
+  },
+  {
+    "name": "lc4-lp4-pb0.7z",
+    "lc": 4,
+    "lp": 4,
+    "pb": 0,
+    "size": 5842,
+    "sha256": "2569b9ce0527841ce4c4255906e59a7b83664610a129752b976284cd7ad9e044"
+  },
+  {
+    "name": "lc5-lp4-pb0.7z",
+    "lc": 5,
+    "lp": 4,
+    "pb": 0,
+    "size": 5852,
+    "sha256": "e2b24e950165f7cabcb0e2c03efc16b1b73d31bb4dc8b3fe118616697b2dce49"
+  },
+  {
+    "name": "lc6-lp4-pb0.7z",
+    "lc": 6,
+    "lp": 4,
+    "pb": 0,
+    "size": 5858,
+    "sha256": "0eb60acdc8b927e730c938618e8df8ba25ac9c60b0cfea07c3519c95b7e97df7"
+  },
+  {
+    "name": "lc7-lp4-pb0.7z",
+    "lc": 7,
+    "lp": 4,
+    "pb": 0,
+    "size": 5860,
+    "sha256": "368c6850fe531e55c621c581c513b8b092473181b05462407ac1c0a9b0f185ed"
+  },
+  {
+    "name": "lc8-lp4-pb0.7z",
+    "lc": 8,
+    "lp": 4,
+    "pb": 0,
+    "size": 5864,
+    "sha256": "6b90284f79e1001a5e88e2cf9ef08a26d4901cdc16532bdcf0dfd859039c423c"
+  },
+  {
+    "name": "lc0-lp0-pb1.7z",
+    "lc": 0,
+    "lp": 0,
+    "pb": 1,
+    "size": 5545,
+    "sha256": "ed7b600942a8c464e8df875cb9b8b2016837e1f9f1b06548b4097c30e9a1e1ce"
+  },
+  {
+    "name": "lc1-lp0-pb1.7z",
+    "lc": 1,
+    "lp": 0,
+    "pb": 1,
+    "size": 5493,
+    "sha256": "783e6df72d0d4199867d8600237f6f3c6a0a528680f850cede3d197bca7c8eb0"
+  },
+  {
+    "name": "lc2-lp0-pb1.7z",
+    "lc": 2,
+    "lp": 0,
+    "pb": 1,
+    "size": 5512,
+    "sha256": "696fe2eb5116b578adeb1ea448e59f0f933a76577d4419e30bfe1a354bd6e8af"
+  },
+  {
+    "name": "lc3-lp0-pb1.7z",
+    "lc": 3,
+    "lp": 0,
+    "pb": 1,
+    "size": 5514,
+    "sha256": "062d9ae0fa8c37ec5e7b58fb417be52701f6700273e6dd31a721055a9bbb1bbe"
+  },
+  {
+    "name": "lc4-lp0-pb1.7z",
+    "lc": 4,
+    "lp": 0,
+    "pb": 1,
+    "size": 5566,
+    "sha256": "b70a511f034fb3f8cee93cc9abf59ac6cbd134a70795bc9bcdd8d0ab20fdb28a"
+  },
+  {
+    "name": "lc5-lp0-pb1.7z",
+    "lc": 5,
+    "lp": 0,
+    "pb": 1,
+    "size": 5625,
+    "sha256": "e5c45be3fab49503f713143f6da8dc7c16dff354ef593d339383d6e8f4abf5ac"
+  },
+  {
+    "name": "lc6-lp0-pb1.7z",
+    "lc": 6,
+    "lp": 0,
+    "pb": 1,
+    "size": 5715,
+    "sha256": "580e1278420f3fcb8bba4380b0b543387395cbe5d88368c8169fb21e4fb1db7c"
+  },
+  {
+    "name": "lc7-lp0-pb1.7z",
+    "lc": 7,
+    "lp": 0,
+    "pb": 1,
+    "size": 5762,
+    "sha256": "af02d40f4c0e6c3ba88b0dc255bf2ac1a9634c7f0a57c2187dbc642fe3391ced"
+  },
+  {
+    "name": "lc8-lp0-pb1.7z",
+    "lc": 8,
+    "lp": 0,
+    "pb": 1,
+    "size": 5798,
+    "sha256": "3cb29c14829753aec5c3951d24c3d5cccce1d9b83c6debc017394494a7901898"
+  },
+  {
+    "name": "lc0-lp1-pb1.7z",
+    "lc": 0,
+    "lp": 1,
+    "pb": 1,
+    "size": 5618,
+    "sha256": "213a74bb7672c31a5ed46ff1283b45a58981fbef90d1a02b5b354e9c7c79f59c"
+  },
+  {
+    "name": "lc1-lp1-pb1.7z",
+    "lc": 1,
+    "lp": 1,
+    "pb": 1,
+    "size": 5562,
+    "sha256": "4eb64691ef51aefc1cbfc259532ba47e3b23cb815393a2cea2be2d5800971305"
+  },
+  {
+    "name": "lc2-lp1-pb1.7z",
+    "lc": 2,
+    "lp": 1,
+    "pb": 1,
+    "size": 5585,
+    "sha256": "4dbf354bec59f5ec181f252e0120196a9fbd87a7d280b632b6c1bb8d9d1adc62"
+  },
+  {
+    "name": "lc3-lp1-pb1.7z",
+    "lc": 3,
+    "lp": 1,
+    "pb": 1,
+    "size": 5590,
+    "sha256": "428d4f3a6d0e9d895adac52676377d0b2aeef76e8fcb8de6f61c3d79427635d4"
+  },
+  {
+    "name": "lc4-lp1-pb1.7z",
+    "lc": 4,
+    "lp": 1,
+    "pb": 1,
+    "size": 5665,
+    "sha256": "cc7f171124274acc107ba19d441c87ac03389e355f4370c694b60388a3d7641e"
+  },
+  {
+    "name": "lc5-lp1-pb1.7z",
+    "lc": 5,
+    "lp": 1,
+    "pb": 1,
+    "size": 5734,
+    "sha256": "863ffdcdb6f9c45a8c8706c83e62357e30d02b5ba51c103b0bdceba0c76786ef"
+  },
+  {
+    "name": "lc6-lp1-pb1.7z",
+    "lc": 6,
+    "lp": 1,
+    "pb": 1,
+    "size": 5783,
+    "sha256": "e8f17dc1b1ccc375efa717bc44dcb41f3f1f72731a16469c03eb225ee6af52bb"
+  },
+  {
+    "name": "lc7-lp1-pb1.7z",
+    "lc": 7,
+    "lp": 1,
+    "pb": 1,
+    "size": 5816,
+    "sha256": "d3651e218c3cbad597d49060b02dc7be5539236a462cf2fe819d480d65e48506"
+  },
+  {
+    "name": "lc8-lp1-pb1.7z",
+    "lc": 8,
+    "lp": 1,
+    "pb": 1,
+    "size": 5837,
+    "sha256": "e31aab815ca14ec0a9ec93a5fc91509e4ba2d039e8844c8b79630ec7eab73b55"
+  },
+  {
+    "name": "lc0-lp2-pb1.7z",
+    "lc": 0,
+    "lp": 2,
+    "pb": 1,
+    "size": 5696,
+    "sha256": "fc83764a744d0eaa0031fb7539dc1cb61791ff2bf56415f38c3517422c2627c7"
+  },
+  {
+    "name": "lc1-lp2-pb1.7z",
+    "lc": 1,
+    "lp": 2,
+    "pb": 1,
+    "size": 5638,
+    "sha256": "f72c765fdc09f7765089530bfd6b6d961d9013740f4d0bd8fe8e02faec50e1b2"
+  },
+  {
+    "name": "lc2-lp2-pb1.7z",
+    "lc": 2,
+    "lp": 2,
+    "pb": 1,
+    "size": 5682,
+    "sha256": "4fd60fe22bbdab3d9529a14eaa8905208875c3d09268d61bc423d6c52647178b"
+  },
+  {
+    "name": "lc3-lp2-pb1.7z",
+    "lc": 3,
+    "lp": 2,
+    "pb": 1,
+    "size": 5696,
+    "sha256": "58b14973009d92d1fe7d501145967c35f5ef7c0b48d27e6d3d1572b1855416cc"
+  },
+  {
+    "name": "lc4-lp2-pb1.7z",
+    "lc": 4,
+    "lp": 2,
+    "pb": 1,
+    "size": 5759,
+    "sha256": "1e13014e038bcae3403db2845811fd6737786a6762d26c0bf21595d57c58853c"
+  },
+  {
+    "name": "lc5-lp2-pb1.7z",
+    "lc": 5,
+    "lp": 2,
+    "pb": 1,
+    "size": 5797,
+    "sha256": "1fe55a232e313f067f848fd2137c60c14f64a6185ca9be7f70f21e1fa4f7314b"
+  },
+  {
+    "name": "lc6-lp2-pb1.7z",
+    "lc": 6,
+    "lp": 2,
+    "pb": 1,
+    "size": 5829,
+    "sha256": "1d7201818c03f2f6da1d5dff495252f8f7f056cbdbc8072986cf9c1e73bfd2ad"
+  },
+  {
+    "name": "lc7-lp2-pb1.7z",
+    "lc": 7,
+    "lp": 2,
+    "pb": 1,
+    "size": 5848,
+    "sha256": "38554409e22d6f4dac088d8e1d42521f2901600687fa3e133eeed13c9e709bcd"
+  },
+  {
+    "name": "lc8-lp2-pb1.7z",
+    "lc": 8,
+    "lp": 2,
+    "pb": 1,
+    "size": 5858,
+    "sha256": "f8de226584eb6d04c71536eb6379ac3b271d996eb721b3f31005feb3301c7707"
+  },
+  {
+    "name": "lc0-lp3-pb1.7z",
+    "lc": 0,
+    "lp": 3,
+    "pb": 1,
+    "size": 5776,
+    "sha256": "4cb232e9134aa2644600ae235b24a22853a78a34d2c95153d15c89c9f2ff46f5"
+  },
+  {
+    "name": "lc1-lp3-pb1.7z",
+    "lc": 1,
+    "lp": 3,
+    "pb": 1,
+    "size": 5723,
+    "sha256": "d34ce21589f0484e9cd28b1678c403712e8e0213fb806a161cf399297f9fc88c"
+  },
+  {
+    "name": "lc2-lp3-pb1.7z",
+    "lc": 2,
+    "lp": 3,
+    "pb": 1,
+    "size": 5763,
+    "sha256": "8e407f235ab06e04384f979c38a399dc138f88f3bd6460accc6f4eb1adb756d2"
+  },
+  {
+    "name": "lc3-lp3-pb1.7z",
+    "lc": 3,
+    "lp": 3,
+    "pb": 1,
+    "size": 5776,
+    "sha256": "aae9769b777af66d65b0caee795add9331af1f51767f0514d7d7952bb813e162"
+  },
+  {
+    "name": "lc4-lp3-pb1.7z",
+    "lc": 4,
+    "lp": 3,
+    "pb": 1,
+    "size": 5817,
+    "sha256": "d9c0fe9db1d6b14e60ef35358bb6de95c0f8630838faba454db1365ba979257c"
+  },
+  {
+    "name": "lc5-lp3-pb1.7z",
+    "lc": 5,
+    "lp": 3,
+    "pb": 1,
+    "size": 5843,
+    "sha256": "b7a74237d129725784d82fe74e9bd1b9a234802187082d4f6662ca1cbb52c256"
+  },
+  {
+    "name": "lc6-lp3-pb1.7z",
+    "lc": 6,
+    "lp": 3,
+    "pb": 1,
+    "size": 5856,
+    "sha256": "090c68a11c92c7c9b5579c21d6688b063ab7dadc69311671dc0fbe123c83b4d8"
+  },
+  {
+    "name": "lc7-lp3-pb1.7z",
+    "lc": 7,
+    "lp": 3,
+    "pb": 1,
+    "size": 5866,
+    "sha256": "94273d51a45f481668b5d9fce45fc578137917d2e3dd1f3a0170fae487ffaabb"
+  },
+  {
+    "name": "lc8-lp3-pb1.7z",
+    "lc": 8,
+    "lp": 3,
+    "pb": 1,
+    "size": 5872,
+    "sha256": "8b6873a4fa8875ab7086678188c0a950fb024d8678097350414997ebfd6aad43"
+  },
+  {
+    "name": "lc0-lp4-pb1.7z",
+    "lc": 0,
+    "lp": 4,
+    "pb": 1,
+    "size": 5822,
+    "sha256": "3b16788dd05775377629622e4856174ef8e83e87b611ead99a86f67c4cd7430d"
+  },
+  {
+    "name": "lc1-lp4-pb1.7z",
+    "lc": 1,
+    "lp": 4,
+    "pb": 1,
+    "size": 5786,
+    "sha256": "7f168b439096280c0fca687591cd7a6e8723289abf7a371c8d0e22ce40408854"
+  },
+  {
+    "name": "lc2-lp4-pb1.7z",
+    "lc": 2,
+    "lp": 4,
+    "pb": 1,
+    "size": 5815,
+    "sha256": "0e5f2bae175bf0cfcbad752df262d009cf2e10b223c01dce2c1ec6da65be52ca"
+  },
+  {
+    "name": "lc3-lp4-pb1.7z",
+    "lc": 3,
+    "lp": 4,
+    "pb": 1,
+    "size": 5823,
+    "sha256": "440fcd0ae1602dd904aa0157573be85699891715e0ccf8ea8f1f318cd456773b"
+  },
+  {
+    "name": "lc4-lp4-pb1.7z",
+    "lc": 4,
+    "lp": 4,
+    "pb": 1,
+    "size": 5854,
+    "sha256": "da0b5cd636d4aaef52a46ba2fcba82711097b5631f1116e4d86b18309a8d4826"
+  },
+  {
+    "name": "lc5-lp4-pb1.7z",
+    "lc": 5,
+    "lp": 4,
+    "pb": 1,
+    "size": 5864,
+    "sha256": "313ed443940a7b2eb147e621ea8a247ef74f3188d0943ee081e4dc9638a46c74"
+  },
+  {
+    "name": "lc6-lp4-pb1.7z",
+    "lc": 6,
+    "lp": 4,
+    "pb": 1,
+    "size": 5872,
+    "sha256": "79da1f9986941ec46ada9061d17de8fc0e742b72cc3c345064729e905e4c5d68"
+  },
+  {
+    "name": "lc7-lp4-pb1.7z",
+    "lc": 7,
+    "lp": 4,
+    "pb": 1,
+    "size": 5875,
+    "sha256": "445f638847ed0efd011ef9d43168edadf8edf83a2564368cc6f2e27ec445ab86"
+  },
+  {
+    "name": "lc8-lp4-pb1.7z",
+    "lc": 8,
+    "lp": 4,
+    "pb": 1,
+    "size": 5876,
+    "sha256": "7d9ee8af8a75637c2c452feb9b875b58c376e0a64e9484ba4f2fb1a18df1947c"
+  },
+  {
+    "name": "lc0-lp0-pb2.7z",
+    "lc": 0,
+    "lp": 0,
+    "pb": 2,
+    "size": 5563,
+    "sha256": "dc2fd054213efcd191663e3e8b1f82fd6722e8651bfe4f49c0856c48348017ac"
+  },
+  {
+    "name": "lc1-lp0-pb2.7z",
+    "lc": 1,
+    "lp": 0,
+    "pb": 2,
+    "size": 5513,
+    "sha256": "df83acda335478104631d8e2b9fedaea489454198e47b49dfa9b8dceda66d5da"
+  },
+  {
+    "name": "lc2-lp0-pb2.7z",
+    "lc": 2,
+    "lp": 0,
+    "pb": 2,
+    "size": 5529,
+    "sha256": "cd3af1b7495fefc70df79088cff98ae1ebd258bb9b113a4e93ea9320e034950e"
+  },
+  {
+    "name": "lc3-lp0-pb2.7z",
+    "lc": 3,
+    "lp": 0,
+    "pb": 2,
+    "size": 5531,
+    "sha256": "b16fd44ea39902f13acd3f46b3f51ac2a083e749efe60495be321b0b0a616ee7"
+  },
+  {
+    "name": "lc4-lp0-pb2.7z",
+    "lc": 4,
+    "lp": 0,
+    "pb": 2,
+    "size": 5579,
+    "sha256": "f0188ba64b6757faf4f4efd7ba8c4e404ab1d75db2dd91f985efad856169e14b"
+  },
+  {
+    "name": "lc5-lp0-pb2.7z",
+    "lc": 5,
+    "lp": 0,
+    "pb": 2,
+    "size": 5642,
+    "sha256": "50487428f5f3285156977b7e3ae7521be3384697d19723109ec50e9aee6ef519"
+  },
+  {
+    "name": "lc6-lp0-pb2.7z",
+    "lc": 6,
+    "lp": 0,
+    "pb": 2,
+    "size": 5726,
+    "sha256": "3fb38a9e8ebea531da1cf8f746ef13467389c21ed28ba1cf01e47e20c234d0a1"
+  },
+  {
+    "name": "lc7-lp0-pb2.7z",
+    "lc": 7,
+    "lp": 0,
+    "pb": 2,
+    "size": 5774,
+    "sha256": "6e7a5fc9e4a20d7df2795573f1623dc04e50aa651289677695f3962b8e216608"
+  },
+  {
+    "name": "lc8-lp0-pb2.7z",
+    "lc": 8,
+    "lp": 0,
+    "pb": 2,
+    "size": 5806,
+    "sha256": "9b488bfefeddabd7cdb7c4509ce68359aad7ac9aa2fd9a97688a263eeb894b18"
+  },
+  {
+    "name": "lc0-lp1-pb2.7z",
+    "lc": 0,
+    "lp": 1,
+    "pb": 2,
+    "size": 5634,
+    "sha256": "db068c50d1a62a898e45782999828329b35453af757ee513658f423fe1fc4a20"
+  },
+  {
+    "name": "lc1-lp1-pb2.7z",
+    "lc": 1,
+    "lp": 1,
+    "pb": 2,
+    "size": 5579,
+    "sha256": "cfd0a75607b353e6a4e2417f863e67bf34afaa4453a2a1f1bd2b81f6dc849711"
+  },
+  {
+    "name": "lc2-lp1-pb2.7z",
+    "lc": 2,
+    "lp": 1,
+    "pb": 2,
+    "size": 5602,
+    "sha256": "6dc1b8c22fc6e6a28b5e89898663c9f2455e3d84e84e7585ca92ea1c8b8dde7a"
+  },
+  {
+    "name": "lc3-lp1-pb2.7z",
+    "lc": 3,
+    "lp": 1,
+    "pb": 2,
+    "size": 5607,
+    "sha256": "d3402e62ef6450e6e02e88de850b68519ec3947ab90eef1a1a8699ebe1f06022"
+  },
+  {
+    "name": "lc4-lp1-pb2.7z",
+    "lc": 4,
+    "lp": 1,
+    "pb": 2,
+    "size": 5678,
+    "sha256": "7e9c83d5f0cd774e5b647fca1946f35c9f16992792240d7a01117360cf241b0d"
+  },
+  {
+    "name": "lc5-lp1-pb2.7z",
+    "lc": 5,
+    "lp": 1,
+    "pb": 2,
+    "size": 5745,
+    "sha256": "9e486a0592da382a52ea1ebbeb7e1b25520bcd532a127fb7a648741a1ecdb8c6"
+  },
+  {
+    "name": "lc6-lp1-pb2.7z",
+    "lc": 6,
+    "lp": 1,
+    "pb": 2,
+    "size": 5794,
+    "sha256": "6a6f2e8e08c85a781ddca7a5a84d9d0bc34a8af8c29fc99da2148ffd508f6abc"
+  },
+  {
+    "name": "lc7-lp1-pb2.7z",
+    "lc": 7,
+    "lp": 1,
+    "pb": 2,
+    "size": 5825,
+    "sha256": "9f2f142ce5ffb0090dc628c122568732a2aff8200e0f19c1c0efe7bda06d3749"
+  },
+  {
+    "name": "lc8-lp1-pb2.7z",
+    "lc": 8,
+    "lp": 1,
+    "pb": 2,
+    "size": 5847,
+    "sha256": "4d44e3937595348fcf6ad6ec46700d9d89cf095854dbddb82d3a7fd28b1b1776"
+  },
+  {
+    "name": "lc0-lp2-pb2.7z",
+    "lc": 0,
+    "lp": 2,
+    "pb": 2,
+    "size": 5713,
+    "sha256": "f5a2771fe03c803d9fd5dbee238699ea4aa2497e32f4cbdb52efb76d91188ed7"
+  },
+  {
+    "name": "lc1-lp2-pb2.7z",
+    "lc": 1,
+    "lp": 2,
+    "pb": 2,
+    "size": 5653,
+    "sha256": "4aff3efe175dea3cefd0e72b42cf289dd17ddae08dc08b25df9ff30a02faafd6"
+  },
+  {
+    "name": "lc2-lp2-pb2.7z",
+    "lc": 2,
+    "lp": 2,
+    "pb": 2,
+    "size": 5693,
+    "sha256": "442d64915dd4dd6aeacab72e4af6de0c8c6b563703b348ddee07beea14559c2a"
+  },
+  {
+    "name": "lc3-lp2-pb2.7z",
+    "lc": 3,
+    "lp": 2,
+    "pb": 2,
+    "size": 5708,
+    "sha256": "e0e78fbd73bd347a73f77ddb2620d42afc35e1b16d2c831ceacc2dd416182765"
+  },
+  {
+    "name": "lc4-lp2-pb2.7z",
+    "lc": 4,
+    "lp": 2,
+    "pb": 2,
+    "size": 5769,
+    "sha256": "53701263bad161f4e76680a0ba8a1ea1bb46998f720e0bfb95f3d2f944a8d878"
+  },
+  {
+    "name": "lc5-lp2-pb2.7z",
+    "lc": 5,
+    "lp": 2,
+    "pb": 2,
+    "size": 5810,
+    "sha256": "24192229eb2b89a0768d4ace558533310776b005d0beb88c38523aebb5bb6df9"
+  },
+  {
+    "name": "lc6-lp2-pb2.7z",
+    "lc": 6,
+    "lp": 2,
+    "pb": 2,
+    "size": 5841,
+    "sha256": "420b0fbad6b7ca0251e4ad3c677902793c03c52cee852ba5e1d8fe40e55de95e"
+  },
+  {
+    "name": "lc7-lp2-pb2.7z",
+    "lc": 7,
+    "lp": 2,
+    "pb": 2,
+    "size": 5861,
+    "sha256": "edec476c6e65b64dfff2b4d252497ac96ffb4724b2691a5077b50de83416611d"
+  },
+  {
+    "name": "lc8-lp2-pb2.7z",
+    "lc": 8,
+    "lp": 2,
+    "pb": 2,
+    "size": 5873,
+    "sha256": "9836f7d67698ebc06216e14edf53f34aadd683f9e41889726a3074940022e05a"
+  },
+  {
+    "name": "lc0-lp3-pb2.7z",
+    "lc": 0,
+    "lp": 3,
+    "pb": 2,
+    "size": 5785,
+    "sha256": "cd975c023428079b26153c142aefe7c6dc73969d467c3d12853e850ee95900ae"
+  },
+  {
+    "name": "lc1-lp3-pb2.7z",
+    "lc": 1,
+    "lp": 3,
+    "pb": 2,
+    "size": 5734,
+    "sha256": "6fd18df6419a8d1cc84ab25f35d58f74fe84a2a313fe6befe2c6e19e516c345a"
+  },
+  {
+    "name": "lc2-lp3-pb2.7z",
+    "lc": 2,
+    "lp": 3,
+    "pb": 2,
+    "size": 5774,
+    "sha256": "28284de64d702acedc0ab540415f1eb77035f3aa287ae9a447ccdb76de97c7fb"
+  },
+  {
+    "name": "lc3-lp3-pb2.7z",
+    "lc": 3,
+    "lp": 3,
+    "pb": 2,
+    "size": 5789,
+    "sha256": "051da0ac282af7680b890f8436b9628fa4c8cc65463a5742f15d598fcbbbc1e3"
+  },
+  {
+    "name": "lc4-lp3-pb2.7z",
+    "lc": 4,
+    "lp": 3,
+    "pb": 2,
+    "size": 5826,
+    "sha256": "f935ebd1539edcf6efebc922c8497f964fca602865ffc823cf6659bbdd1d0ee2"
+  },
+  {
+    "name": "lc5-lp3-pb2.7z",
+    "lc": 5,
+    "lp": 3,
+    "pb": 2,
+    "size": 5854,
+    "sha256": "b0e7a8d8c694c7eb5cf3473d94f386c1baf43e325cfdde00914b0cf14063c959"
+  },
+  {
+    "name": "lc6-lp3-pb2.7z",
+    "lc": 6,
+    "lp": 3,
+    "pb": 2,
+    "size": 5871,
+    "sha256": "a8949d0197f8acdf3814c6b75d800d29aa23ab6b5d00eb00389596f1b3188871"
+  },
+  {
+    "name": "lc7-lp3-pb2.7z",
+    "lc": 7,
+    "lp": 3,
+    "pb": 2,
+    "size": 5879,
+    "sha256": "cc01840d0b2c51d246e2e713c9b8891d8ce34d39a403c919f8bed2fac9b82762"
+  },
+  {
+    "name": "lc8-lp3-pb2.7z",
+    "lc": 8,
+    "lp": 3,
+    "pb": 2,
+    "size": 5885,
+    "sha256": "b5dddd6e2701f9b4830ba771c5383fc8103551c000f222d82cc99b9117627565"
+  },
+  {
+    "name": "lc0-lp4-pb2.7z",
+    "lc": 0,
+    "lp": 4,
+    "pb": 2,
+    "size": 5832,
+    "sha256": "e4db417172e1cab8c54847add1362e8d485e319357ae9461f279c2ff2e47dcaf"
+  },
+  {
+    "name": "lc1-lp4-pb2.7z",
+    "lc": 1,
+    "lp": 4,
+    "pb": 2,
+    "size": 5796,
+    "sha256": "e0a1a6f3fdd64e2fd364fe38db8436e136059c822d17f475950834b3b0b81bd4"
+  },
+  {
+    "name": "lc2-lp4-pb2.7z",
+    "lc": 2,
+    "lp": 4,
+    "pb": 2,
+    "size": 5827,
+    "sha256": "e611f9e2cc4ed05a34b96e5f0773bd284628c4960992aec56247158b0d740b51"
+  },
+  {
+    "name": "lc3-lp4-pb2.7z",
+    "lc": 3,
+    "lp": 4,
+    "pb": 2,
+    "size": 5837,
+    "sha256": "2f0bebdb54b324f6ed6c814e88068f4f10f81521df0de735c52abbef6d6e1d61"
+  },
+  {
+    "name": "lc4-lp4-pb2.7z",
+    "lc": 4,
+    "lp": 4,
+    "pb": 2,
+    "size": 5862,
+    "sha256": "d6bce9a9e017ff3c0137fa02d9e63a107a008031f8b6df6d49cc1b2d09de2075"
+  },
+  {
+    "name": "lc5-lp4-pb2.7z",
+    "lc": 5,
+    "lp": 4,
+    "pb": 2,
+    "size": 5878,
+    "sha256": "1ab44430792338cefdb26fde0595aa106d9df88c60e31a71ffef5e5b97f6a66c"
+  },
+  {
+    "name": "lc6-lp4-pb2.7z",
+    "lc": 6,
+    "lp": 4,
+    "pb": 2,
+    "size": 5880,
+    "sha256": "d0f0b7b3e4d8b55c15a7e4930124909ce9b05c8eda4481f1f76d4b571c4eaf7e"
+  },
+  {
+    "name": "lc7-lp4-pb2.7z",
+    "lc": 7,
+    "lp": 4,
+    "pb": 2,
+    "size": 5887,
+    "sha256": "7bc2c287b9a931390dd153c0b7cb7430b0a76a346451cd933a66d52b36f18d0f"
+  },
+  {
+    "name": "lc8-lp4-pb2.7z",
+    "lc": 8,
+    "lp": 4,
+    "pb": 2,
+    "size": 5892,
+    "sha256": "0aaef0f73dcda71ca419116f0f437e052b1c87cba4ba63dfa488aa5e36faeaa2"
+  },
+  {
+    "name": "lc0-lp0-pb3.7z",
+    "lc": 0,
+    "lp": 0,
+    "pb": 3,
+    "size": 5578,
+    "sha256": "3e3db28ebcfe19901037caa6eac683c12da13efb6318e9e4370509dd5f25df7a"
+  },
+  {
+    "name": "lc1-lp0-pb3.7z",
+    "lc": 1,
+    "lp": 0,
+    "pb": 3,
+    "size": 5526,
+    "sha256": "6efda3c3838a174c1ca33b780c8c8278e1ef3c85d7d8f6180b42f2735ac08b16"
+  },
+  {
+    "name": "lc2-lp0-pb3.7z",
+    "lc": 2,
+    "lp": 0,
+    "pb": 3,
+    "size": 5540,
+    "sha256": "26ff3c24c4510054ede86249457fbcd87c2aa798342fb1dd77f509e1d5241b88"
+  },
+  {
+    "name": "lc3-lp0-pb3.7z",
+    "lc": 3,
+    "lp": 0,
+    "pb": 3,
+    "size": 5545,
+    "sha256": "385370f2b4ad309ebd207ae1a5ffd0511dc41c0b65fae8255b62ba886d4b8cfd"
+  },
+  {
+    "name": "lc4-lp0-pb3.7z",
+    "lc": 4,
+    "lp": 0,
+    "pb": 3,
+    "size": 5595,
+    "sha256": "93c23ff88f28eda007355dd44576f2b147d66c804682528c97d7342875e8a335"
+  },
+  {
+    "name": "lc5-lp0-pb3.7z",
+    "lc": 5,
+    "lp": 0,
+    "pb": 3,
+    "size": 5654,
+    "sha256": "9aa21a75128a7c47fc1ecfa1cee848b99363f887e5874e1043ea430a2c8283c1"
+  },
+  {
+    "name": "lc6-lp0-pb3.7z",
+    "lc": 6,
+    "lp": 0,
+    "pb": 3,
+    "size": 5729,
+    "sha256": "a1e1bbce62d4339a4714dcab125331882b2b380f2ffd8487e231fe61f66aa234"
+  },
+  {
+    "name": "lc7-lp0-pb3.7z",
+    "lc": 7,
+    "lp": 0,
+    "pb": 3,
+    "size": 5783,
+    "sha256": "864774ee9216a9a2152e7ee069796db4606fbcc3748ec4b98484cb99364cf90f"
+  },
+  {
+    "name": "lc8-lp0-pb3.7z",
+    "lc": 8,
+    "lp": 0,
+    "pb": 3,
+    "size": 5816,
+    "sha256": "e6dbe52ab8ce23444694587d3a8e7413945b33c8578ecda5756f1c013263a4ad"
+  },
+  {
+    "name": "lc0-lp1-pb3.7z",
+    "lc": 0,
+    "lp": 1,
+    "pb": 3,
+    "size": 5642,
+    "sha256": "5015d7226ebbc477156039cf4b5b89d990564d5235ed57c65a08c133d53448f7"
+  },
+  {
+    "name": "lc1-lp1-pb3.7z",
+    "lc": 1,
+    "lp": 1,
+    "pb": 3,
+    "size": 5588,
+    "sha256": "8215fca2787e256892ad822cc2b76aa3fe64b980dd2d13a4ab8174402100dfc8"
+  },
+  {
+    "name": "lc2-lp1-pb3.7z",
+    "lc": 2,
+    "lp": 1,
+    "pb": 3,
+    "size": 5612,
+    "sha256": "3a81e1a314e219df00e40601f3dbfee2d3200f7bcf9e2c191d6090ca1f08c1a6"
+  },
+  {
+    "name": "lc3-lp1-pb3.7z",
+    "lc": 3,
+    "lp": 1,
+    "pb": 3,
+    "size": 5618,
+    "sha256": "7415cb469da3d7e52726db360f86976d197e38f8850272206101586df447fa9a"
+  },
+  {
+    "name": "lc4-lp1-pb3.7z",
+    "lc": 4,
+    "lp": 1,
+    "pb": 3,
+    "size": 5684,
+    "sha256": "43d535484b4ba59032cfeaca62b448b8e9f2463e1e2586ffea737c735a284a02"
+  },
+  {
+    "name": "lc5-lp1-pb3.7z",
+    "lc": 5,
+    "lp": 1,
+    "pb": 3,
+    "size": 5755,
+    "sha256": "01c87f45b6c10ad89778d9a884f0cd6bcf142c1634cbdff3ca1077cfce1cbe34"
+  },
+  {
+    "name": "lc6-lp1-pb3.7z",
+    "lc": 6,
+    "lp": 1,
+    "pb": 3,
+    "size": 5802,
+    "sha256": "508d2bfb3cfdb5f6f324c3c3aedb887a007453c4355cf47bc3730d3634fff08e"
+  },
+  {
+    "name": "lc7-lp1-pb3.7z",
+    "lc": 7,
+    "lp": 1,
+    "pb": 3,
+    "size": 5833,
+    "sha256": "1a5736729f336d8ed0391bace717ac4014776f39a2756dfdf63757f281a6b802"
+  },
+  {
+    "name": "lc8-lp1-pb3.7z",
+    "lc": 8,
+    "lp": 1,
+    "pb": 3,
+    "size": 5855,
+    "sha256": "0da807f7bbf73bc5ea5f41738decafaa4a61ea74d4ce514a8e41248d1a0f565e"
+  },
+  {
+    "name": "lc0-lp2-pb3.7z",
+    "lc": 0,
+    "lp": 2,
+    "pb": 3,
+    "size": 5720,
+    "sha256": "2f7613228bccf89ba64fb7eb0d4df17a07428c43a947b231ee762707e93548b5"
+  },
+  {
+    "name": "lc1-lp2-pb3.7z",
+    "lc": 1,
+    "lp": 2,
+    "pb": 3,
+    "size": 5660,
+    "sha256": "5e90fed0f8eb19774f2f3cdc5497090baf551a8642f0d05fdbcc6ce2d12a8a37"
+  },
+  {
+    "name": "lc2-lp2-pb3.7z",
+    "lc": 2,
+    "lp": 2,
+    "pb": 3,
+    "size": 5701,
+    "sha256": "a77d24772bc5d51b5f06d807d008be9c07af09c4032389e2e1ca76412f7d8d67"
+  },
+  {
+    "name": "lc3-lp2-pb3.7z",
+    "lc": 3,
+    "lp": 2,
+    "pb": 3,
+    "size": 5712,
+    "sha256": "c45c913540894cb7e009a772b3bd64f4c38486019e1492873b3c8c597f54dd0d"
+  },
+  {
+    "name": "lc4-lp2-pb3.7z",
+    "lc": 4,
+    "lp": 2,
+    "pb": 3,
+    "size": 5775,
+    "sha256": "2ef571f510074fa1c0b5431ab3a05925bbcc23b4b37c1f14be710e239d2074ce"
+  },
+  {
+    "name": "lc5-lp2-pb3.7z",
+    "lc": 5,
+    "lp": 2,
+    "pb": 3,
+    "size": 5817,
+    "sha256": "6fa39e606c4f7f1105ecf5ae7daee8518751c74d3d859c132f797e18e553aa05"
+  },
+  {
+    "name": "lc6-lp2-pb3.7z",
+    "lc": 6,
+    "lp": 2,
+    "pb": 3,
+    "size": 5849,
+    "sha256": "68f943c05c16ec1671ec98f6e5ac2e8112f7c5f386978400c755c97815ed3d9d"
+  },
+  {
+    "name": "lc7-lp2-pb3.7z",
+    "lc": 7,
+    "lp": 2,
+    "pb": 3,
+    "size": 5872,
+    "sha256": "c5254d64e2c73a4f28b2a1e082d6988bc742be6ddc78ccb2bb17a3b1029b1c14"
+  },
+  {
+    "name": "lc8-lp2-pb3.7z",
+    "lc": 8,
+    "lp": 2,
+    "pb": 3,
+    "size": 5884,
+    "sha256": "a79ac2263e44a9489be52b4dd111776a634843225a776ea6b55d7d15198cc991"
+  },
+  {
+    "name": "lc0-lp3-pb3.7z",
+    "lc": 0,
+    "lp": 3,
+    "pb": 3,
+    "size": 5796,
+    "sha256": "f0605cd3a6aff536c439cb1fa3ba10a178ad7632c68ea537a6fe13f87c55d6c6"
+  },
+  {
+    "name": "lc1-lp3-pb3.7z",
+    "lc": 1,
+    "lp": 3,
+    "pb": 3,
+    "size": 5742,
+    "sha256": "46ec3beb86b7a5dc973ee9b2c02da02857b70772aae071e19a3cfb29c4777a78"
+  },
+  {
+    "name": "lc2-lp3-pb3.7z",
+    "lc": 2,
+    "lp": 3,
+    "pb": 3,
+    "size": 5779,
+    "sha256": "f7f28a3bfdb07b7be058f2df655e3f9d96aba8454ab65ac16ac5be30825bb183"
+  },
+  {
+    "name": "lc3-lp3-pb3.7z",
+    "lc": 3,
+    "lp": 3,
+    "pb": 3,
+    "size": 5797,
+    "sha256": "2b011e1692aca607bea78a04172efe1ebe17cc4110b13dda5d70f31ef895447c"
+  },
+  {
+    "name": "lc4-lp3-pb3.7z",
+    "lc": 4,
+    "lp": 3,
+    "pb": 3,
+    "size": 5837,
+    "sha256": "f908a11cbf1767d4bb7b19dafa29a0a508af7e90577c99e6302718aa170c38ba"
+  },
+  {
+    "name": "lc5-lp3-pb3.7z",
+    "lc": 5,
+    "lp": 3,
+    "pb": 3,
+    "size": 5862,
+    "sha256": "6244dd56de906f8160507b50b6ed90b8b8cbaf6a7c677145ff37251a0268a995"
+  },
+  {
+    "name": "lc6-lp3-pb3.7z",
+    "lc": 6,
+    "lp": 3,
+    "pb": 3,
+    "size": 5883,
+    "sha256": "dd937fa846edbf4daeb85db4312351eac5b4c73477ae5dd0f17943dae4d1c15c"
+  },
+  {
+    "name": "lc7-lp3-pb3.7z",
+    "lc": 7,
+    "lp": 3,
+    "pb": 3,
+    "size": 5888,
+    "sha256": "e1baeb5a48c3d2f156ef92de84da14e1bfa6a08f96261c0a96134fdcd6db0cbf"
+  },
+  {
+    "name": "lc8-lp3-pb3.7z",
+    "lc": 8,
+    "lp": 3,
+    "pb": 3,
+    "size": 5896,
+    "sha256": "023d7b2eaec48bf663907eece89bfc103528bc8bf571dbacce52277cf4e3e2a2"
+  },
+  {
+    "name": "lc0-lp4-pb3.7z",
+    "lc": 0,
+    "lp": 4,
+    "pb": 3,
+    "size": 5841,
+    "sha256": "4fd4652e5e04fab0b679b9e0331f592582c648d00d0aedd3e322ad2bcaa3abbb"
+  },
+  {
+    "name": "lc1-lp4-pb3.7z",
+    "lc": 1,
+    "lp": 4,
+    "pb": 3,
+    "size": 5805,
+    "sha256": "15e241a4fe145b2c8232bd6836537ee1e2ac40646eef74a34319d16a96894dd7"
+  },
+  {
+    "name": "lc2-lp4-pb3.7z",
+    "lc": 2,
+    "lp": 4,
+    "pb": 3,
+    "size": 5835,
+    "sha256": "526548fb9ff91fdb35d87ebb36ca88f109275360ad712c65d12038c14035c4ea"
+  },
+  {
+    "name": "lc3-lp4-pb3.7z",
+    "lc": 3,
+    "lp": 4,
+    "pb": 3,
+    "size": 5850,
+    "sha256": "6646e943d0f5912d3a6c68baece13b26d9793d53a9e2c65ad884a51ab36ad0f1"
+  },
+  {
+    "name": "lc4-lp4-pb3.7z",
+    "lc": 4,
+    "lp": 4,
+    "pb": 3,
+    "size": 5873,
+    "sha256": "70b4264ba0e4bd78fe040ecc6654c53ac1776db2e7367b8e1ed7fb13329a7238"
+  },
+  {
+    "name": "lc5-lp4-pb3.7z",
+    "lc": 5,
+    "lp": 4,
+    "pb": 3,
+    "size": 5889,
+    "sha256": "d27c23dae0923c3ce06c75397576d8fe24b4fea90cfffe1f22309f35302c41f8"
+  },
+  {
+    "name": "lc6-lp4-pb3.7z",
+    "lc": 6,
+    "lp": 4,
+    "pb": 3,
+    "size": 5897,
+    "sha256": "2895a505fc6239d97832d719128804b759e57eae89165263e3bca430f4bcdfd8"
+  },
+  {
+    "name": "lc7-lp4-pb3.7z",
+    "lc": 7,
+    "lp": 4,
+    "pb": 3,
+    "size": 5901,
+    "sha256": "d40e3f7387861c27ae68ac6cb5c2fafb8261d073e2ffa678809b469a6d8934f5"
+  },
+  {
+    "name": "lc8-lp4-pb3.7z",
+    "lc": 8,
+    "lp": 4,
+    "pb": 3,
+    "size": 5902,
+    "sha256": "13c875440a20ed17f2637246cea70e432672ea89f5b3a8d0275b876596aeb196"
+  },
+  {
+    "name": "lc0-lp0-pb4.7z",
+    "lc": 0,
+    "lp": 0,
+    "pb": 4,
+    "size": 5586,
+    "sha256": "2698c1a5c06d142b6f3af3affb5a86e845540951b0de3878e946a8a3cee3367d"
+  },
+  {
+    "name": "lc1-lp0-pb4.7z",
+    "lc": 1,
+    "lp": 0,
+    "pb": 4,
+    "size": 5536,
+    "sha256": "5bc9cf9821d7eb1187d22982436050fa32e5d60b6581d6a94ee8efb964a9f6c7"
+  },
+  {
+    "name": "lc2-lp0-pb4.7z",
+    "lc": 2,
+    "lp": 0,
+    "pb": 4,
+    "size": 5547,
+    "sha256": "b706fd5ab283257ded919ad9a9071906539d5945a3039c9ec1d14ad380141e7d"
+  },
+  {
+    "name": "lc3-lp0-pb4.7z",
+    "lc": 3,
+    "lp": 0,
+    "pb": 4,
+    "size": 5552,
+    "sha256": "e775c049e3af2a442ae3dfac1f58a1e6501f5c1815ff16a977b06a8a5d1b1d5b"
+  },
+  {
+    "name": "lc4-lp0-pb4.7z",
+    "lc": 4,
+    "lp": 0,
+    "pb": 4,
+    "size": 5605,
+    "sha256": "25f6e856fb2c08197df1c3c953c031ea821fa68db4049a342429b73deb077cc2"
+  },
+  {
+    "name": "lc5-lp0-pb4.7z",
+    "lc": 5,
+    "lp": 0,
+    "pb": 4,
+    "size": 5664,
+    "sha256": "a97d28a23df7bc5e14368a21bb80fe840ae545240c55257e55c6440aa4d95d3c"
+  },
+  {
+    "name": "lc6-lp0-pb4.7z",
+    "lc": 6,
+    "lp": 0,
+    "pb": 4,
+    "size": 5737,
+    "sha256": "e9caa070966a1dda819fce2664bb277b81cdd484c8ff43d6902a731846325ec5"
+  },
+  {
+    "name": "lc7-lp0-pb4.7z",
+    "lc": 7,
+    "lp": 0,
+    "pb": 4,
+    "size": 5790,
+    "sha256": "80f9cd7b2bcea6dc8b85a80d75d1d9fce55aa9c98ceb9525ad386e9575ea2cb7"
+  },
+  {
+    "name": "lc8-lp0-pb4.7z",
+    "lc": 8,
+    "lp": 0,
+    "pb": 4,
+    "size": 5826,
+    "sha256": "c2238ab7b971b594bae3b03a1920a5c16fa17ef94b62c9db31952e152f530f70"
+  },
+  {
+    "name": "lc0-lp1-pb4.7z",
+    "lc": 0,
+    "lp": 1,
+    "pb": 4,
+    "size": 5649,
+    "sha256": "d97dd1ea11bd053f94ec69a8d32ca8d10a2b22fa0c9b2c1af647c0a64480be7a"
+  },
+  {
+    "name": "lc1-lp1-pb4.7z",
+    "lc": 1,
+    "lp": 1,
+    "pb": 4,
+    "size": 5594,
+    "sha256": "d246e750fe219201c72d31ee8fb9fda14ae92159769bc384a23a424f424ab0c0"
+  },
+  {
+    "name": "lc2-lp1-pb4.7z",
+    "lc": 2,
+    "lp": 1,
+    "pb": 4,
+    "size": 5623,
+    "sha256": "00e957b0c95101f87c8c3bcf1b9e103d0cfb17bf8d5f5066f2ebccd3f9f6692d"
+  },
+  {
+    "name": "lc3-lp1-pb4.7z",
+    "lc": 3,
+    "lp": 1,
+    "pb": 4,
+    "size": 5629,
+    "sha256": "a4499b77b569e43067bc17c4c7a140dbf407882e632ad65daab06e88d474eb7e"
+  },
+  {
+    "name": "lc4-lp1-pb4.7z",
+    "lc": 4,
+    "lp": 1,
+    "pb": 4,
+    "size": 5694,
+    "sha256": "0d660ae52be226f94de34ec8d796755029c61b2450be0f23a83cd7833ebb06c3"
+  },
+  {
+    "name": "lc5-lp1-pb4.7z",
+    "lc": 5,
+    "lp": 1,
+    "pb": 4,
+    "size": 5766,
+    "sha256": "3e6e16a3a74a506bb298916b4bf4fdddedb774bc98b96b9a2138188fb231edcb"
+  },
+  {
+    "name": "lc6-lp1-pb4.7z",
+    "lc": 6,
+    "lp": 1,
+    "pb": 4,
+    "size": 5812,
+    "sha256": "5512c5324dc72be69744d0ccc336aa68e76eb45cd968aa22a364958e9de6f86e"
+  },
+  {
+    "name": "lc7-lp1-pb4.7z",
+    "lc": 7,
+    "lp": 1,
+    "pb": 4,
+    "size": 5842,
+    "sha256": "0daa001725f0449728b87950286e75985dbd76114dae66bcfc58deaa49fa23cf"
+  },
+  {
+    "name": "lc8-lp1-pb4.7z",
+    "lc": 8,
+    "lp": 1,
+    "pb": 4,
+    "size": 5864,
+    "sha256": "5f78d09e68616ad563c2ef01bde8c0bda0270e6d509d325de444697b9254b581"
+  },
+  {
+    "name": "lc0-lp2-pb4.7z",
+    "lc": 0,
+    "lp": 2,
+    "pb": 4,
+    "size": 5729,
+    "sha256": "3ab666744c969bf74ee4406a4eaa2ee9ea08c4923fca067fc2202fec163058ed"
+  },
+  {
+    "name": "lc1-lp2-pb4.7z",
+    "lc": 1,
+    "lp": 2,
+    "pb": 4,
+    "size": 5671,
+    "sha256": "d389d3439f987a6f460f33796560b9e4bff2f7e9e0185a65a77cd2fc8f38a299"
+  },
+  {
+    "name": "lc2-lp2-pb4.7z",
+    "lc": 2,
+    "lp": 2,
+    "pb": 4,
+    "size": 5709,
+    "sha256": "72d0fc051cf22e2a2a995b40564671d913010de340e6a951ddc34baf4db0d0dd"
+  },
+  {
+    "name": "lc3-lp2-pb4.7z",
+    "lc": 3,
+    "lp": 2,
+    "pb": 4,
+    "size": 5723,
+    "sha256": "22af50ba0914a1ee3881b09952b725bdfd86fe5a77cc3c5be25209cc8c544d27"
+  },
+  {
+    "name": "lc4-lp2-pb4.7z",
+    "lc": 4,
+    "lp": 2,
+    "pb": 4,
+    "size": 5788,
+    "sha256": "81696e5a0c5cfaf47c5f8738ddf46fdd69af9f3f23fd0e93d4af8ae2e143852b"
+  },
+  {
+    "name": "lc5-lp2-pb4.7z",
+    "lc": 5,
+    "lp": 2,
+    "pb": 4,
+    "size": 5828,
+    "sha256": "702b0eeac96cc971d4be623b0d464c909debf1b4556e2fc7fdb697462dcb320a"
+  },
+  {
+    "name": "lc6-lp2-pb4.7z",
+    "lc": 6,
+    "lp": 2,
+    "pb": 4,
+    "size": 5860,
+    "sha256": "ca32b164511e7703a75cf012ae4f0fa833469d10c72e2780d8d8384e47ce9c4e"
+  },
+  {
+    "name": "lc7-lp2-pb4.7z",
+    "lc": 7,
+    "lp": 2,
+    "pb": 4,
+    "size": 5881,
+    "sha256": "dc32c955af53b411fa01d88a358d9c31f69f9360eff39e581436ee8ca1445ffb"
+  },
+  {
+    "name": "lc8-lp2-pb4.7z",
+    "lc": 8,
+    "lp": 2,
+    "pb": 4,
+    "size": 5892,
+    "sha256": "4dd64b347cbcb7311b20fd7390d563f9b4b884d7cff4c12a5586d0c9737366e1"
+  },
+  {
+    "name": "lc0-lp3-pb4.7z",
+    "lc": 0,
+    "lp": 3,
+    "pb": 4,
+    "size": 5808,
+    "sha256": "76feed0ad7aee8e5e956b57fe180f36282ac16a92a0de3d8064d0fdc50303a70"
+  },
+  {
+    "name": "lc1-lp3-pb4.7z",
+    "lc": 1,
+    "lp": 3,
+    "pb": 4,
+    "size": 5752,
+    "sha256": "23d46faac9a276426b2076403f9c26ceef14e104f0c0cb1d917b6fd29532b62f"
+  },
+  {
+    "name": "lc2-lp3-pb4.7z",
+    "lc": 2,
+    "lp": 3,
+    "pb": 4,
+    "size": 5793,
+    "sha256": "b4b1cd1ddce88212ba3e66434ccf80c8c6d1118749bdb0a92b221efbed5d0111"
+  },
+  {
+    "name": "lc3-lp3-pb4.7z",
+    "lc": 3,
+    "lp": 3,
+    "pb": 4,
+    "size": 5809,
+    "sha256": "da915bf053eb3dc87b60de97d2bf26b51a1bfbdf4f2d02c2370e73f360c7a139"
+  },
+  {
+    "name": "lc4-lp3-pb4.7z",
+    "lc": 4,
+    "lp": 3,
+    "pb": 4,
+    "size": 5846,
+    "sha256": "185bcda8ec78af272e1c3755805156f01d27932261c652fb9e7540c547543536"
+  },
+  {
+    "name": "lc5-lp3-pb4.7z",
+    "lc": 5,
+    "lp": 3,
+    "pb": 4,
+    "size": 5872,
+    "sha256": "431358b4a9ce76d33a3ea49faf190d3d04453da3f88f39d42052e8dfeaf04402"
+  },
+  {
+    "name": "lc6-lp3-pb4.7z",
+    "lc": 6,
+    "lp": 3,
+    "pb": 4,
+    "size": 5891,
+    "sha256": "3062a7c3b002e016048e178939900fc8795adb7961e00537c6e9c2bb10cf8c7d"
+  },
+  {
+    "name": "lc7-lp3-pb4.7z",
+    "lc": 7,
+    "lp": 3,
+    "pb": 4,
+    "size": 5902,
+    "sha256": "d7476289b39b2596bb3b08c71ed0263c97f2a0d661d71ba70f7a3c2253fb8e0c"
+  },
+  {
+    "name": "lc8-lp3-pb4.7z",
+    "lc": 8,
+    "lp": 3,
+    "pb": 4,
+    "size": 5909,
+    "sha256": "176cd0186aca6b65e3902570efaed1ed83f6fc89967f93ab68dc68b64fe9541a"
+  },
+  {
+    "name": "lc0-lp4-pb4.7z",
+    "lc": 0,
+    "lp": 4,
+    "pb": 4,
+    "size": 5854,
+    "sha256": "01e0b9b11b7b19a7d5c0e09a272f11f9b684655b1fdef3faccbefe0af998820d"
+  },
+  {
+    "name": "lc1-lp4-pb4.7z",
+    "lc": 1,
+    "lp": 4,
+    "pb": 4,
+    "size": 5818,
+    "sha256": "e4aaada721243d173d9cc14a5fd73b51cfd197058a3a0abcb9ddb84c191f9e57"
+  },
+  {
+    "name": "lc2-lp4-pb4.7z",
+    "lc": 2,
+    "lp": 4,
+    "pb": 4,
+    "size": 5849,
+    "sha256": "81ca2aa8fd749856845797ca9a585b6a9ade7ae368047ef0209684d161c224fb"
+  },
+  {
+    "name": "lc3-lp4-pb4.7z",
+    "lc": 3,
+    "lp": 4,
+    "pb": 4,
+    "size": 5859,
+    "sha256": "00ea92bfee1b8f9b1f83929baed4aa1c2ba386defc14b993f06b2a4dcdc52432"
+  },
+  {
+    "name": "lc4-lp4-pb4.7z",
+    "lc": 4,
+    "lp": 4,
+    "pb": 4,
+    "size": 5883,
+    "sha256": "d3784de001b3499fc4513bbba8c8db8bc350848d1619cdb20a0e0ca2e4d70351"
+  },
+  {
+    "name": "lc5-lp4-pb4.7z",
+    "lc": 5,
+    "lp": 4,
+    "pb": 4,
+    "size": 5899,
+    "sha256": "37877156a2d424503355ba02824c978ac300a205a8b28c97fbccc4c7376585e1"
+  },
+  {
+    "name": "lc6-lp4-pb4.7z",
+    "lc": 6,
+    "lp": 4,
+    "pb": 4,
+    "size": 5911,
+    "sha256": "eabfd3839e27c0adfda71678af84e335b59dd6332a1ca70832ac0c10d3b40077"
+  },
+  {
+    "name": "lc7-lp4-pb4.7z",
+    "lc": 7,
+    "lp": 4,
+    "pb": 4,
+    "size": 5916,
+    "sha256": "2cf80da26e34128822866fd3e3d8567a9fe8174b7a599abf3334236693db506c"
+  },
+  {
+    "name": "lc8-lp4-pb4.7z",
+    "lc": 8,
+    "lp": 4,
+    "pb": 4,
+    "size": 5920,
+    "sha256": "6e6bfba7ede17f19212a13b1c26fe751ad0b2a5754eade9b836bde82d8b26a00"
+  }
+]

@@ -1,0 +1,81 @@
+import {
+  "Wyh123456559/moon7z/archive",
+  "moonbitlang/core/encoding/base64",
+} for "test"
+
+rule(
+  name: "history",
+  command: ":embed -i $input -o $output --name history_text",
+)
+
+dev_build(
+  rule: "history",
+  input: "../../corpus/lzma1/history.base64",
+  output: "history_archive_test.mbt",
+)
+
+rule(
+  name: "matrix",
+  command: ":embed -i $input -o $output --name lzma_matrix_text",
+)
+
+dev_build(
+  rule: "matrix",
+  input: "../../corpus/lzma1/matrix.base64",
+  output: "matrix_archive_test.mbt",
+)
+
+rule(
+  name: "full",
+  command: ":embed --binary -i $input -o $output --name lzma_full",
+)
+
+dev_build(
+  rule: "full",
+  input: "../../corpus/lzma1/lc8-lp4-pb4.7z",
+  output: "full_archive_test.mbt",
+)
+
+rule(
+  name: "eos",
+  command: ":embed --binary -i $input -o $output --name lzma_eos",
+)
+
+dev_build(
+  rule: "eos",
+  input: "../../corpus/lzma1/end-marker.7z",
+  output: "eos_archive_test.mbt",
+)
+
+rule(
+  name: "readme",
+  command: ":embed --binary -i $input -o $output --name upstream_readme",
+)
+
+dev_build(
+  rule: "readme",
+  input: "../../corpus/source/lzma-mbt/README.md",
+  output: "readme_archive_test.mbt",
+)
+
+rule(
+  name: "license",
+  command: ":embed --binary -i $input -o $output --name upstream_license",
+)
+
+dev_build(
+  rule: "license",
+  input: "../../corpus/source/lzma-mbt/LICENSE",
+  output: "license_archive_test.mbt",
+)
+
+rule(
+  name: "manifest",
+  command: ":embed --binary -i $input -o $output --name manifest",
+)
+
+dev_build(
+  rule: "manifest",
+  input: "../../corpus/source/清单.json",
+  output: "manifest_archive_test.mbt",
+)

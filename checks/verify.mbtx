@@ -38,6 +38,8 @@ async fn main {
       ["fmt", "--check", "checks/external.mbtx"],
       ["fmt", "--check", "checks/semantics.mbtx"],
       ["fmt", "--check", "checks/ppmd.mbtx"],
+      ["fmt", "--check", "checks/lzma1.mbtx"],
+      ["fmt", "--check", "corpus/lzma1/generate.mbtx"],
       ["fmt", "--check", "corpus/ppmd/generate.mbtx"],
       ["fmt", "--check", "corpus/semantics/generate.mbtx"],
       ["fmt", "--check", "corpus/external/generate.mbtx"],
@@ -53,14 +55,17 @@ async fn main {
       ["fmt", "--check", "corpus/x86/generate.mbtx"],
       ["fmt", "--check", "corpus/arm64/generate.mbtx"],
       ["info"],
-      ["check", "--target", target, "--deny-warn"],
-      ["build", "--target", target, "--deny-warn"],
-      ["test", "--target", target, "--deny-warn"],
+      ["check", "--target", target, "--deny-warn", "-j", "2"],
+      ["build", "--target", target, "--deny-warn", "-j", "2"],
+      ["test", "--target", target, "--deny-warn", "-j", "2"],
     ] {
     @shell.Cmd("moon", command).run(timeout_ms=120000)
   }
   @shell.Cmd("git", ["diff", "--exit-code", "--", "*.mbti"]).run()
   if target == "wasm" || target == "native" {
+    @shell.Cmd("moon", ["run", "checks/lzma1.mbtx", "--", target]).run(
+      timeout_ms=360000,
+    )
     @shell.Cmd("moon", ["run", "checks/ppmd.mbtx", "--", target]).run(
       timeout_ms=360000,
     )

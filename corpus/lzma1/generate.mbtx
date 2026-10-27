@@ -1,0 +1,178 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/env",
+  "moonbitlang/core/encoding/base64",
+  "moonbitlang/core/json",
+  "moonbitlang/x/crypto",
+}
+----
+
+///|
+fn sha256(bytes : Bytes) -> String {
+  let hash = @crypto.SHA256::new()
+  hash.update(bytes[:])
+  let digest = FixedArray::make(32, b'\x00')
+  @crypto.CryptoHasher::finalize_into(hash, digest, offset=0)
+  let alphabet = [
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+  ]
+  let out = StringBuilder()
+  for b in digest {
+    out.write_char(alphabet[b.to_int() >> 4])
+    out.write_char(alphabet[b.to_int() & 15])
+  }
+  out.to_string()
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else {
+    fail("usage: generate.mbtx 7ZA26 NEW_DIRECTORY")
+  }
+  guard @shell.Cmd(args[1], []).output().stdout().contains("26.05") else {
+    fail("expected official 7-Zip Extra 26.05")
+  }
+  @fs.mkdir(args[2])
+  let root = @fs.realpath(args[2])
+  @fs.mkdir(root + "/source")
+  let files = ["README.md", "LICENSE", "清单.json"]
+  for
+    (original, name) in [
+      ("corpus/source/lzma-mbt/README.md", "README.md"),
+      ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    @fs.write_file(root + "/source/" + name, @fs.read_file(original).binary())
+  }
+  let bundle = @buffer.Buffer()
+  bundle.write_bytes(b"M7L1\x01")
+  bundle.write_uint_le(225U)
+  let rows : Array[Json] = []
+  for pb in 0..<5 {
+    for lp in 0..<5 {
+      for lc in 0..<9 {
+        let name = "lc\{lc}-lp\{lp}-pb\{pb}"
+        let path = root + "/" + name + ".7z"
+        let command = ["a", path] +
+          files +
+          [
+            "-t7z",
+            "-m0=LZMA:lc=\{lc}:lp=\{lp}:pb=\{pb}:d=64k",
+            "-ms=on",
+            "-mhc=off",
+            "-mtm=off",
+            "-mtc=off",
+            "-mta=off",
+          ]
+        let pack = @shell.Cmd(args[1], command, cwd=root + "/source").output(
+          timeout_ms=120000,
+        )
+        guard pack.exit_code() == 0 else { fail(pack.stdout() + pack.stderr()) }
+        let tested = @shell.Cmd(args[1], ["t", path]).output()
+        assert_eq(tested.exit_code(), 0)
+        let output = root + "/unpacked-" + name
+        let unpacked = @shell.Cmd(args[1], ["x", path, "-o" + output]).output()
+        assert_eq(unpacked.exit_code(), 0)
+        for file in files {
+          assert_eq(
+            @fs.read_file(output + "/" + file).binary(),
+            @fs.read_file(root + "/source/" + file).binary(),
+          )
+        }
+        let bytes = @fs.read_file(path).binary()
+        bundle.write_byte(lc.to_byte())
+        bundle.write_byte(lp.to_byte())
+        bundle.write_byte(pb.to_byte())
+        bundle.write_uint_le(bytes.length().reinterpret_as_uint())
+        bundle.write_bytes(bytes)
+        rows.push({
+          "name": Json(name + ".7z"),
+          "lc": Json(lc),
+          "lp": Json(lp),
+          "pb": Json(pb),
+          "size": Json(bytes.length()),
+          "sha256": Json(sha256(bytes)),
+        })
+      }
+    }
+    println(
+      "Independent producer/test/extraction passed for pb=\{pb}, all 45 lc/lp pairs",
+    )
+  }
+  @fs.write_file(root + "/matrix.base64", wrapped_base64(bundle.to_bytes()))
+  @fs.write_file(
+    root + "/manifest.json",
+    Json::array(rows).stringify(indent=2) + "\n",
+  )
+  let eos = root + "/end-marker.7z"
+  @shell.Cmd(
+    args[1],
+    ["a", eos] +
+    files +
+    [
+      "-t7z", "-m0=LZMA:lc=8:lp=4:pb=4:d=64k:eos=on", "-ms=on", "-mhc=on", "-mtm=off",
+      "-mtc=off", "-mta=off",
+    ],
+    cwd=root + "/source",
+  ).run()
+  @shell.Cmd(args[1], ["t", eos]).run()
+  @shell.Cmd(args[1], ["x", eos, "-o" + root + "/unpacked-eos"]).run()
+  for file in files {
+    assert_eq(
+      @fs.read_file(root + "/unpacked-eos/" + file).binary(),
+      @fs.read_file(root + "/source/" + file).binary(),
+    )
+  }
+  let half = FixedArray::make(65536, b'\x00')
+  let mut seed = 0x12345678U
+  for i in 0..<65536 {
+    seed = seed * 1664525U + 1013904223U
+    half[i] = (seed >> 24).to_byte()
+  }
+  let first = Bytes::makei(65536, i => half[i])
+  let window = first + first + b"end"
+  @fs.write_file(root + "/source/window.bin", window)
+  let history = root + "/history.7z"
+  @shell.Cmd(
+    args[1],
+    [
+      "a", history, "window.bin", "-t7z", "-m0=LZMA:lc=3:lp=2:pb=4:d=64k", "-mhc=on",
+      "-mtm=off", "-mtc=off", "-mta=off",
+    ],
+    cwd=root + "/source",
+  ).run()
+  @shell.Cmd(args[1], ["t", history]).run()
+  @shell.Cmd(args[1], ["x", history, "-o" + root + "/unpacked-history"]).run()
+  assert_eq(
+    @fs.read_file(root + "/unpacked-history/window.bin").binary(),
+    window,
+  )
+  @fs.write_file(
+    root + "/history.base64",
+    wrapped_base64(@fs.read_file(history).binary()),
+  )
+  println(
+    "All 225 LZMA1 property combinations and the end-marker case independently verified",
+  )
+}
+
+///|
+fn wrapped_base64(bytes : Bytes) -> String {
+  let encoded = @base64.encode(bytes)
+  let wrapped = StringBuilder()
+  for start = 0; start < encoded.length(); start = start + 256 {
+    let end = if start + 256 < encoded.length() {
+      start + 256
+    } else {
+      encoded.length()
+    }
+    wrapped.write_string(encoded[start:end].to_owned())
+    wrapped.write_char('\n')
+  }
+  wrapped.to_string()
+}

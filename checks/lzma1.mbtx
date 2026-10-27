@@ -1,0 +1,81 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  let corpus = args.get(2).unwrap_or("corpus/lzma1")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-lzma1")
+  defer @fs.rmdir(root, recursive=true)
+  for
+    id in ["lc0-lp0-pb0", "lc3-lp2-pb2", "lc8-lp4-pb4", "end-marker", "history"] {
+    @shell.Cmd("moon", [
+      "run",
+      "--target",
+      target,
+      "app",
+      "--",
+      "extract",
+      "--contents-only",
+      corpus + "/" + id + ".7z",
+      root,
+      id,
+    ]).run(timeout_ms=120000)
+    if id == "history" {
+      let half = FixedArray::make(65536, b'\x00')
+      let mut seed = 0x12345678U
+      for i in 0..<65536 {
+        seed = seed * 1664525U + 1013904223U
+        half[i] = (seed >> 24).to_byte()
+      }
+      let first = Bytes::makei(65536, i => half[i])
+      assert_eq(
+        @fs.read_file(root + "/history/window.bin").binary(),
+        first + first + b"end",
+      )
+      continue
+    }
+    for
+      (original, name) in [
+        ("corpus/source/lzma-mbt/README.md", "README.md"),
+        ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+        ("corpus/source/清单.json", "清单.json"),
+      ] {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + name).binary(),
+        @fs.read_file(original).binary(),
+      )
+    }
+  }
+  let damaged = @fs.read_file(corpus + "/lc8-lp4-pb4.7z").binary().to_array()
+  damaged[32] = b'\x01'
+  @fs.write_file(root + "/damaged.7z", Bytes::from_array(damaged))
+  let result = @shell.Cmd("moon", [
+    "run",
+    "--target",
+    target,
+    "app",
+    "--",
+    "extract",
+    "--contents-only",
+    root + "/damaged.7z",
+    root,
+    "refused",
+  ]).output(timeout_ms=120000)
+  assert_true(result.exit_code() != 0)
+  assert_eq(result.stdout(), "")
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 6)
+  println(
+    "Full LZMA1 contexts and optional end markers export exact package bytes; malformed input publishes nothing",
+  )
+}

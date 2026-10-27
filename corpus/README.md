@@ -1,5 +1,10 @@
 # Interoperability corpus
 
+[LZMA1 evidence](../docs/lzma1.md) includes all 225 legal property combinations
+as a Base64 test transport, individual example archives, an explicit end-marker
+case and a 64 KiB dictionary/history case. Each was independently tested and
+extracted with official 7-Zip 26.05 before Moon7z byte comparison.
+
 [PPMd7 evidence](../docs/ppmd.md) records seven independent test/extraction cases,
 including actual package documentation/metadata, binary restart stress, AES data
 and a project-assembled PPMd encoded header. All required checks run without a

@@ -3,6 +3,7 @@ _build/
 /moon.lock
 /out/
 /archive/*_archive_test.mbt
+/tests/lzma1/*_archive_test.mbt
 /archive/upstream_*_test.mbt
 /archive/manifest_test.mbt
 /archive/*_resource_wbtest.mbt

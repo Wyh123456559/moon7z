@@ -200,10 +200,11 @@ pub struct Limits {
   kdf_bytes : Int32
   password_bytes : Int32
   file_property_records : Int32
+  lzma_probability_bytes : Int32
 } derive(Eq, @debug.Debug)
 #deprecated
 pub fn Limits::equal(Self, Self) -> Bool
-pub fn Limits::new(input_bytes? : Int32, header_bytes? : Int32, output_bytes? : Int32, dictionary_bytes? : Int32, entries? : Int32, working_bytes? : Int32, coders? : Int32, kdf_rounds? : Int32, kdf_bytes? : Int32, password_bytes? : Int32, file_property_records? : Int32) -> Self
+pub fn Limits::new(input_bytes? : Int32, header_bytes? : Int32, output_bytes? : Int32, dictionary_bytes? : Int32, entries? : Int32, working_bytes? : Int32, coders? : Int32, kdf_rounds? : Int32, kdf_bytes? : Int32, password_bytes? : Int32, file_property_records? : Int32, lzma_probability_bytes? : Int32) -> Self
 #deprecated
 pub fn Limits::not_equal(Self, Self) -> Bool
 #deprecated

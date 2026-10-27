@@ -1,9 +1,7 @@
 import {
   "moonbitlang/x/crypto",
-  "aurora0x27/lzma-mbt/lzma",
   "aurora0x27/lzma-mbt/lzma2",
   "aurora0x27/lzma-mbt/filters",
-  "moonbitlang/core/buffer",
   "moonbitlang/core/encoding/utf16",
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/base64",
@@ -11,11 +9,24 @@ import {
 
 import {
   "moonbitlang/core/json",
+  "moonbitlang/core/buffer",
 } for "test"
 
 import {
   "moonbitlang/core/json",
+  "moonbitlang/core/buffer",
 } for "wbtest"
+
+rule(
+  name: "lzma_private",
+  command: ":embed --binary -i $input -o $output --name lzma_private",
+)
+
+dev_build(
+  rule: "lzma_private",
+  input: "../corpus/lzma1/lc8-lp4-pb4.7z",
+  output: "lzma1_resource_wbtest.mbt",
+)
 
 rule(
   name: "ppmd_header",

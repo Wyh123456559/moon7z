@@ -22,6 +22,7 @@ pub fn Archive::open(
       limits.kdf_bytes,
       limits.password_bytes,
       limits.file_property_records,
+      limits.lzma_probability_bytes,
     ] {
     guard value >= 0 && value <= 0x3fffffff else {
       raise Invalid(

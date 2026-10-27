@@ -7,7 +7,8 @@ reviewed direct peer, not a dependency or a source of code/fixtures here.
 
 | Material | Source | License and use |
 | --- | --- | --- |
-| LZMA/LZMA2 decoder and Delta/branch filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma`, `lzma2` and `filters` public APIs, not vendored; exact calls are in docs/ecosystem.md |
+| LZMA2 decoder and Delta/branch filter dependency | [aurora0x27/lzma-mbt](https://github.com/aurora0x27/lzma-mbt), Mooncakes 0.1.0 | Apache-2.0; `lzma2` and `filters` public APIs, not vendored; exact calls are in docs/ecosystem.md |
+| Raw LZMA1 model/range algorithms | [lzma-mbt at e50568f7d8358045c39092210d140f6a5eec6971](https://github.com/aurora0x27/lzma-mbt/tree/e50568f7d8358045c39092210d140f6a5eec6971), `src/internal/coder/decode.mbt`, `helpers.mbt`, `src/internal/range_coder/range.mbt` | Apache-2.0; adapted in `archive/lzma.mbt` with flat probability allocation, full LZMA1 properties, output-backed bounded history and exact packed/end-marker checks. Original license retained in `licenses/lzma-mbt-Apache-2.0.txt`; no upstream tests copied. This replaces the previous high-level `decode_alone` use; private dependency packages are not imported |
 | Host I/O and asynchronous execution | [moonbitlang/async](https://github.com/moonbitlang/async), 0.22.5 | Apache-2.0; CLI/example/checks only |
 | Standard library | [moonbitlang/core](https://github.com/moonbitlang/core) | Apache-2.0; toolchain dependency |
 | Cryptographic primitives | [moonbitlang/x](https://github.com/moonbitlang/x), 0.5.5, `crypto` | Apache-2.0 dependency; `SHA256::new/update`, `CryptoHasher::finalize_into`, `aes_cbc_decrypt`. No AES or SHA implementation is claimed as project-authored |
@@ -41,6 +42,14 @@ whose encoded file-table header was compressed by 26.05 PPMd. All seven pass
 independent test/extraction and exact byte comparison. The builder and new
 tests are project-authored Apache-2.0; [docs/ppmd.md](docs/ppmd.md) records hashes,
 arguments, encoder limits and which decoder boundaries have only local tests.
+
+`corpus/lzma1/` contains 225 independently encoded/tested/extracted property
+cases, stored in a Base64 test transport with per-archive SHA-256 manifest,
+individual runnable examples, an explicit end-marker archive and a full 64 KiB
+history archive. The original documentation/JSON retains its existing Apache-2.0
+attribution; history bytes, builder, framing and tests are project-authored
+Apache-2.0. No external fixtures/tests were copied. [docs/lzma1.md](docs/lzma1.md)
+records parameters, actual dictionary normalization, storage format and hashes.
 
 The two PCM WAV originals in `corpus/audio/` and their generator are
 project-authored Apache-2.0 interoperability data. Their Delta-filtered archives
@@ -96,7 +105,8 @@ and linked ip7z/7zip release assets, and are not redistributed. Unlike 7zr,
 or linked into Moon7z. bsdtar/libarchive (BSD-2-Clause) is a test oracle only.
 Input SHA-256 and archive SHA-256 values are recorded in `manifest.json`;
 hashing in standalone development/check scripts uses
-`moonbitlang/x@0.5.5/crypto` (Apache-2.0), not a runtime library dependency.
+`moonbitlang/x@0.5.5/crypto` (Apache-2.0), which also supplies the runtime crypto
+primitives listed above.
 
 Development was rechecked on 2026-10-26 with official stable
 `moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).

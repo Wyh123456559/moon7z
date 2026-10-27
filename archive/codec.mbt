@@ -56,17 +56,7 @@ fn validate_coder(coder : Coder) -> Unit raise ArchiveError {
       if !coder.properties.is_empty() {
         raise Invalid(offset=0, reason="Copy coder has properties")
       }
-    b"\x03\x01\x01" => {
-      guard coder.properties.length() == 5 else {
-        raise Invalid(offset=0, reason="LZMA needs five property bytes")
-      }
-      let p = coder.properties[0].to_int()
-      guard p < 225 && p % 9 + p / 9 % 5 <= 4 else {
-        raise Unsupported(
-          feature="LZMA lc/lp properties outside decoder support",
-        )
-      }
-    }
+    b"\x03\x01\x01" => ignore(lzma_properties(coder.properties))
     b"\x21" => {
       guard coder.properties.length() == 1 && coder.properties[0].to_int() <= 40 else {
         raise Invalid(offset=0, reason="invalid LZMA2 dictionary property")
@@ -113,6 +103,9 @@ fn validate_dictionary(
   coder : Coder,
   limits : Limits,
 ) -> Unit raise ArchiveError {
+  if coder.codec_id == b"\x03\x01\x01" {
+    ignore(lzma_probabilities(coder.properties, limits))
+  }
   ignore(
     bounded(dictionary(coder), limits.dictionary_bytes, "dictionary bytes"),
   )
@@ -182,15 +175,8 @@ fn decode(
     b"\x04\x02\x02" => decode_bzip2(packed, block.size, limits.dictionary_bytes)
     b"\x04\x01\x08" => decode_deflate(packed, block.size)
     b"\x00" => packed
-    b"\x03\x01\x01" => {
-      let alone = @buffer.Buffer()
-      alone.write_bytes(coder.properties)
-      alone.write_uint64_le(block.size.to_uint64())
-      alone.write_bytes(packed)
-      @lzma.decode_alone(alone.to_bytes(), limits.dictionary_bytes.to_uint64()) catch {
-        _ => raise Codec(reason="invalid or truncated compressed data")
-      }
-    }
+    b"\x03\x01\x01" =>
+      decode_lzma1(packed, block.size, coder.properties, limits)
     b"\x21" => {
       preflight_lzma2(packed, block.size)
       @lzma2.decode_lzma2(

@@ -5,9 +5,10 @@ returns complete file members and their metadata without launching 7-Zip or
 writing temporary files. It is intended for importers, resource managers and
 batch data tools that need to consume archives through an API.
 
-The project is a 7z container and verified-import implementation built on an
-existing LZMA/LZMA2 codec. It includes public-domain BCJ/BCJ2/PPMd7 adaptations; it
-does not claim that the compression algorithms are original. Basic archive
+The project implements the 7z container and verified-import workflow. It reuses
+published LZMA2/filter/crypto APIs and includes attributed LZMA1, BCJ/BCJ2, PPMd7
+and BZip2 adaptations. It does not claim that the compression algorithms are
+original. Basic archive
 reading overlaps the recently published `Sxy11112/moon7z`; the independent work
 is the broader compatibility path plus bounded, verified member processing.
 See [ecosystem and reuse comparison](docs/ecosystem.md), the
@@ -231,6 +232,12 @@ input, decoder buffers, folder output and returned member copies can coexist.
 LZMA2 chunk sizes are checked before codec allocation. This is a bounded,
 in-memory implementation, not a streaming reader or an exact backup restorer.
 
+LZMA1 supports all 225 legal `lc`/`lp`/`pb` combinations, including `lc + lp > 4`.
+`Limits.lzma_probability_bytes` separately bounds its UInt32 probability table
+before allocation (default 16 MiB). Packed bytes must be fully consumed, with a
+finished range state and a valid end marker when present. LZMA2 retains its own
+format-required `lc + lp <= 4` rule. See [complete LZMA1 property evidence](docs/lzma1.md).
+
 Whole-archive `verify()` decodes and checks one folder at a time. It does not
 build the complete extracted tree or copy each member's contents; member CRCs
 are checked directly on folder views. This is useful for ingestion gates that
@@ -340,8 +347,8 @@ regular-file reads before allocating input; `app/` is the
 host command; `examples/import/` consumes verified members; `corpus/` records
 interoperability inputs; `checks/` runs repeatable verification.
 
-Streaming, other filters, encryption and archive writing require separate
-compatibility work and are not implemented.
+Seekable input, volumes/SFX and archive writing require separate compatibility
+work and are not implemented.
 
 Moon7z supplies the 7z container/member layer. Existing MoonBit LZMA/XZ codecs
 and ZIP readers cover different boundaries. The compression algorithms are
