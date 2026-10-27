@@ -47,7 +47,10 @@ test "packed metadata and payload intervals reject overlaps gaps and unclaimed s
       [(32, 40)],
     ] {
     let failed = try {
-      check_regions(regions, 45)
+      check_regions(
+        regions.map(region => (region.0.to_uint64(), region.1.to_uint64())),
+        45,
+      )
       false
     } catch {
       Invalid(..) | Unsupported(..) => true

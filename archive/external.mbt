@@ -61,26 +61,34 @@ fn decode_metadata_streams(
 }
 
 ///|
-fn packed_region(streams : Streams) -> (Int32, Int32) {
-  let start = 32 + streams.pack_offset
+fn packed_region(streams : Streams) -> (UInt64, UInt64) {
+  let start = 32UL + streams.pack_offset
   let mut end = start
   for size in streams.pack_sizes {
-    end += size
+    end += size.to_uint64()
   }
   (start, end)
 }
 
 ///|
 fn check_regions(
-  regions : Array[(Int32, Int32)],
-  boundary : Int32,
+  regions : Array[(UInt64, UInt64)],
+  boundary : UInt64,
 ) -> Unit raise ArchiveError {
   let sorted = regions.filter(region => region.0 != region.1)
-  sorted.sort_by((a, b) => a.0 - b.0)
-  let mut end = 32
+  sorted.sort_by((a, b) => {
+    if a.0 < b.0 {
+      -1
+    } else if a.0 > b.0 {
+      1
+    } else {
+      0
+    }
+  })
+  let mut end = 32UL
   for (start, limit) in sorted {
     guard start >= end else {
-      raise Invalid(offset=start, reason="packed metadata/data regions overlap")
+      raise position_error(start, "packed metadata/data regions overlap")
     }
     guard start == end else {
       raise Unsupported(

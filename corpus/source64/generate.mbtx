@@ -1,0 +1,101 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/encoding/utf16",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+fn crc(bytes : Bytes) -> UInt32 {
+  let mut value = 0xffffffffU
+  for byte in bytes {
+    value = value ^ byte.to_uint()
+    for _ in 0..<8 {
+      value = (value >> 1) ^ (if (value & 1U) != 0U { 0xedb88320U } else { 0U })
+    }
+  }
+  value ^ 0xffffffffU
+}
+
+///|
+fn number(buffer : @buffer.Buffer, value : UInt64) -> Unit {
+  buffer.write_byte(b'\xff')
+  buffer.write_uint64_le(value)
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 2 else {
+    fail("usage: generate.mbtx NEW_OUTPUT_DIRECTORY")
+  }
+  @fs.mkdir(args[1])
+  let payload = @fs.read_file("corpus/source/清单.json").binary()
+  let header = @buffer.Buffer()
+  header.write_bytes(b"\x01\x04\x06")
+  number(header, 0UL)
+  number(header, 65UL)
+  header.write_byte(b'\x09')
+  for _ in 0..<64 {
+    number(header, 67108864UL)
+  }
+  number(header, payload.length().to_uint64())
+  header.write_bytes(b"\x00\x07\x0b")
+  number(header, 65UL)
+  header.write_byte(b'\x00')
+  for _ in 0..<65 {
+    header.write_bytes(b"\x01\x01\x00")
+  }
+  header.write_byte(b'\x0c')
+  for _ in 0..<64 {
+    number(header, 67108864UL)
+  }
+  number(header, payload.length().to_uint64())
+  header.write_bytes(b"\x0a\x00")
+  header.write_bytes(b"\x00".repeat(8) + b"\x80")
+  header.write_uint_le(crc(payload))
+  header.write_bytes(b"\x00\x00\x05")
+  number(header, 65UL)
+  let names = @buffer.Buffer()
+  names.write_byte(b'\x00')
+  for i in 0..<64 {
+    let name = "padding-\{i}.bin\u0000"
+    names.write_bytes(@utf16.encode(name[:], bom=false, endianness=Little))
+  }
+  names.write_bytes(
+    @utf16.encode("manifest.json\u0000"[:], bom=false, endianness=Little),
+  )
+  header.write_byte(b'\x11')
+  number(header, names.length().to_uint64())
+  header.write_bytes(names.to_bytes())
+  header.write_bytes(b"\x00\x00")
+  let next = header.to_bytes()
+  let fields = @buffer.Buffer()
+  fields.write_uint64_le(4294967296UL + payload.length().to_uint64())
+  fields.write_uint64_le(next.length().to_uint64())
+  fields.write_uint_le(crc(next))
+  let start = @buffer.Buffer()
+  start.write_bytes(b"7z\xbc\xaf\x27\x1c\x00\x04")
+  start.write_uint_le(crc(fields.to_bytes()))
+  start.write_bytes(fields.to_bytes())
+  @fs.write_file(args[1] + "/start.bin", start.to_bytes())
+  @fs.write_file(args[1] + "/tail.bin", payload + next)
+  let manifest : Json = {
+    "schema": "moon7z.source64_corpus.v1",
+    "last_member_id": 64,
+    "tail_offset": "4294967328",
+    "source_bytes": Json(
+      (4294967328UL + payload.length().to_uint64() + next.length().to_uint64()).to_string(),
+    ),
+    "decoded_bytes": Json(
+      (4294967296UL + payload.length().to_uint64()).to_string(),
+    ),
+  }
+  @fs.write_file(
+    args[1] + "/manifest.json",
+    manifest.stringify(indent=2) + "\n",
+  )
+}

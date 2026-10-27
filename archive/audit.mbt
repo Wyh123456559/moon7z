@@ -67,7 +67,7 @@ pub fn Archive::audit(self : Archive) -> AuditReport {
     }
   }
   let results : Array[FolderAudit] = []
-  let mut start = 32 + self.streams.pack_offset
+  let mut start = 32 + self.streams.pack_offset.to_int()
   for id, block in self.streams.blocks {
     let error : ArchiveError? = try {
       verify_folder(self, id, start, groups[id])

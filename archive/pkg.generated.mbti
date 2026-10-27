@@ -10,6 +10,8 @@ pub fn validate_path(String) -> Unit raise ArchiveError
 
 // Errors
 pub suberror ArchiveError {
+  SourceLimit(resource~ : String, maximum~ : UInt64)
+  SourceRead(offset~ : UInt64, reason~ : String)
   VolumeError(index~ : Int32, reason~ : String)
   SignatureNotFound(searched_bytes~ : Int32)
   PasswordRequired
@@ -283,6 +285,47 @@ pub fn ReaderStats::equal(Self, Self) -> Bool
 pub fn ReaderStats::not_equal(Self, Self) -> Bool
 #deprecated
 pub fn ReaderStats::to_repr(Self) -> @debug.Repr
+
+pub struct SeekableInput {
+  size : UInt64
+  // private fields
+}
+pub fn SeekableInput::concat(ArrayView[Self], max_parts? : Int32) -> Self raise ArchiveError
+pub fn SeekableInput::new(UInt64, async (UInt64, Int32) -> Bytes) -> Self
+pub async fn SeekableInput::read_at(Self, UInt64, Int32) -> Bytes
+
+pub struct SourceArchive {
+  // private fields
+}
+pub fn SourceArchive::entries(Self) -> Array[Entry]
+pub fn SourceArchive::file_properties(Self) -> Array[FileProperty]
+pub fn SourceArchive::inventory_json(Self) -> Json
+pub fn SourceArchive::is_encrypted(Self) -> Bool
+pub fn SourceArchive::metadata_streams(Self) -> Array[Bytes]
+pub async fn SourceArchive::open(SeekableInput, limits? : Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, password? : String) -> Self
+pub fn SourceArchive::plan_contents(Self) -> ContentPlan raise ArchiveError
+pub fn SourceArchive::properties(Self) -> Array[ArchiveProperty]
+pub fn SourceArchive::reader(Self, cache_bytes? : Int32) -> SourceReader raise ArchiveError
+pub fn SourceArchive::source_size(Self) -> UInt64
+pub async fn SourceArchive::verify(Self, require_member_crcs? : Bool) -> SourceVerification
+
+pub struct SourceReader {
+  // private fields
+}
+pub fn SourceReader::clear_cache(Self) -> Unit
+pub async fn SourceReader::read(Self, Int32) -> Member
+pub async fn SourceReader::read_range(Self, Int32, offset~ : Int32, length~ : Int32) -> Bytes
+pub fn SourceReader::stats(Self) -> ReaderStats
+
+pub struct SourceVerification {
+  files : Int32
+  bytes : UInt64
+  blocks : Int32
+  member_crcs_checked : Int32
+  members_without_crc : Int32
+}
+pub fn SourceVerification::to_json(Self) -> Json
+pub impl ToJson for SourceVerification
 
 pub struct SplitArchive {
   archive : Archive

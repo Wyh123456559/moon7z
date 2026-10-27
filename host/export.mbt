@@ -70,6 +70,43 @@ async fn publish_contents(
 ) -> ExportedContents {
   let (scheduled, cache_bytes) = export_schedule(archive, plan.entries())
   let reader = archive.reader(cache_bytes~)
+  publish_read_plan(plan, scheduled, id => reader.read(id), parent~, name~)
+}
+
+///|
+/// Same publication policy as export_contents, with bounded positioned reads.
+pub async fn export_source_contents(
+  archive : @archive.SourceArchive,
+  parent~ : String,
+  name~ : String,
+) -> ExportedContents {
+  @archive.validate_path(name)
+  guard !name.contains("/") else {
+    fail("export name must be a single directory component")
+  }
+  let plan = archive.plan_contents()
+  let (scheduled, cache_bytes) = schedule_entries(
+    archive.entries(),
+    plan.entries(),
+  )
+  let reader = archive.reader(cache_bytes~)
+  publish_read_plan(
+    plan,
+    scheduled,
+    async fn(id) { reader.read(id) },
+    parent~,
+    name~,
+  )
+}
+
+///|
+async fn publish_read_plan(
+  plan : @archive.ContentPlan,
+  scheduled : Array[@archive.Entry],
+  read_member : async (Int32) -> @archive.Member,
+  parent~ : String,
+  name~ : String,
+) -> ExportedContents {
   let parent = @fs.realpath(parent)
   guard @fs.kind(parent, follow_symlink=false) == Directory else {
     fail("export parent must be an existing directory")
@@ -82,9 +119,8 @@ async fn publish_contents(
     @fs.mkdir(staging + "/" + directory, permission=0o700)
   }
   for entry in scheduled {
-    write_member(reader, entry, staging)
+    write_member(read_member, entry, staging)
   }
-  reader.clear_cache()
   @fs.rename(staging, destination, replace=false)
   published = true
   { directory: destination, entries: plan.entries(), }
@@ -94,11 +130,11 @@ async fn publish_contents(
 /// Keep the owned member buffer local to this call across its write. The next
 /// member is not copied until this call returns. The reader retains one folder.
 async fn write_member(
-  reader : @archive.Reader,
+  read_member : async (Int32) -> @archive.Member,
   entry : @archive.Entry,
   staging : String,
 ) -> Unit {
-  let item = reader.read(entry.id)
+  let item = read_member(entry.id)
   @fs.write_file(
     staging + "/" + entry.name,
     item.bytes,

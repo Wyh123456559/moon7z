@@ -1,0 +1,143 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/async/process",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-source")
+  defer @fs.rmdir(root, recursive=true)
+  let command = ["run", "--target", target, "app", "--"]
+  let split_paths = Array::makei(6, i => {
+    "corpus/volumes/variable/package.7z.00" + (i + 1).to_string()
+  })
+  let split = @shell.Cmd(
+    "moon",
+    command + ["source-volumes-test", "--json"] + split_paths,
+  ).output(timeout_ms=120000)
+  assert_eq(split.exit_code(), 0)
+  assert_true(
+    @json.parse(split.stdout())
+    is { "contents_verified": True, "bytes": String("14229"), .. },
+  )
+  let fixture = "corpus/ppmd/v2605-solid.7z"
+  let inventory = @shell.Cmd(
+    "moon",
+    command + ["source-list", "--json", fixture],
+  ).output(timeout_ms=120000)
+  assert_eq(inventory.exit_code(), 0)
+  assert_true(
+    @json.parse(inventory.stdout())
+    is {
+      "schema": String("moon7z.source_inventory.v1"),
+      "contents_verified": False,
+      ..
+    },
+  )
+  let verified = @shell.Cmd(
+    "moon",
+    command + ["source-test", "--json", fixture],
+  ).output(timeout_ms=120000)
+  assert_eq(verified.exit_code(), 0)
+  assert_true(
+    @json.parse(verified.stdout())
+    is {
+      "schema": String("moon7z.source_verification.v1"),
+      "contents_verified": True,
+      "bytes": String("14229"),
+      ..
+    },
+  )
+  @shell.Cmd(
+    "moon",
+    command + ["source-extract", "--contents-only", fixture, root, "package"],
+  ).run(timeout_ms=120000)
+  for
+    (original, name) in [
+      ("corpus/source/lzma-mbt/README.md", "README.md"),
+      ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    assert_eq(
+      @fs.read_file(root + "/package/" + name).binary(),
+      @fs.read_file(original).binary(),
+    )
+  }
+  let (code, range, _) = @process.collect_output(
+    "moon",
+    command + ["source-read-range", "corpus/binary.7z", "0", "128", "64"],
+  )
+  assert_eq(code, 0)
+  assert_eq(range.binary(), Bytes::makei(64, i => (i + 128).to_byte()))
+  let damaged = @fs.read_file(fixture).binary().to_array()
+  damaged[32] = b'\x01'
+  @fs.write_file(root + "/damaged.7z", Bytes::from_array(damaged))
+  let refused = @shell.Cmd(
+    "moon",
+    command +
+    ["source-extract", "--contents-only", root + "/damaged.7z", root, "refused"],
+  ).output(timeout_ms=120000)
+  assert_true(refused.exit_code() != 0)
+  assert_eq(refused.stdout(), "")
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 2)
+  if !(@async.platform is Windows) {
+    let file = root + "/large.7z"
+    @shell.Cmd("moon", ["run", "corpus/source64/materialize.mbtx", "--", file]).run(
+      timeout_ms=120000,
+    )
+    let large = @shell.Cmd("moon", command + ["source-list", "--json", file]).output(
+      timeout_ms=120000,
+    )
+    assert_eq(large.exit_code(), 0)
+    assert_true(
+      @json.parse(large.stdout())
+      is {
+        "source_bytes": String("4294970749"),
+        "contents_verified": False,
+        "entries": Array(entries),
+        ..
+      } &&
+      entries.length() == 65,
+    )
+    let selected = @shell.Cmd("moon", command + ["source-read", file, "64"]).output(
+      timeout_ms=120000,
+    )
+    assert_eq(selected.exit_code(), 0)
+    assert_eq(
+      selected.stdout(),
+      @fs.read_file("corpus/source/清单.json").text(),
+    )
+    assert_true(selected.stderr().contains("selected folder"))
+    let checked = @shell.Cmd("moon", command + ["source-test", "--json", file]).output(
+      timeout_ms=120000,
+    )
+    assert_eq(checked.exit_code(), 0)
+    assert_true(
+      @json.parse(checked.stdout())
+      is {
+        "contents_verified": True,
+        "bytes": String("4294967348"),
+        "blocks": Number(65, ..),
+        "member_crcs_checked": Number(1, ..),
+        "members_without_crc": Number(64, ..),
+        ..
+      },
+    )
+    println(
+      "Actual sparse 7z above four GiB: seekable header and final member read passed",
+    )
+  }
+  println(
+    "Source inventory, full small-archive verification, byte-exact export/range and failed-export cleanup passed",
+  )
+}

@@ -4,15 +4,20 @@ fn read_streams(
   limits : Limits,
   output_limit : Int32,
   buffers~ : Array[Bytes] = [],
+  source_mode~ : Bool = false,
 ) -> Streams raise ArchiveError {
   let mut id = r.byte()
-  let mut pack_offset = 0
+  let mut pack_offset = 0UL
   let sizes : Array[Int32] = []
   let mut pack_crcs : Array[UInt32?] = []
   let blocks : Array[Block] = []
   let layouts : Array[Layout] = []
   if id == 6 {
-    pack_offset = r.count(limits.input_bytes, "pack offset")
+    pack_offset = if source_mode {
+      r.number()
+    } else {
+      r.count(limits.input_bytes, "pack offset").to_uint64()
+    }
     let n = r.count(limits.entries, "pack streams")
     r.expect(9)
     for _ in 0..<n {
@@ -63,11 +68,17 @@ fn read_streams(
       ignore(
         bounded(
           block.size.to_uint64(),
-          output_limit - total,
+          if source_mode {
+            output_limit
+          } else {
+            output_limit - total
+          },
           "total unpacked bytes",
         ),
       )
-      total += block.size
+      if !source_mode {
+        total += block.size
+      }
     }
     id = r.byte()
     if id == 10 {

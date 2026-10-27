@@ -1,7 +1,7 @@
 ///|
 fn ppmd_input() -> Bytes raise ArchiveError {
   let archive = Archive::open(ppmd_internal)
-  let start = 32 + archive.streams.pack_offset
+  let start = 32 + archive.streams.pack_offset.to_int()
   archive.input[start:start + archive.streams.pack_sizes[0]].to_owned()
 }
 

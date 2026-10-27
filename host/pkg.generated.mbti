@@ -10,9 +10,15 @@ pub async fn export_contents(@archive.Archive, parent~ : String, name~ : String)
 
 pub async fn export_selected(@archive.Archive, ArrayView[Int32], parent~ : String, name~ : String) -> ExportedContents
 
+pub async fn export_source_contents(@archive.SourceArchive, parent~ : String, name~ : String) -> ExportedContents
+
 pub async fn open_embedded_file(String, limits? : @archive.Limits, password? : String, search_bytes? : Int32) -> @archive.EmbeddedArchive
 
 pub async fn open_file(String, limits? : @archive.Limits, password? : String) -> @archive.Archive
+
+pub async fn open_seekable_file(String, limits? : @archive.Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, password? : String) -> SourceFile
+
+pub async fn open_seekable_volumes(ArrayView[String], limits? : @archive.Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, max_volumes? : Int32, password? : String) -> SourceFile
 
 pub async fn open_volume_files(ArrayView[String], limits? : @archive.Limits, password? : String, max_volumes? : Int32) -> @archive.SplitArchive
 
@@ -23,6 +29,12 @@ pub struct ExportedContents {
   directory : String
   entries : Array[@archive.Entry]
 }
+
+pub struct SourceFile {
+  archive : @archive.SourceArchive
+  // private fields
+}
+pub fn SourceFile::close(Self) -> Unit
 
 // Type aliases
 

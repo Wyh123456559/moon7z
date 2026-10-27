@@ -97,4 +97,5 @@ tests cover missing, empty, nonregular and oversized files followed by recovery.
 CI executes these workflows on Wasm and native Linux/macOS/Windows and the core
 tests on Wasm-GC and JavaScript. Source/license details are in [SOURCES.md](../SOURCES.md).
 
-Seekable UInt64 archive input and Mooncakes publication remain unfinished.
+The separate [seekable source API](seekable.md) now composes numeric volumes
+without joining them in memory. Mooncakes publication remains unfinished.

@@ -1,6 +1,8 @@
 ///|
 /// Errors identify an input defect, unsupported feature or resource policy.
 pub suberror ArchiveError {
+  SourceLimit(resource~ : String, maximum~ : UInt64)
+  SourceRead(offset~ : UInt64, reason~ : String)
   VolumeError(index~ : Int32, reason~ : String)
   SignatureNotFound(searched_bytes~ : Int32)
   PasswordRequired
@@ -156,7 +158,7 @@ priv struct Block {
 
 ///|
 priv struct Streams {
-  pack_offset : Int32
+  pack_offset : UInt64
   pack_sizes : Array[Int32]
   pack_crcs : Array[UInt32?]
   blocks : Array[Block]

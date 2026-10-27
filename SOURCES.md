@@ -130,6 +130,15 @@ no C++ implementation was copied. The ordinary numeric 7z volume workflow is
 implemented here; the upstream handler's alphabetic split style is outside this
 API. Packer licensing and development-only use are recorded above.
 
+The UInt64 source API, file/volume adapters and source64 framing/generators are
+project-authored Apache-2.0. Existing codecs, crypto, graph and metadata parsers
+are reused with their notices above. `corpus/source64/` records fragment and
+oracle archive hashes; its hole bytes are declared zero-filled file members,
+not copied upstream data. Official Linux 7zz 26.05 independently listed/tested
+the entire sparse archive and extracted the final attributed JSON. Its release
+binary is a development oracle with LGPL/BSD components, not redistributed or
+linked. No external source or test suite was added for the source abstraction.
+
 Development was rechecked on 2026-10-27 with official stable
 `moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).
 Windows compiler/runtime/formatter/interface executables were checked against

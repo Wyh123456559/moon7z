@@ -1,0 +1,55 @@
+///|
+async fn source_command(args : Array[String], password : String?) -> Bool {
+  guard args.get(1) is Some(command) &&
+    [
+      "source-list", "source-test", "source-read", "source-read-range", "source-extract",
+    ].contains(command) else {
+    return false
+  }
+  let json = command == "source-list" || command == "source-test"
+  let extract = command == "source-extract"
+  guard (json && args.length() == 4 && args[2] == "--json") ||
+    (extract && args.length() == 6 && args[2] == "--contents-only") ||
+    (command == "source-read" && args.length() == 4) ||
+    (command == "source-read-range" && args.length() == 6) else {
+    fail(
+      "usage: source-list|source-test --json FILE OR source-read FILE ID OR source-read-range FILE ID OFFSET LENGTH OR source-extract --contents-only FILE PARENT NEW_NAME",
+    )
+  }
+  let opened = @host.open_seekable_file(
+    args[if json || extract { 3 } else { 2 }],
+    password?,
+  )
+  defer opened.close()
+  if command == "source-list" {
+    println(opened.archive.inventory_json().stringify())
+  } else if command == "source-test" {
+    println(opened.archive.verify().to_json().stringify())
+  } else if extract {
+    let output = @host.export_source_contents(
+      opened.archive,
+      parent=args[4],
+      name=args[5],
+    )
+    println(
+      "Exported \{output.entries.length()} entries to \{output.directory}; timestamps and attributes were not applied",
+    )
+  } else {
+    let reader = opened.archive.reader()
+    let id = @string.parse_int(args[3])
+    let bytes = if command == "source-read" {
+      reader.read(id).bytes
+    } else {
+      reader.read_range(
+        id,
+        offset=@string.parse_int(args[4]),
+        length=@string.parse_int(args[5]),
+      )
+    }
+    @stdio.stdout.write(bytes)
+    @stdio.stderr.write(
+      "Only the selected folder was checked; use source-test for whole-archive verification.\n",
+    )
+  }
+  true
+}

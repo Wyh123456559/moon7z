@@ -95,4 +95,5 @@ archives, UInt64 overflow, truncated inputs, empty archives at the final eligibl
 offset, encrypted-header password recovery and ordinary API behavior.
 
 Numeric split archives have a separate [volume API](volumes.md); split SFX is
-not implemented. Seekable UInt64 input and Mooncakes publication remain unfinished.
+not implemented. [Seekable ordinary files/volumes](seekable.md) now have a separate
+API; seekable SFX discovery and Mooncakes publication remain unfinished.

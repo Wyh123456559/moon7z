@@ -4,6 +4,16 @@
 pub impl ToJson for ArchiveError with fn to_json(self) {
   let fields : Map[String, Json] = Map([])
   match self {
+    SourceLimit(resource~, maximum~) => {
+      fields["code"] = Json("source_limit")
+      fields["resource"] = Json(resource)
+      fields["maximum"] = Json(maximum.to_string())
+    }
+    SourceRead(offset~, reason~) => {
+      fields["code"] = Json("source_read")
+      fields["offset"] = Json(offset.to_string())
+      fields["reason"] = Json(reason)
+    }
     VolumeError(index~, reason~) => {
       fields["code"] = Json("volume")
       fields["index"] = Json(index)

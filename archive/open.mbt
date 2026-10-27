@@ -68,12 +68,12 @@ pub fn Archive::open(
     }
   }
   let mut header = Cursor::new(input[offset:offset + size].to_owned())
-  let regions : Array[(Int32, Int32)] = []
+  let regions : Array[(UInt64, UInt64)] = []
   let mut id = header.byte()
   if id == 23 {
     let streams = read_streams(header, limits, limits.header_bytes)
     header.end()
-    validate_pack_ranges(streams, offset)
+    validate_pack_ranges(streams, offset.to_uint64())
     regions.push(packed_region(streams))
     let decoded = decode_metadata_streams(input, streams, limits, crypto)
     guard decoded.length() <= 1 else {
@@ -83,7 +83,7 @@ pub fn Archive::open(
       )
     }
     if decoded.is_empty() {
-      check_regions(regions, offset)
+      check_regions(regions, offset.to_uint64())
       return {
         auxiliary: [],
         file_extensions: [],
@@ -125,7 +125,7 @@ pub fn Archive::open(
       limits,
       limits.header_bytes - header.data.length(),
     )
-    validate_pack_ranges(additional, offset)
+    validate_pack_ranges(additional, offset.to_uint64())
     regions.push(packed_region(additional))
     let buffers = decode_metadata_streams(input, additional, limits, crypto)
     id = header.byte()
@@ -140,7 +140,7 @@ pub fn Archive::open(
       limits.output_bytes,
       buffers=auxiliary,
     )
-    validate_pack_ranges(streams, offset)
+    validate_pack_ranges(streams, offset.to_uint64())
     regions.push(packed_region(streams))
     id = header.byte()
   }
@@ -162,7 +162,7 @@ pub fn Archive::open(
     raise Unsupported(feature="archive header property \{id}")
   }
   header.end()
-  check_regions(regions, offset)
+  check_regions(regions, offset.to_uint64())
   guard !inventory.is_empty() || streams.blocks.is_empty() else {
     raise Invalid(
       offset=header.pos,
@@ -188,14 +188,20 @@ pub fn Archive::open(
 ///|
 fn validate_pack_ranges(
   streams : Streams,
-  header_offset : Int32,
+  header_offset : UInt64,
 ) -> Unit raise ArchiveError {
-  let mut offset = 32 + streams.pack_offset
+  guard streams.pack_offset <= 0xffffffffffffffdfUL else {
+    raise SourceRead(
+      offset=streams.pack_offset,
+      reason="packed offset overflows the 32-byte origin",
+    )
+  }
+  let mut offset = 32UL + streams.pack_offset
   for size in streams.pack_sizes {
-    guard offset <= header_offset && size <= header_offset - offset else {
-      raise Invalid(offset~, reason="packed data overlaps next header")
+    guard offset <= header_offset && size.to_uint64() <= header_offset - offset else {
+      raise position_error(offset, "packed data overlaps next header")
     }
-    offset += size
+    offset += size.to_uint64()
   }
 }
 
@@ -237,7 +243,7 @@ pub fn Archive::verify(
       }
     }
   }
-  let mut start = 32 + self.streams.pack_offset
+  let mut start = 32 + self.streams.pack_offset.to_int()
   for id in 0..<self.streams.blocks.length() {
     verify_folder(self, id, start, entries[id])
     start += packed_folder_bytes(self.streams, id)

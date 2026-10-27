@@ -233,7 +233,7 @@ fn decode_streams(
   crypto~ : CryptState? = None,
 ) -> Array[Bytes] raise ArchiveError {
   let output : Array[Bytes] = []
-  let mut offset = 32 + streams.pack_offset
+  let mut offset = 32 + streams.pack_offset.to_int()
   for i in 0..<streams.blocks.length() {
     output.push(
       decode_packed_stream(input, streams, i, offset, limits, crypto~),
@@ -267,6 +267,17 @@ fn decode_packed_stream(
     packed.push(bytes)
     offset += length
   }
+  decode_packed_parts(streams, id, packed, limits, crypto~)
+}
+
+///|
+fn decode_packed_parts(
+  streams : Streams,
+  id : Int32,
+  packed : Array[Bytes],
+  limits : Limits,
+  crypto~ : CryptState? = None,
+) -> Bytes raise ArchiveError {
   if streams.layouts.is_empty() {
     decode(streams.blocks[id], packed[0], limits, crypto~)
   } else {

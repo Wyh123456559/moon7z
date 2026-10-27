@@ -8,7 +8,16 @@ pub async fn open_volume_files(
   password? : String,
   max_volumes~ : Int32 = 1024,
 ) -> @archive.SplitArchive {
-  let names = paths.map(path => {
+  let sequence = @archive.VolumeSequence::new(
+    volume_names(paths)[:],
+    max_volumes~,
+  )
+  read_volume_files(sequence, paths, limits~, password?)
+}
+
+///|
+fn volume_names(paths : ArrayView[String]) -> Array[String] {
+  paths.map(path => {
     let unix = if @async.platform is Windows {
       path.split("\\").to_array().last().unwrap().to_owned()
     } else {
@@ -16,7 +25,15 @@ pub async fn open_volume_files(
     }
     unix.split("/").to_array().last().unwrap().to_owned()
   })
-  let sequence = @archive.VolumeSequence::new(names[:], max_volumes~)
+}
+
+///|
+async fn read_volume_files(
+  sequence : @archive.VolumeSequence,
+  paths : ArrayView[String],
+  limits~ : @archive.Limits,
+  password? : String,
+) -> @archive.SplitArchive {
   guard limits.input_bytes >= 0 && limits.input_bytes <= 0x3fffffff else {
     fail("combined volume input limit must be between zero and 1073741823")
   }

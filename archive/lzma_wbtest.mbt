@@ -1,7 +1,7 @@
 ///|
 fn lzma_raw_fixture() -> Bytes raise ArchiveError {
   let archive = Archive::open(lzma_private)
-  let start = 32 + archive.streams.pack_offset
+  let start = 32 + archive.streams.pack_offset.to_int()
   archive.input[start:start + archive.streams.pack_sizes[0]].to_owned()
 }
 

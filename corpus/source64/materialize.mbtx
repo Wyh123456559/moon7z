@@ -1,0 +1,31 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 2 else {
+    fail("usage: materialize.mbtx NEW_SPARSE_FILE (on Linux/macOS)")
+  }
+  guard !(@async.platform is Windows) else {
+    fail(
+      "this fixture materializer requires sparse-file hole support on Linux/macOS; virtual UInt64 source tests also run on Windows",
+    )
+  }
+  let start = @fs.read_file("corpus/source64/start.bin").binary()
+  let tail = @fs.read_file("corpus/source64/tail.bin").binary()
+  assert_eq(start.length(), 32)
+  let file = @fs.open(args[1], mode=ReadWrite, create_mode=CreateNew)
+  defer file.close()
+  file.write_at(start[:], position=0L)
+  file.write_at(tail[:], position=4294967328L)
+  assert_eq(file.size(), 4294967328L + tail.length().to_int64())
+  println(
+    "Created sparse 7z: 64 zero-filled Copy members followed by manifest.json; logical size=\{4294967328L + tail.length().to_int64()}",
+  )
+}

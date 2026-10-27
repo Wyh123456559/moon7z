@@ -6,6 +6,14 @@ fn export_schedule(
   archive : @archive.Archive,
   selected : ArrayView[@archive.Entry],
 ) -> (Array[@archive.Entry], Int32) {
+  schedule_entries(archive.entries(), selected)
+}
+
+///|
+fn schedule_entries(
+  inventory : ArrayView[@archive.Entry],
+  selected : ArrayView[@archive.Entry],
+) -> (Array[@archive.Entry], Int32) {
   let groups : Map[Int32, Array[@archive.Entry]] = Map([])
   let empty : Array[@archive.Entry] = []
   for entry in selected {
@@ -21,7 +29,7 @@ fn export_schedule(
     }
   }
   let sizes : Map[Int32, Int32] = Map([])
-  for entry in archive.entries() {
+  for entry in inventory {
     if entry.block is Some(id) && groups.contains(id) {
       sizes[id] = sizes.get(id).unwrap_or(0) + entry.size
     }
