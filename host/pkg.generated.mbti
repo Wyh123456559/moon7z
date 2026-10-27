@@ -10,6 +10,8 @@ pub async fn export_contents(@archive.Archive, parent~ : String, name~ : String)
 
 pub async fn export_selected(@archive.Archive, ArrayView[Int32], parent~ : String, name~ : String) -> ExportedContents
 
+pub async fn open_embedded_file(String, limits? : @archive.Limits, password? : String, search_bytes? : Int32) -> @archive.EmbeddedArchive
+
 pub async fn open_file(String, limits? : @archive.Limits, password? : String) -> @archive.Archive
 
 // Errors

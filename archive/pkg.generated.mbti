@@ -10,6 +10,7 @@ pub fn validate_path(String) -> Unit raise ArchiveError
 
 // Errors
 pub suberror ArchiveError {
+  SignatureNotFound(searched_bytes~ : Int32)
   PasswordRequired
   DecryptionFailed
   Invalid(offset~ : Int32, reason~ : String)
@@ -104,6 +105,16 @@ pub struct ContentPlan {
 }
 pub fn ContentPlan::directories(Self) -> Array[String]
 pub fn ContentPlan::entries(Self) -> Array[Entry]
+
+pub struct EmbeddedArchive {
+  prefix : Bytes
+  payload : Bytes
+  suffix : Bytes
+  archive : Archive
+}
+pub fn EmbeddedArchive::inventory_json(Self) -> Json
+pub fn EmbeddedArchive::open(Bytes, limits? : Limits, password? : String, search_bytes? : Int32) -> Self raise ArchiveError
+pub fn EmbeddedArchive::open_at(Bytes, Int32, limits? : Limits, password? : String) -> Self raise ArchiveError
 
 pub struct Entry {
   anti : Bool

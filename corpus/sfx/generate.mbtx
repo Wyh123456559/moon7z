@@ -1,0 +1,106 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/encoding/base64",
+  "moonbitlang/x@0.5.5/crypto",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else {
+    fail("usage: generate.mbtx PACKER_26_05 SDK_DIRECTORY NEW_OUTPUT_DIRECTORY")
+  }
+  guard @shell.Cmd(args[1], []).output().stdout().contains("26.05") else {
+    fail("expected official 7za 26.05")
+  }
+  @fs.mkdir(args[3])
+  let root = @fs.realpath(args[3])
+  let sdk = @fs.realpath(args[2])
+  for
+    (name, hash) in [
+      (
+        "7zS2.sfx", "a47ba54a62b53595d556db5211dfaf252e2f28ec00574e594ed2d37b0dc9927b",
+      ),
+      (
+        "7zS2con.sfx", "096faf069e0c8e9900de97f95ef458aff9b6c0193ee523dd427d0cfc34994943",
+      ),
+      (
+        "7zSD.sfx", "3a335e4338ebb8a8cff7b81aaa35decc148845e2ce144bfaf680b09cd647cb8c",
+      ),
+    ] {
+    assert_eq(
+      @crypto.bytes_to_hex_string(
+        @crypto.sha256(@fs.read_file(sdk + "/bin/" + name).binary()),
+      ),
+      hash,
+    )
+  }
+  let source = root + "/source"
+  @fs.mkdir(source)
+  for
+    (path, name) in [
+      ("corpus/source/lzma-mbt/README.md", "README.md"),
+      ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+      ("corpus/source/清单.json", "清单.json"),
+    ] {
+    @fs.write_file(source + "/" + name, @fs.read_file(path).binary())
+  }
+  @shell.Cmd(
+    args[1],
+    [
+      "a",
+      root + "/payload.7z",
+      "README.md",
+      "LICENSE",
+      "清单.json",
+      "-t7z",
+      "-m0=LZMA2",
+      "-ms=on",
+      "-mhc=on",
+      "-mtm=off",
+      "-mtc=off",
+      "-mta=off",
+    ],
+    cwd=source,
+  ).run()
+  let payload = @fs.read_file(root + "/payload.7z").binary()
+  for
+    (id, stub, config) in [
+      ("gui", "7zS2.sfx", b""),
+      ("console", "7zS2con.sfx", b""),
+      (
+        "installer", "7zSD.sfx", b";!@Install@!UTF-8!\nTitle=\"Moon7z fixture\"\n;!@InstallEnd@!\n",
+      ),
+    ] {
+    let prefix = @fs.read_file(sdk + "/bin/" + stub).binary() + config
+    let bytes = prefix + payload
+    let file = root + "/" + id + ".bin"
+    @fs.write_file(file, bytes)
+    @shell.Cmd(args[1], ["t", file]).run()
+    @shell.Cmd(args[1], ["x", file, "-o" + root + "/unpacked-" + id]).run()
+    for name in ["README.md", "LICENSE", "清单.json"] {
+      assert_eq(
+        @fs.read_file(root + "/unpacked-" + id + "/" + name).binary(),
+        @fs.read_file(source + "/" + name).binary(),
+      )
+    }
+    let encoded = @base64.encode(bytes)
+    let lines = StringBuilder()
+    for offset = 0; offset < encoded.length(); offset = offset + 256 {
+      let end = (offset + 256).min(encoded.length())
+      lines.write_string(encoded[offset:end].to_owned())
+      lines.write_char('\n')
+    }
+    @fs.write_file(root + "/" + id + ".base64", lines.to_string())
+    println(
+      "Independent SFX test/extraction: " +
+      id +
+      ", offset=\{prefix.length()}, archive_bytes=\{payload.length()}, total_bytes=\{bytes.length()}",
+    )
+  }
+}

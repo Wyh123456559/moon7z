@@ -33,13 +33,14 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | LZMA properties | LZMA1 all 225 legal property combinations independently encoded/extracted; probability-table budget, exact consumption and optional end markers. LZMA2 retains its format's lc+lp≤4 rule | Retain this behavior across remaining source/volume/header paths |
 | Filters | Delta, classic x86 BCJ, ARM64, RISC-V, ARM, ARM-Thumb, PowerPC, IA64, SPARC, Swap2/Swap4; [classic evidence](filters.md), [RISC-V evidence](riscv.md) | Preserve valid method/property behavior across remaining input/header paths; classic methods use empty properties, unlike ARM64/RISC-V |
 | Encryption | Password API, AES-256-CBC/SHA-256 derivation with cumulative work limits, encrypted headers/data and [four real cases](encrypted.md), missing/wrong password recovery | Preserve these contracts across remaining input/header paths; CRC is not authenticated encryption |
-| Split/SFX input | Explicitly unsupported; signature must be at byte zero | Ordered volume source, missing/reordered volume diagnostics and bounded signature discovery for SFX; no executable is run |
+| SFX/embedded input | Opt-in bounded signature discovery and explicit offset API; original prefix/payload/suffix retained, three [official SDK envelopes](sfx.md) independently tested/extracted; no executable is run | Preserve these contracts across remaining source/volume paths |
+| Split input | Explicitly unsupported | Ordered volume source, missing/reordered volume diagnostics |
 | Input scale | In-memory bytes, controlled sizes at most 0x3fffffff | Seekable bounded input with UInt64 offsets; retain a deliberate in-memory convenience API |
 | Integrity | All available pack/folder/member CRCs in verified scope; missing member CRCs explicit | Same behavior for all new graph/method/volume paths; CRC is not authenticity |
 | Publishing | No-replace staging, exact selected IDs, metadata returned rather than applied | Preserve these contracts while expanding readable inputs; unsafe export must fail clearly |
 
 Every pending row is a real gap. In particular, remaining
-seekable/volume/SFX input and publication must not be relabeled complete merely
+seekable/volume input and publication must not be relabeled complete merely
 because additional codecs now pass. A larger test count cannot substitute for
 these rows.
 

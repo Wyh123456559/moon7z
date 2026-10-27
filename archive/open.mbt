@@ -9,28 +9,7 @@ pub fn Archive::open(
   limits~ : Limits = Limits::new(),
   password? : String,
 ) -> Archive raise ArchiveError {
-  for
-    value in [
-      limits.input_bytes,
-      limits.header_bytes,
-      limits.output_bytes,
-      limits.dictionary_bytes,
-      limits.entries,
-      limits.working_bytes,
-      limits.coders,
-      limits.kdf_rounds,
-      limits.kdf_bytes,
-      limits.password_bytes,
-      limits.file_property_records,
-      limits.lzma_probability_bytes,
-    ] {
-    guard value >= 0 && value <= 0x3fffffff else {
-      raise Invalid(
-        offset=0,
-        reason="limits must be between zero and 1073741823",
-      )
-    }
-  }
+  limits.validate()
   let secret = match password {
     None => None
     Some(text) => {

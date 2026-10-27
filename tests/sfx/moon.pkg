@@ -1,0 +1,61 @@
+import {
+  "Wyh123456559/moon7z/archive",
+  "moonbitlang/core/encoding/base64",
+} for "test"
+
+rule(name: "gui", command: ":embed -i $input -o $output --name gui")
+
+dev_build(
+  rule: "gui",
+  input: "../../corpus/sfx/gui.base64",
+  output: "gui_archive_test.mbt",
+)
+
+rule(name: "console", command: ":embed -i $input -o $output --name console")
+
+dev_build(
+  rule: "console",
+  input: "../../corpus/sfx/console.base64",
+  output: "console_archive_test.mbt",
+)
+
+rule(name: "installer", command: ":embed -i $input -o $output --name installer")
+
+dev_build(
+  rule: "installer",
+  input: "../../corpus/sfx/installer.base64",
+  output: "installer_archive_test.mbt",
+)
+
+rule(
+  name: "readme",
+  command: ":embed --binary -i $input -o $output --name readme",
+)
+
+dev_build(
+  rule: "readme",
+  input: "../../corpus/source/lzma-mbt/README.md",
+  output: "readme_archive_test.mbt",
+)
+
+rule(
+  name: "license",
+  command: ":embed --binary -i $input -o $output --name license",
+)
+
+dev_build(
+  rule: "license",
+  input: "../../corpus/source/lzma-mbt/LICENSE",
+  output: "license_archive_test.mbt",
+)
+
+rule(
+  name: "manifest",
+  command: ":embed --binary -i $input -o $output --name manifest",
+)
+
+dev_build(
+  rule: "manifest",
+  input: "../../corpus/source/清单.json",
+  output: "manifest_archive_test.mbt",
+)

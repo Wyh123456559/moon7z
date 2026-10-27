@@ -1,6 +1,7 @@
 ///|
 /// Errors identify an input defect, unsupported feature or resource policy.
 pub suberror ArchiveError {
+  SignatureNotFound(searched_bytes~ : Int32)
   PasswordRequired
   DecryptionFailed
   Invalid(offset~ : Int32, reason~ : String)
@@ -109,6 +110,32 @@ pub fn Limits::new(
     password_bytes,
     file_property_records,
     lzma_probability_bytes,
+  }
+}
+
+///|
+fn Limits::validate(self : Limits) -> Unit raise ArchiveError {
+  for
+    value in [
+      self.input_bytes,
+      self.header_bytes,
+      self.output_bytes,
+      self.dictionary_bytes,
+      self.entries,
+      self.working_bytes,
+      self.coders,
+      self.kdf_rounds,
+      self.kdf_bytes,
+      self.password_bytes,
+      self.file_property_records,
+      self.lzma_probability_bytes,
+    ] {
+    guard value >= 0 && value <= 0x3fffffff else {
+      raise Invalid(
+        offset=0,
+        reason="limits must be between zero and 1073741823",
+      )
+    }
   }
 }
 

@@ -108,7 +108,18 @@ hashing in standalone development/check scripts uses
 `moonbitlang/x@0.5.5/crypto` (Apache-2.0), which also supplies the runtime crypto
 primitives listed above.
 
-Development was rechecked on 2026-10-26 with official stable
+`corpus/sfx/` redistributes unchanged SFX stub bytes from official
+[LZMA SDK 26.05](https://www.7-zip.org/sdk.html), in complete envelopes encoded
+as Base64 test data. The SDK `DOC/lzma-sdk.txt` and `DOC/installer.txt` explicitly
+place the source and compiled binaries in the Public Domain; the notice is in
+`licenses/7zip-SFX-Public-Domain.txt`. Stub/envelope hashes and release asset are
+recorded in `corpus/sfx/manifest.md`. Payload members retain their previously
+recorded Apache-2.0 provenance. No executable stub is run or linked at runtime.
+The official 26.05 `7zIn.cpp` search policy was consulted (first CRC-valid start
+header); no C++ implementation or upstream tests were copied. Envelope framing,
+preservation, API/CLI integration and boundary tests are project-authored.
+
+Development was rechecked on 2026-10-27 with official stable
 `moon 0.1.20261023` and `moonc v0.10.17+d971670cd` (2026-10-23).
 Windows compiler/runtime/formatter/interface executables were checked against
 the current official stable SHA-256 manifest. No performance or full 7-Zip

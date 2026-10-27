@@ -6,6 +6,29 @@ pub async fn open_file(
   limits~ : @archive.Limits = @archive.Limits::new(),
   password? : String,
 ) -> @archive.Archive {
+  @archive.Archive::open(read_input_file(path, limits~), limits~, password?)
+}
+
+///|
+/// Inspect/import an SFX or another embedded archive without running its stub.
+/// The original prefix/payload/suffix are returned intact and remain bounded
+/// by the same whole-input size policy as ordinary file opening.
+pub async fn open_embedded_file(
+  path : String,
+  limits~ : @archive.Limits = @archive.Limits::new(),
+  password? : String,
+  search_bytes~ : Int32 = 1024 * 1024,
+) -> @archive.EmbeddedArchive {
+  @archive.EmbeddedArchive::open(
+    read_input_file(path, limits~),
+    limits~,
+    password?,
+    search_bytes~,
+  )
+}
+
+///|
+async fn read_input_file(path : String, limits~ : @archive.Limits) -> Bytes {
   let file = @fs.open(path, mode=ReadOnly)
   defer file.close()
   guard file.kind() == Regular else {
@@ -24,5 +47,5 @@ pub async fn open_file(
   guard file.read_some(max_len=1) is None else {
     fail("archive input grew while being read; retry from a stable file")
   }
-  @archive.Archive::open(bytes, limits~, password?)
+  bytes
 }

@@ -1,0 +1,121 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/encoding/base64",
+  "moonbitlang/x@0.5.5/crypto",
+}
+----
+
+///|
+async fn main {
+  let args = @env.args()
+  let target = args.get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("SFX workflow requires wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-sfx")
+  defer @fs.rmdir(root, recursive=true)
+  let command = ["run", "--target", target, "app", "--"]
+  for
+    (id, offset, hash) in [
+      (
+        "gui", 35328, "a0bbb70b702dbaac6ba7768faa02887224ca20c8c852f14b0d07fdc44a849022",
+      ),
+      (
+        "console", 34816, "934218948dcb8220b68e556ef63bd2932ddc4508251b3fe30f1cf6570a71e41b",
+      ),
+      (
+        "installer", 129082, "933e33f31f3dea0a07cacb2a3abf3f9597d9a76d2c422fd6bc504857e664040b",
+      ),
+    ] {
+    let text = @fs.read_file("corpus/sfx/" + id + ".base64").text()
+    let decoded = @base64.decode(text.split("\n").join(""))
+    assert_eq(@crypto.bytes_to_hex_string(@crypto.sha256(decoded)), hash)
+    let input = decoded + b"\x00\xfffooter"
+    let file = root + "/" + id + ".bin"
+    @fs.write_file(file, input)
+    let inventory = @shell.Cmd("moon", command + ["sfx-list", "--json", file]).output(
+      timeout_ms=120000,
+    )
+    assert_eq(inventory.exit_code(), 0)
+    let document = @json.parse(inventory.stdout())
+    assert_true(
+      document
+      is {
+        "schema": String("moon7z.embedded_inventory.v1"),
+        "contents_verified": False,
+        "envelope_verified": False,
+        "offset": Number(found, ..),
+        "prefix_base64": String(prefix),
+        "suffix_base64": String(suffix),
+        ..
+      } &&
+      found == offset.to_double() &&
+      @base64.decode(prefix) +
+      input[offset:offset + 5550].to_owned() +
+      @base64.decode(suffix) ==
+      input,
+    )
+    let report = @shell.Cmd("moon", command + ["sfx-test", "--json", file]).output(
+      timeout_ms=120000,
+    )
+    assert_eq(report.exit_code(), 0)
+    assert_true(
+      @json.parse(report.stdout())
+      is {
+        "schema": String("moon7z.embedded_verification.v1"),
+        "envelope_verified": False,
+        "verification": {
+          "contents_verified": True,
+          "bytes": Number(14229, ..),
+          ..
+        },
+        ..
+      },
+    )
+    @shell.Cmd(
+      "moon",
+      command + ["sfx-extract", "--contents-only", file, root, id],
+    ).run(timeout_ms=120000)
+    for
+      (original, name) in [
+        ("corpus/source/lzma-mbt/README.md", "README.md"),
+        ("corpus/source/lzma-mbt/LICENSE", "LICENSE"),
+        ("corpus/source/清单.json", "清单.json"),
+      ] {
+      assert_eq(
+        @fs.read_file(root + "/" + id + "/" + name).binary(),
+        @fs.read_file(original).binary(),
+      )
+    }
+    assert_eq(@fs.read_file(file).binary(), input)
+  }
+  let refused = @shell.Cmd(
+    "moon",
+    command +
+    [
+      "sfx-extract",
+      "--scan-bytes",
+      "35328",
+      "--contents-only",
+      root + "/gui.bin",
+      root,
+      "refused",
+    ],
+  ).output(timeout_ms=120000)
+  assert_true(refused.exit_code() != 0)
+  assert_eq(refused.stdout(), "")
+  assert_true(refused.stderr().contains("search_bytes"))
+  let normal = @shell.Cmd("moon", command + ["test", root + "/gui.bin"]).output(
+    timeout_ms=120000,
+  )
+  assert_true(normal.exit_code() != 0)
+  assert_eq(@fs.readdir(root, include_hidden=true).length(), 6)
+  println(
+    "Three SDK SFX envelopes: inventory round trip, payload verification, exact export, unchanged input and failed-export cleanup passed",
+  )
+}

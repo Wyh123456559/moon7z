@@ -5,6 +5,10 @@ pub extend ArchiveError with Show::{to_string, output}
 ///|
 pub impl Show for ArchiveError with fn output(self, logger) {
   match self {
+    SignatureNotFound(searched_bytes~) =>
+      logger.write_string(
+        "No CRC-valid 7z start header among the first \{searched_bytes} eligible input offsets. Check the input, increase search_bytes for a trusted larger stub, or use EmbeddedArchive::open_at with a known offset.",
+      )
     PasswordRequired =>
       logger.write_string(
         "This 7z stream requires a password. Supply Archive::open(password=...) or the CLI --password-env option.",
