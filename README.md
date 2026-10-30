@@ -5,6 +5,12 @@ returns complete file members and their metadata without launching 7-Zip or
 writing temporary files. It is intended for importers, resource managers and
 batch data tools that need to consume archives through an API.
 
+Positioned files, numeric volumes and SFX also support `SourceArchive::audit()`:
+identify damaged folders and affected members while continuing to healthy
+folders, without loading the complete source. Run `moon run app -- source-audit
+--json corpus/copy-plain.7z`; see [audit workflows](docs/audit.md) for volume/SFX
+commands, missing-CRC semantics and source I/O failure behavior.
+
 The project implements the 7z container and verified-import workflow. It reuses
 published LZMA2/filter/crypto APIs and includes attributed LZMA1, BCJ/BCJ2, PPMd7
 and BZip2 adaptations. It does not claim that the compression algorithms are

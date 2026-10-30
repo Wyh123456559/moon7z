@@ -1,5 +1,31 @@
 # Auditing damaged archives
 
+## Positioned files, volumes and SFX
+
+`SourceArchive::audit()` now supplies the same `AuditReport` and `moon7z.audit.v1`
+schema through bounded UInt64 positioned reads. Ordinary files, numeric volumes
+and the archive inside a `SourceEmbeddedArchive` use this method. It never loads
+the full source or accumulates decoded folders. Typed `ArchiveError` failures
+are recorded per folder; arbitrary source I/O exceptions propagate unchanged,
+so a caller can repair the source and retry. Cancellation is not swallowed.
+Invalid headers still prevent opening. A complete report may contain failed
+folders; inspect its status rather than treating CLI exit zero as integrity.
+
+```console
+moon run app -- source-audit --json corpus/copy-plain.7z
+moon run app -- source-volumes-audit --json part.001 part.002
+moon run app -- source-sfx-audit --json installer.exe
+moon run app -- source-sfx-volumes-audit --json installer.001 installer.002
+```
+
+SFX commands also accept the existing `--offset`/`--scan-bytes` and leading
+`--password-env` options. Their `moon7z.source_embedded_audit.v1` layout wraps
+the audit with exact decimal-string offsets/sizes and `envelope_verified: false`.
+The stub and suffix are never executed or authenticated. Missing CRCs remain
+explicit. These host workflows run on Wasm and native Linux/macOS/Windows.
+
+## In-memory archives
+
 Use `archive.audit()` when an archive ingestion service needs to identify every
 damaged data folder rather than stop at the first payload failure. Opening the
 archive must still succeed: malformed headers, unsupported codecs and unsafe

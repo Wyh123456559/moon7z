@@ -299,6 +299,7 @@ pub fn SeekableInput::slice(Self, UInt64, UInt64) -> Self raise ArchiveError
 pub struct SourceArchive {
   // private fields
 }
+pub async fn SourceArchive::audit(Self) -> AuditReport
 pub fn SourceArchive::entries(Self) -> Array[Entry]
 pub fn SourceArchive::file_properties(Self) -> Array[FileProperty]
 pub fn SourceArchive::inventory_json(Self) -> Json

@@ -45,6 +45,20 @@ async fn main {
       command + ["source-sfx-list", "--json", path],
     ).output(timeout_ms=120000)
     assert_eq(listed.exit_code(), 0)
+    let audited = @shell.Cmd(
+      "moon",
+      command + ["source-sfx-audit", "--json", path],
+    ).output(timeout_ms=120000)
+    assert_eq(audited.exit_code(), 0)
+    assert_true(
+      @json.parse(audited.stdout())
+      is {
+        "schema": String("moon7z.source_embedded_audit.v1"),
+        "envelope_verified": False,
+        "audit": { "all_available_checks_passed": True, .. },
+        ..
+      },
+    )
     assert_true(
       @json.parse(listed.stdout())
       is {

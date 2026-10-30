@@ -2,18 +2,21 @@
 async fn source_command(args : Array[String], password : String?) -> Bool {
   guard args.get(1) is Some(command) &&
     [
-      "source-list", "source-test", "source-read", "source-read-range", "source-extract",
+      "source-list", "source-test", "source-audit", "source-read", "source-read-range",
+      "source-extract",
     ].contains(command) else {
     return false
   }
-  let json = command == "source-list" || command == "source-test"
+  let json = command == "source-list" ||
+    command == "source-test" ||
+    command == "source-audit"
   let extract = command == "source-extract"
   guard (json && args.length() == 4 && args[2] == "--json") ||
     (extract && args.length() == 6 && args[2] == "--contents-only") ||
     (command == "source-read" && args.length() == 4) ||
     (command == "source-read-range" && args.length() == 6) else {
     fail(
-      "usage: source-list|source-test --json FILE OR source-read FILE ID OR source-read-range FILE ID OFFSET LENGTH OR source-extract --contents-only FILE PARENT NEW_NAME",
+      "usage: source-list|source-test|source-audit --json FILE OR source-read FILE ID OR source-read-range FILE ID OFFSET LENGTH OR source-extract --contents-only FILE PARENT NEW_NAME",
     )
   }
   let opened = @host.open_seekable_file(
@@ -25,6 +28,8 @@ async fn source_command(args : Array[String], password : String?) -> Bool {
     println(opened.archive.inventory_json().stringify())
   } else if command == "source-test" {
     println(opened.archive.verify().to_json().stringify())
+  } else if command == "source-audit" {
+    println(opened.archive.audit().to_json().stringify())
   } else if extract {
     let output = @host.export_source_contents(
       opened.archive,

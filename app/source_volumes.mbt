@@ -4,16 +4,16 @@ async fn source_volumes_command(
   password : String?,
 ) -> Bool {
   guard args.get(1) is Some(command) &&
-    ["source-volumes-list", "source-volumes-test", "source-volumes-extract"].contains(
-      command,
-    ) else {
+    [
+      "source-volumes-list", "source-volumes-test", "source-volumes-audit", "source-volumes-extract",
+    ].contains(command) else {
     return false
   }
   let extract = command == "source-volumes-extract"
   guard (extract && args.length() >= 6 && args[2] == "--contents-only") ||
     (!extract && args.length() >= 4 && args[2] == "--json") else {
     fail(
-      "usage: source-volumes-list|source-volumes-test --json PART.001 PART.002 ... OR source-volumes-extract --contents-only PARENT NEW_NAME PART.001 PART.002 ...",
+      "usage: source-volumes-list|source-volumes-test|source-volumes-audit --json PART.001 PART.002 ... OR source-volumes-extract --contents-only PARENT NEW_NAME PART.001 PART.002 ...",
     )
   }
   let opened = @host.open_seekable_volumes(
@@ -23,6 +23,8 @@ async fn source_volumes_command(
   defer opened.close()
   if command == "source-volumes-list" {
     println(opened.archive.inventory_json().stringify())
+  } else if command == "source-volumes-audit" {
+    println(opened.archive.audit().to_json().stringify())
   } else if extract {
     let result = @host.export_source_contents(
       opened.archive,

@@ -99,7 +99,8 @@ The core arithmetic, composition contracts and existing synchronous engine are
 checked on all four stable targets. Async source workflows currently run on
 Wasm and native via the host package. No browser/JavaScript Promise adapter is
 provided or claimed. [Seekable SFX discovery and split SFX](source-sfx.md) now
-use the same source engine. Source-reader batch/audit/diff convenience methods
+use the same source engine. `SourceArchive::audit()` now isolates typed folder
+failures; see [positioned audit](audit.md). Batch reads and source comparison
 remain future work; the original in-memory APIs retain them.
 
 ## Reproducible evidence

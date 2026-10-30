@@ -1,5 +1,9 @@
 # Sources and licenses
 
+Positioned audit implementation, tests and CLI integration are project-authored
+Apache-2.0. They reuse the existing attributed corpus and the project's original
+audit report model; no external algorithm, fixtures or tests were added.
+
 The API-level reuse boundary and current ecosystem comparison are documented in
 [docs/ecosystem.md](docs/ecosystem.md). The project does not claim that the LZMA,
 LZMA2 or adapted BCJ algorithms are original. `Sxy11112/moon7z` is an independently

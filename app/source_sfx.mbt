@@ -7,7 +7,7 @@ async fn source_sfx_command(
     [
       "source-sfx-list", "source-sfx-test", "source-sfx-read", "source-sfx-read-range",
       "source-sfx-extract", "source-sfx-volumes-list", "source-sfx-volumes-test",
-      "source-sfx-volumes-extract",
+      "source-sfx-volumes-extract", "source-sfx-audit", "source-sfx-volumes-audit",
     ].contains(command) else {
     return false
   }
@@ -30,9 +30,10 @@ async fn source_sfx_command(
   let volumes = command.has_prefix("source-sfx-volumes-")
   let listing = command.has_suffix("-list")
   let testing = command.has_suffix("-test")
+  let auditing = command.has_suffix("-audit")
   let extraction = command.has_suffix("-extract")
   guard (
-      (listing || testing) &&
+      (listing || testing || auditing) &&
       args.length() >= 4 &&
       args[2] == "--json" &&
       (if volumes { args.length() >= 4 } else { args.length() == 4 })
@@ -46,7 +47,7 @@ async fn source_sfx_command(
     (command == "source-sfx-read" && args.length() == 4) ||
     (command == "source-sfx-read-range" && args.length() == 6) else {
     fail(
-      "usage: source-sfx-list|source-sfx-test [--scan-bytes N|--offset N] --json FILE; source-sfx-read FILE ID; source-sfx-read-range FILE ID OFFSET LENGTH; source-sfx-extract --contents-only FILE PARENT NEW_NAME; source-sfx-volumes-list|test --json PART...; source-sfx-volumes-extract --contents-only PARENT NEW_NAME PART...",
+      "usage: source-sfx-list|source-sfx-test|source-sfx-audit [--scan-bytes N|--offset N] --json FILE; source-sfx-read FILE ID; source-sfx-read-range FILE ID OFFSET LENGTH; source-sfx-extract --contents-only FILE PARENT NEW_NAME; source-sfx-volumes-list|test|audit --json PART...; source-sfx-volumes-extract --contents-only PARENT NEW_NAME PART...",
     )
   }
   let opened = if volumes {
@@ -58,7 +59,7 @@ async fn source_sfx_command(
     )
   } else {
     @host.open_seekable_sfx_file(
-      args[if listing || testing || extraction { 3 } else { 2 }],
+      args[if listing || testing || auditing || extraction { 3 } else { 2 }],
       password?,
       offset?,
       search_bytes~,
@@ -68,6 +69,16 @@ async fn source_sfx_command(
   let embedded = opened.embedded
   if listing {
     println(embedded.inventory_json().stringify())
+  } else if auditing {
+    let json : Json = {
+      "schema": "moon7z.source_embedded_audit.v1",
+      "envelope_verified": false,
+      "offset": Json(embedded.offset.to_string()),
+      "archive_bytes": Json(embedded.payload.size.to_string()),
+      "suffix_bytes": Json(embedded.suffix.size.to_string()),
+      "audit": embedded.archive.audit().to_json(),
+    }
+    println(json.stringify())
   } else if testing {
     let report = embedded.archive.verify()
     let json : Json = {

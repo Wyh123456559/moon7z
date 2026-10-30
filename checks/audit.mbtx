@@ -59,6 +59,42 @@ async fn main {
   ]).output(timeout_ms=120000)
   assert_true(strict.exit_code() != 0)
   assert_true(strict.stdout().is_empty())
+  for input in ["corpus/copy-plain.7z", path] {
+    let positioned = @shell.Cmd("moon", [
+      "run", "--target", target, "app", "--", "source-audit", "--json", input,
+    ]).output(timeout_ms=120000)
+    assert_eq(positioned.exit_code(), 0)
+    let memory = @shell.Cmd("moon", args + [input]).output(timeout_ms=120000)
+    let actual = @json.parse(positioned.stdout())
+    let expected = @json.parse(memory.stdout())
+    if input == path {
+      assert_true(
+        actual
+        is {
+          "all_available_checks_passed": False,
+          "folders": Array(
+            [
+              { "status": String("failed"), .. },
+              { "status": String("passed"), .. },
+              _,
+              _,
+            ]
+          ),
+          ..
+        },
+      )
+    } else {
+      assert_eq(actual, expected)
+    }
+  }
+  let split = @shell.Cmd("moon", [
+    "run", "--target", target, "app", "--", "source-volumes-audit", "--json", "corpus/volumes/fixed/package.7z.001",
+    "corpus/volumes/fixed/package.7z.002", "corpus/volumes/fixed/package.7z.003",
+  ]).output(timeout_ms=120000)
+  assert_eq(split.exit_code(), 0)
+  assert_true(
+    @json.parse(split.stdout()) is { "all_available_checks_passed": True, .. },
+  )
   @fs.write_file(root + "/truncated.7z", b"7z")
   let bad_header = @shell.Cmd("moon", args + [root + "/truncated.7z"]).output(
     timeout_ms=120000,
