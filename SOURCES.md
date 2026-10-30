@@ -1,5 +1,9 @@
 # Sources and licenses
 
+Positioned batch reads, selection planning/export and their tests/example are
+project-authored Apache-2.0. They reuse existing attributed archive fixtures and
+the original in-memory request/path semantics; no external test code was copied.
+
 Positioned audit implementation, tests and CLI integration are project-authored
 Apache-2.0. They reuse the existing attributed corpus and the project's original
 audit report model; no external algorithm, fixtures or tests were added.

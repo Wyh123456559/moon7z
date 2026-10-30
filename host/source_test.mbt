@@ -92,6 +92,12 @@ async test "virtual archive above four GiB reads only header and selected folder
   assert_eq(calls[2], (4294967328UL, expected.length()))
   assert_eq(reader.read_range(64, offset=0, length=1), expected[:1].to_owned())
   assert_eq(calls.length(), 3)
+  assert_eq(reader.read_many([64, 64])[1].bytes, expected)
+  assert_eq(
+    reader.read_ranges([@archive.RangeRequest::new(64, offset=0, length=3)])[0],
+    expected[:3].to_owned(),
+  )
+  assert_eq(calls.length(), 3)
   let document = archive.inventory_json()
   assert_true(
     document is { "source_bytes": String(size), "contents_verified": False, .. } &&

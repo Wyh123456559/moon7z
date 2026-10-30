@@ -11,6 +11,11 @@ folders, without loading the complete source. Run `moon run app -- source-audit
 --json corpus/copy-plain.7z`; see [audit workflows](docs/audit.md) for volume/SFX
 commands, missing-CRC semantics and source I/O failure behavior.
 
+Positioned readers also provide grouped `read_many`/`read_ranges` and exact
+selected export with preflight limits and rollback. See
+[batch and selected source workflows](docs/seekable.md#batches-and-selected-export)
+and the runnable `examples/source-select` application.
+
 The project implements the 7z container and verified-import workflow. It reuses
 published LZMA2/filter/crypto APIs and includes attributed LZMA1, BCJ/BCJ2, PPMd7
 and BZip2 adaptations. It does not claim that the compression algorithms are

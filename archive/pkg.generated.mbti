@@ -307,6 +307,7 @@ pub fn SourceArchive::is_encrypted(Self) -> Bool
 pub fn SourceArchive::metadata_streams(Self) -> Array[Bytes]
 pub async fn SourceArchive::open(SeekableInput, limits? : Limits, max_source_bytes? : UInt64, max_output_bytes? : UInt64, password? : String) -> Self
 pub fn SourceArchive::plan_contents(Self) -> ContentPlan raise ArchiveError
+pub fn SourceArchive::plan_selection(Self, ArrayView[Int32]) -> ContentPlan raise ArchiveError
 pub fn SourceArchive::properties(Self) -> Array[ArchiveProperty]
 pub fn SourceArchive::reader(Self, cache_bytes? : Int32) -> SourceReader raise ArchiveError
 pub fn SourceArchive::source_size(Self) -> UInt64
@@ -328,7 +329,9 @@ pub struct SourceReader {
 }
 pub fn SourceReader::clear_cache(Self) -> Unit
 pub async fn SourceReader::read(Self, Int32) -> Member
+pub async fn SourceReader::read_many(Self, ArrayView[Int32]) -> Array[Member]
 pub async fn SourceReader::read_range(Self, Int32, offset~ : Int32, length~ : Int32) -> Bytes
+pub async fn SourceReader::read_ranges(Self, ArrayView[RangeRequest]) -> Array[Bytes]
 pub fn SourceReader::stats(Self) -> ReaderStats
 
 pub struct SourceVerification {

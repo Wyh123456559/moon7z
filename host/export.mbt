@@ -85,6 +85,34 @@ pub async fn export_source_contents(
     fail("export name must be a single directory component")
   }
   let plan = archive.plan_contents()
+  publish_source_contents(archive, plan, parent~, name~)
+}
+
+///|
+/// Export exactly selected source member IDs, using the same no-replace staging
+/// and metadata policy as export_source_contents. Unselected folders are not
+/// verified; selected solid siblings are. Empty selection creates an empty tree.
+pub async fn export_source_selected(
+  archive : @archive.SourceArchive,
+  ids : ArrayView[Int32],
+  parent~ : String,
+  name~ : String,
+) -> ExportedContents {
+  @archive.validate_path(name)
+  guard !name.contains("/") else {
+    fail("export name must be a single directory component")
+  }
+  let plan = archive.plan_selection(ids)
+  publish_source_contents(archive, plan, parent~, name~)
+}
+
+///|
+async fn publish_source_contents(
+  archive : @archive.SourceArchive,
+  plan : @archive.ContentPlan,
+  parent~ : String,
+  name~ : String,
+) -> ExportedContents {
   let (scheduled, cache_bytes) = schedule_entries(
     archive.entries(),
     plan.entries(),

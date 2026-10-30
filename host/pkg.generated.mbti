@@ -12,6 +12,8 @@ pub async fn export_selected(@archive.Archive, ArrayView[Int32], parent~ : Strin
 
 pub async fn export_source_contents(@archive.SourceArchive, parent~ : String, name~ : String) -> ExportedContents
 
+pub async fn export_source_selected(@archive.SourceArchive, ArrayView[Int32], parent~ : String, name~ : String) -> ExportedContents
+
 pub async fn open_embedded_file(String, limits? : @archive.Limits, password? : String, search_bytes? : Int32) -> @archive.EmbeddedArchive
 
 pub async fn open_file(String, limits? : @archive.Limits, password? : String) -> @archive.Archive

@@ -1,0 +1,48 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+}
+----
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-source-select")
+  defer @fs.rmdir(root, recursive=true)
+  let command = [
+    "run", "--target", target, "app", "--", "source-extract-selected", "--contents-only",
+  ]
+  @shell.Cmd(
+    "moon",
+    command + ["corpus/lzma2-solid.7z", root, "selected", "6", "3"],
+  ).run(timeout_ms=120000)
+  assert_eq(
+    @fs.read_file(root + "/selected/清单.json").binary(),
+    @fs.read_file("corpus/source/清单.json").binary(),
+  )
+  assert_eq(@fs.readdir(root + "/selected/lzma-mbt"), ["LICENSE"])
+  let refused = @shell.Cmd(
+    "moon",
+    command + ["corpus/lzma2-solid.7z", root, "duplicate", "6", "6"],
+  ).output(timeout_ms=120000)
+  assert_true(refused.exit_code() != 0)
+  assert_true(refused.stdout().is_empty())
+  assert_eq(@fs.readdir(root), ["selected"])
+  @shell.Cmd("moon", [
+    "run", "--target", target, "examples/source-select", "--", "corpus/lzma2-solid.7z",
+    root, "example", "6",
+  ]).run(timeout_ms=120000)
+  assert_eq(
+    @fs.read_file(root + "/example/清单.json").binary(),
+    @fs.read_file("corpus/source/清单.json").binary(),
+  )
+  println(
+    "Positioned selection CLI and batch example preserve exact bytes and reject duplicate IDs without output",
+  )
+}

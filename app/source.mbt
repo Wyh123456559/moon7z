@@ -3,7 +3,7 @@ async fn source_command(args : Array[String], password : String?) -> Bool {
   guard args.get(1) is Some(command) &&
     [
       "source-list", "source-test", "source-audit", "source-read", "source-read-range",
-      "source-extract",
+      "source-extract", "source-extract-selected",
     ].contains(command) else {
     return false
   }
@@ -11,16 +11,18 @@ async fn source_command(args : Array[String], password : String?) -> Bool {
     command == "source-test" ||
     command == "source-audit"
   let extract = command == "source-extract"
+  let selected = command == "source-extract-selected"
   guard (json && args.length() == 4 && args[2] == "--json") ||
     (extract && args.length() == 6 && args[2] == "--contents-only") ||
+    (selected && args.length() >= 7 && args[2] == "--contents-only") ||
     (command == "source-read" && args.length() == 4) ||
     (command == "source-read-range" && args.length() == 6) else {
     fail(
-      "usage: source-list|source-test|source-audit --json FILE OR source-read FILE ID OR source-read-range FILE ID OFFSET LENGTH OR source-extract --contents-only FILE PARENT NEW_NAME",
+      "usage: source-list|source-test|source-audit --json FILE OR source-read FILE ID OR source-read-range FILE ID OFFSET LENGTH OR source-extract --contents-only FILE PARENT NEW_NAME OR source-extract-selected --contents-only FILE PARENT NEW_NAME ID...",
     )
   }
   let opened = @host.open_seekable_file(
-    args[if json || extract { 3 } else { 2 }],
+    args[if json || extract || selected { 3 } else { 2 }],
     password?,
   )
   defer opened.close()
@@ -30,6 +32,17 @@ async fn source_command(args : Array[String], password : String?) -> Bool {
     println(opened.archive.verify().to_json().stringify())
   } else if command == "source-audit" {
     println(opened.archive.audit().to_json().stringify())
+  } else if selected {
+    let ids = args[6:].map(id => @string.parse_int(id))
+    let output = @host.export_source_selected(
+      opened.archive,
+      ids[:],
+      parent=args[4],
+      name=args[5],
+    )
+    println(
+      "Exported \{output.entries.length()} selected entries to \{output.directory}; unselected folders were not verified and metadata was not applied",
+    )
   } else if extract {
     let output = @host.export_source_contents(
       opened.archive,

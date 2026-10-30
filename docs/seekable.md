@@ -100,8 +100,39 @@ checked on all four stable targets. Async source workflows currently run on
 Wasm and native via the host package. No browser/JavaScript Promise adapter is
 provided or claimed. [Seekable SFX discovery and split SFX](source-sfx.md) now
 use the same source engine. `SourceArchive::audit()` now isolates typed folder
-failures; see [positioned audit](audit.md). Batch reads and source comparison
-remain future work; the original in-memory APIs retain them.
+failures; see [positioned audit](audit.md). Batches and selected export are
+available through `SourceReader::read_many/read_ranges`,
+`SourceArchive::plan_selection` and `host.export_source_selected`.
+Source comparison remains future work.
+
+## Batches and selected export
+
+`read_many(ids)` retains request order and duplicate IDs. `read_ranges(requests)`
+accepts the existing `RangeRequest` type, including overlaps, duplicates and empty
+EOF ranges. Every ID/range and combined returned-byte budget is validated before
+I/O or cache changes. Each selected folder decodes at most once per call even
+with `cache_bytes=0`; the request count and total copies are bounded by
+`Limits.entries/output_bytes`. This is not seeking within compressed solid data.
+All available CRCs of selected solid siblings are checked; unselected folders
+are not verified. Failed loads clear unchecked cache data and permit retry.
+
+`plan_selection(ids)` and `host.export_source_selected(archive, ids, parent~, name~)`
+apply the existing safe path, no-replace staging and contents-only metadata
+contract. Duplicate IDs, aliases and unsupported file semantics fail before
+staging. A directory ID selects no children; an empty library selection creates
+an empty directory. Returned original metadata follows request order. Later
+source/CRC failures remove earlier staged files. Files, volumes and embedded
+SFX expose the same `SourceArchive`, so these APIs apply to all three.
+
+```console
+moon run app -- source-extract-selected --contents-only corpus/lzma2-solid.7z . chosen 6 3
+moon run examples/source-select -- corpus/lzma2-solid.7z . previewed 6
+moon run checks/source-select.mbtx -- wasm
+moon run checks/source-select.mbtx -- native
+```
+
+The example checks selected zero-length intervals before exporting exact files.
+It accepts real file paths/IDs; use a new output directory name on each run.
 
 ## Reproducible evidence
 
