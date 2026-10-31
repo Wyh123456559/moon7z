@@ -1,0 +1,72 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+}
+----
+
+///|
+fn setting(config : String, key : String) -> String raise {
+  for line in config.split("\n") {
+    if line.trim().has_prefix(key + " =") {
+      let fields = line.split("\"").collect()
+      guard fields.length() == 3 else { fail("expected quoted module " + key) }
+      return fields[1].to_owned()
+    }
+  }
+  fail("missing module setting: " + key)
+}
+
+///|
+async fn main {
+  let repo = @fs.realpath(".")
+  let config = @fs.read_file("moon.mod").text()
+  let name = setting(config, "name").split("/").join("-")
+  let version = setting(config, "version")
+  @shell.Cmd("moon", ["package"]).run(timeout_ms=120000)
+  let zip = repo + "/_build/publish/" + name + "-" + version + ".zip"
+  let root = @fs.tmpdir(prefix="moon7z-package-check")
+  defer @fs.rmdir(root, recursive=true)
+  if @async.platform is Windows {
+    @shell.Cmd("tar", ["-xf", zip, "-C", root]).run()
+  } else {
+    @shell.Cmd("unzip", ["-q", zip, "-d", root]).run()
+  }
+  assert_true(!@fs.exists(root + "/_build"))
+  assert_true(!@fs.exists(root + "/.mooncakes"))
+  assert_true(@fs.exists(root + "/LICENSE"))
+  assert_true(@fs.exists(root + "/SOURCES.md"))
+  let mut outputs = 0
+  for directory in ["archive", "tests/lzma1", "tests/sfx", "tests/volumes"] {
+    let config = @fs.read_file(root + "/" + directory + "/moon.pkg").text()
+    for line in config.split("\n") {
+      if line.trim().has_prefix("output:") {
+        let fields = line.split("\"").collect()
+        guard fields.length() == 3 else {
+          fail("expected a quoted dev_build output")
+        }
+        let path = root + "/" + directory + "/" + fields[1].to_owned()
+        assert_true(
+          @fs.exists(path),
+          msg="missing packaged generated fixture: " + path,
+        )
+        outputs += 1
+      }
+    }
+  }
+  assert_true(outputs > 0)
+  @shell.Cmd(
+    "moon",
+    ["check", "--target", "wasm", "--deny-warn", "-j", "2"],
+    cwd=root,
+  ).run(timeout_ms=180000)
+  @shell.Cmd(
+    "moon",
+    ["test", "--target", "wasm", "--deny-warn", "-j", "2"],
+    cwd=root,
+  ).run(timeout_ms=180000)
+  println(
+    "Packaged module checks and tests passed with \{outputs} generated fixture declarations present and caches excluded",
+  )
+}

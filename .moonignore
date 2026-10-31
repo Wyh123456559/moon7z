@@ -1,0 +1,6 @@
+# Release packages retain generated test fixture declarations. Development Git
+# ignores them, but published dependencies cannot run dev_build rules.
+_build/
+/out/
+/moon.lock
+!/.moonignore

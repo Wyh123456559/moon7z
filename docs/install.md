@@ -79,3 +79,11 @@ The synchronous `archive` package supports Wasm, Wasm-GC, JavaScript and native.
 `host`, positioned file I/O and this async consumer run on Wasm/native, including
 Windows, Linux and macOS. There is no browser Promise adapter. Source/volume/SFX
 lifetime, password and export policies are unchanged by registry installation.
+
+## Distribution checks
+
+`.moonignore` deliberately includes generated test fixture declarations, while
+excluding build/cache directories. Published dependencies do not run development
+build rules, so a source-check success alone does not establish package usability.
+`moon run checks/package.mbtx` inspects every declared embedded-resource output,
+then checks and tests a newly extracted package. CI runs it on the Wasm job.
