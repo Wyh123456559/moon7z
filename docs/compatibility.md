@@ -39,10 +39,11 @@ delete files or silently omit metadata. Contents-only export must stay explicit.
 | Integrity | All available pack/folder/member CRCs in verified scope; missing member CRCs explicit | Same behavior for all new graph/method/volume paths; CRC is not authenticity |
 | Publishing | No-replace staging, exact selected IDs, metadata returned rather than applied | Preserve these contracts while expanding readable inputs; unsafe export must fail clearly |
 
-Every pending row is a real gap. In particular, remaining
-publication and independent installation must not be relabeled complete merely
-because additional codecs now pass. A larger test count cannot substitute for
-these rows.
+Every pending row is a real gap. Module 0.1.0 publication and independent
+installed-consumer validation are now recorded in the [release evidence](release-0.1.0.md).
+Those release checks do not replace the complete per-feature/producer matrix or
+establish that the entire 1.0 profile is complete. A larger test count cannot
+substitute for a missing required case.
 
 ## Producer and feature matrix
 

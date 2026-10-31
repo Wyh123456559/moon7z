@@ -45,6 +45,8 @@ Import `Wyh123456559/moon7z/archive` for the synchronous portable core, or
 `Wyh123456559/moon7z/host` for async Wasm/native file workflows. See
 [installed consumer guide](docs/install.md) for complete module/package files
 and a runnable program. The commands below run inside a clone of this repository.
+Version 0.1.0 publication, artifact hash and independent installed-consumer
+results are recorded in the [release evidence](docs/release-0.1.0.md).
 
 ```console
 moon update

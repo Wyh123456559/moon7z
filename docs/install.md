@@ -1,5 +1,10 @@
 # Install and use Moon7z 0.1.0
 
+Version 0.1.0 is published. See the [release record](release-0.1.0.md) for the
+uploaded/downloaded archive hash, source revision and independent installed
+consumer results. That validation used `moon 0.1.20261023` / `moonc v0.10.17`;
+use a compatible toolchain when following these steps.
+
 The module is `Wyh123456559/moon7z`; the main library packages are `archive`
 and `host`. This is an initial public API release with the explicitly documented
 [compatibility profile](compatibility.md), not a claim of complete 7-Zip support.
