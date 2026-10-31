@@ -35,6 +35,17 @@ not yet complete; passing the current tests does not imply full 7z coverage.
 
 ## Use it
 
+Install the versioned library in your own module:
+
+```console
+moon add Wyh123456559/moon7z@0.1.0
+```
+
+Import `Wyh123456559/moon7z/archive` for the synchronous portable core, or
+`Wyh123456559/moon7z/host` for async Wasm/native file workflows. See
+[installed consumer guide](docs/install.md) for complete module/package files
+and a runnable program. The commands below run inside a clone of this repository.
+
 ```console
 moon update
 moon run app -- list corpus/lzma2-solid.7z
@@ -60,7 +71,7 @@ The example imports the JSON manifest only after the entire archive has passed
 its available CRC checks. It accepts a real archive path; the included corpus
 also contains an upstream open-source project's README, license and module file.
 
-Add `Wyh123456559/moon7z/archive` to a package's imports inside this checkout:
+Add `Wyh123456559/moon7z/archive` to your package's imports:
 
 ```moonbit
 let archive = @archive.Archive::open(bytes)
@@ -72,7 +83,7 @@ for item in archive.extract_all() {
 ```
 
 This is an API sketch: `bytes` and `consume` belong to the application. The
-module has not been published to Mooncakes. The generated interface in
+generated interface in
 [`archive/pkg.generated.mbti`](archive/pkg.generated.mbti) is the API reference.
 
 For previews, create `let reader = archive.reader(cache_bytes=32 * 1024 * 1024)`

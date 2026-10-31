@@ -117,5 +117,5 @@ Windows runs real smaller SFX and virtual UInt64 offset tests; sparse large-file
 materialization is restricted to Linux/macOS. Core numeric/discovery tests and
 existing portable functionality run on all four stable targets; async host
 workflows run on Wasm and native Linux/macOS/Windows. No browser adapter or
-arbitrary executable-format validation is claimed. Mooncakes publication and
-independent installed-consumer validation remain separate release work.
+arbitrary executable-format validation is claimed. Registry installation and
+independent consumer reproduction are covered by the [installation guide](install.md).
