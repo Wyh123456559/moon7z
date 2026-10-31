@@ -1,5 +1,11 @@
 # Sources and licenses
 
+Positioned comparison and its tests/CLI are project-authored Apache-2.0. They
+reuse attributed existing producer, metadata, volume and SDK SFX fixtures. The
+additional Copy/empty-member framing is project-authored test data (not claimed
+as independent producer validation), deliberately without payload CRCs to test
+byte equality; UInt64 JSON boundary tests are model tests, not huge-file runs.
+
 Positioned batch reads, selection planning/export and their tests/example are
 project-authored Apache-2.0. They reuse existing attributed archive fixtures and
 the original in-memory request/path semantics; no external test code was copied.

@@ -1,5 +1,44 @@
 # Compare package contents across archives
 
+## Positioned files, volumes and SFX
+
+`left.compare(right, require_member_crcs?)` on two `SourceArchive` values returns
+`SourceComparison`. Files, numeric volumes and embedded SFX use the same API and
+may be compared across input types. Open each side with its own password when
+needed. Both sources must remain stable and open throughout the operation.
+
+The report uses `moon7z.source_comparison.v1`, the same six `ChangeKind` values
+and original metadata/property records as in-memory comparison, and UInt64
+verification totals serialized as decimal strings. Duplicate names fail before
+main-payload I/O. Both archives are fully verified before comparing, including
+added/removed members; errors propagate without returning a partial report.
+The optional strict policy requires individual CRCs, including for empty files.
+
+Files compare actual bytes using at most 64 KiB returned copies per side.
+Two internal readers each retain at most one decoded folder, sized up to that
+archive's existing per-folder limit. Packed/decoder buffers coexist with these
+caches; no measured peak-memory or speed claim is made. This does not stream
+within a compressed solid folder. Verification and later comparisons may decode
+folders again. Large input size does not bypass per-folder resource limits.
+
+```console
+moon run app -- source-diff --json corpus/copy-plain.7z corpus/lzma2-solid.7z
+moon run app -- source-sfx-diff --json old-installer.exe new-installer.exe
+moon run checks/source-compare.mbtx -- wasm
+moon run checks/source-compare.mbtx -- native
+```
+
+The CLI exits zero for a complete equal or different report; inspect `identical`.
+Opening, source I/O, decryption or integrity failures exit nonzero with empty
+stdout. `scope: decoded_archive_contents_and_metadata` explicitly excludes SFX
+prefix/config/trailer bytes and volume layout; it is not executable equality or
+authenticity. Missing CRCs remain visible, and same-length concurrent source
+mutation cannot be ruled out by this API. Existing synchronous comparison is
+unchanged. The end-to-end check compares real differently packed archives and
+official SDK GUI/console SFX, then refuses a damaged archive with removed data.
+
+## In-memory archives
+
 Use a verified content comparison when updating resource packs or checking a
 repacked distribution. Both archives must have unique original member names.
 No extraction directory or private service is needed:

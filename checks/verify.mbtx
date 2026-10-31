@@ -44,6 +44,7 @@ async fn main {
       ["fmt", "--check", "checks/source.mbtx"],
       ["fmt", "--check", "checks/source-sfx.mbtx"],
       ["fmt", "--check", "checks/source-select.mbtx"],
+      ["fmt", "--check", "checks/source-compare.mbtx"],
       ["fmt", "--check", "corpus/sfx/materialize-large.mbtx"],
       ["fmt", "--check", "corpus/source64/generate.mbtx"],
       ["fmt", "--check", "corpus/source64/materialize.mbtx"],
@@ -73,6 +74,9 @@ async fn main {
   }
   @shell.Cmd("git", ["diff", "--exit-code", "--", "*.mbti"]).run()
   if target == "wasm" || target == "native" {
+    @shell.Cmd("moon", ["run", "checks/source-compare.mbtx", "--", target]).run(
+      timeout_ms=240000,
+    )
     @shell.Cmd("moon", ["run", "checks/source-select.mbtx", "--", target]).run(
       timeout_ms=240000,
     )

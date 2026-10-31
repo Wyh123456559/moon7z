@@ -300,6 +300,7 @@ pub struct SourceArchive {
   // private fields
 }
 pub async fn SourceArchive::audit(Self) -> AuditReport
+pub async fn SourceArchive::compare(Self, Self, require_member_crcs? : Bool) -> SourceComparison
 pub fn SourceArchive::entries(Self) -> Array[Entry]
 pub fn SourceArchive::file_properties(Self) -> Array[FileProperty]
 pub fn SourceArchive::inventory_json(Self) -> Json
@@ -312,6 +313,17 @@ pub fn SourceArchive::properties(Self) -> Array[ArchiveProperty]
 pub fn SourceArchive::reader(Self, cache_bytes? : Int32) -> SourceReader raise ArchiveError
 pub fn SourceArchive::source_size(Self) -> UInt64
 pub async fn SourceArchive::verify(Self, require_member_crcs? : Bool) -> SourceVerification
+
+pub struct SourceComparison {
+  // private fields
+}
+pub fn SourceComparison::archive_properties_changed(Self) -> Bool
+pub fn SourceComparison::changes(Self) -> Array[EntryChange]
+pub fn SourceComparison::file_properties_changed(Self) -> Bool
+pub fn SourceComparison::identical(Self) -> Bool
+pub fn SourceComparison::metadata_streams_changed(Self) -> Bool
+pub fn SourceComparison::to_json(Self) -> Json
+pub impl ToJson for SourceComparison
 
 pub struct SourceEmbeddedArchive {
   offset : UInt64

@@ -1,0 +1,69 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/encoding/base64",
+}
+----
+
+///|
+async fn main {
+  let target = @env.args().get(1).unwrap_or("wasm")
+  guard target == "wasm" || target == "native" else {
+    fail("expected wasm or native")
+  }
+  let root = @fs.tmpdir(prefix="moon7z-source-compare")
+  defer @fs.rmdir(root, recursive=true)
+  let command = ["run", "--target", target, "app", "--"]
+  let result = @shell.Cmd(
+    "moon",
+    command +
+    ["source-diff", "--json", "corpus/copy-plain.7z", "corpus/lzma2-solid.7z"],
+  ).output(timeout_ms=120000)
+  assert_eq(result.exit_code(), 0)
+  assert_true(
+    @json.parse(result.stdout())
+    is {
+      "schema": String("moon7z.source_comparison.v1"),
+      "identical": True,
+      "left_verification": { "bytes": String("14550"), .. },
+      ..
+    },
+  )
+  let bytes = @fs.read_file("corpus/copy-plain.7z").binary().to_array()
+  bytes[32] = (bytes[32].to_int() ^ 1).to_byte()
+  @fs.write_file(root + "/bad.7z", Bytes::from_array(bytes))
+  let refused = @shell.Cmd(
+    "moon",
+    command + ["source-diff", "--json", root + "/bad.7z", "corpus/binary.7z"],
+  ).output(timeout_ms=120000)
+  assert_true(refused.exit_code() != 0)
+  assert_true(refused.stdout().is_empty())
+  for name in ["gui", "console"] {
+    let text = @fs.read_file("corpus/sfx/" + name + ".base64").text()
+    @fs.write_file(
+      root + "/" + name + ".bin",
+      @base64.decode(text.split("\n").join("")),
+    )
+  }
+  let sfx = @shell.Cmd(
+    "moon",
+    command +
+    ["source-sfx-diff", "--json", root + "/gui.bin", root + "/console.bin"],
+  ).output(timeout_ms=120000)
+  assert_eq(sfx.exit_code(), 0)
+  assert_true(
+    @json.parse(sfx.stdout())
+    is {
+      "scope": String("decoded_archive_contents_and_metadata"),
+      "identical": True,
+      ..
+    },
+  )
+  println(
+    "Positioned version comparison ignores repacking and SFX envelopes, verifies both sides and refuses damaged removed data without output",
+  )
+}

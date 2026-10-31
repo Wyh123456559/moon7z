@@ -21,6 +21,9 @@ async fn main {
   if source_command(args, password) {
     return
   }
+  if source_compare_command(args, password) {
+    return
+  }
   if source_volumes_command(args, password) {
     return
   }

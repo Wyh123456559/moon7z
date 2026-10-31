@@ -103,7 +103,9 @@ use the same source engine. `SourceArchive::audit()` now isolates typed folder
 failures; see [positioned audit](audit.md). Batches and selected export are
 available through `SourceReader::read_many/read_ranges`,
 `SourceArchive::plan_selection` and `host.export_source_selected`.
-Source comparison remains future work.
+`SourceArchive::compare()` also provides fully verified, deterministic content
+and metadata comparisons without loading complete inputs; see
+[positioned version comparison](comparison.md#positioned-files-volumes-and-sfx).
 
 ## Batches and selected export
 

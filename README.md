@@ -16,6 +16,12 @@ selected export with preflight limits and rollback. See
 [batch and selected source workflows](docs/seekable.md#batches-and-selected-export)
 and the runnable `examples/source-select` application.
 
+`SourceArchive::compare` checks both complete archives and compares actual bytes
+and retained metadata through positioned reads, with UInt64 verification totals.
+Run `moon run app -- source-diff --json corpus/copy-plain.7z
+corpus/lzma2-solid.7z`; [source comparison](docs/comparison.md) also covers SFX,
+duplicate names, missing checksums and bounded comparison buffers.
+
 The project implements the 7z container and verified-import workflow. It reuses
 published LZMA2/filter/crypto APIs and includes attributed LZMA1, BCJ/BCJ2, PPMd7
 and BZip2 adaptations. It does not claim that the compression algorithms are
